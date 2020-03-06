@@ -1,0 +1,4 @@
+* change MutationIdentifier: after a copy, there are two elements with the same ID
+    -> check ID after copy operations
+
+* don't mutate declaration statements?
