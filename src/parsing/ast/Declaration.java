@@ -2,6 +2,8 @@ package parsing.ast;
 
 import java.util.function.BiFunction;
 
+import parsing.ast.operations.IAstVisitor;
+
 public class Declaration extends AstElement {
     
     public Type type;
@@ -36,8 +38,8 @@ public class Declaration extends AstElement {
     }
     
     @Override
-    public void accept(IAstVisitor visitor) {
-        visitor.visitDeclaration(this);
+    public <T> T accept(IAstVisitor<T> visitor) {
+        return visitor.visitDeclaration(this);
     }
 
     @Override

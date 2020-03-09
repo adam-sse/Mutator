@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.StringJoiner;
 import java.util.function.BiFunction;
 
+import parsing.ast.operations.IAstVisitor;
+
 public class Function extends AstElement {
 
     public Type type;
@@ -66,8 +68,8 @@ public class Function extends AstElement {
     }
     
     @Override
-    public void accept(IAstVisitor visitor) {
-        visitor.visitFunction(this);
+    public <T> T accept(IAstVisitor<T> visitor) {
+        return visitor.visitFunction(this);
     }
 
     @Override

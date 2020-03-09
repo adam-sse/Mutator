@@ -41,8 +41,7 @@ public class CopyOverrideExpression extends Mutation {
                 srcCopy.id = newId;
             }
             
-            replacer.replace(targetElem, srcCopy);
-            success = replacer.success;
+            success = replacer.replace(targetElem, srcCopy);
             
             if (success) {
                 this.diff = new ArrayList<>(2);

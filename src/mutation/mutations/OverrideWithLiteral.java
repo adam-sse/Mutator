@@ -71,8 +71,7 @@ public class OverrideWithLiteral extends Mutation {
             
             
             ElementReplacer<AstElement> replacer = new ElementReplacer<>();
-            replacer.replace(targetElem, replaceWith);
-            success = replacer.success;
+            success = replacer.replace(targetElem, replaceWith);
             
             if (success) {
                 this.diff = new ArrayList<>(2);

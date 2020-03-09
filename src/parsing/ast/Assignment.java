@@ -2,6 +2,8 @@ package parsing.ast;
 
 import java.util.function.BiFunction;
 
+import parsing.ast.operations.IAstVisitor;
+
 public class Assignment extends Statement {
     
     public Expression variable;
@@ -37,8 +39,8 @@ public class Assignment extends Statement {
     }
     
     @Override
-    public void accept(IAstVisitor visitor) {
-        visitor.visitAssignment(this);
+    public <T> T accept(IAstVisitor<T> visitor) {
+        return visitor.visitAssignment(this);
     }
     
     @Override

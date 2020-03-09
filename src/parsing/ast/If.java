@@ -2,6 +2,8 @@ package parsing.ast;
 
 import java.util.function.BiFunction;
 
+import parsing.ast.operations.IAstVisitor;
+
 public class If extends Statement {
 
     public Expression condition;
@@ -64,8 +66,8 @@ public class If extends Statement {
     }
     
     @Override
-    public void accept(IAstVisitor visitor) {
-        visitor.visitIf(this);
+    public <T> T accept(IAstVisitor<T> visitor) {
+        return visitor.visitIf(this);
     }
 
     @Override

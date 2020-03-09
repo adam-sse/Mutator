@@ -2,6 +2,8 @@ package parsing.ast;
 
 import java.util.function.BiFunction;
 
+import parsing.ast.operations.IAstVisitor;
+
 public class DoWhileLoop extends Loop {
 
     public DoWhileLoop(AstElement parent) {
@@ -48,8 +50,8 @@ public class DoWhileLoop extends Loop {
     }
     
     @Override
-    public void accept(IAstVisitor visitor) {
-        visitor.visitDoWhileLoop(this);
+    public <T> T accept(IAstVisitor<T> visitor) {
+        return visitor.visitDoWhileLoop(this);
     }
 
     @Override

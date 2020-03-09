@@ -10,10 +10,8 @@ import parsing.ast.DoWhileLoop;
 import parsing.ast.EmptyStmt;
 import parsing.ast.ExpressionStmt;
 import parsing.ast.File;
-import parsing.ast.FullVisitor;
 import parsing.ast.Function;
 import parsing.ast.FunctionCall;
-import parsing.ast.IAstVisitor;
 import parsing.ast.Identifier;
 import parsing.ast.If;
 import parsing.ast.Literal;
@@ -21,6 +19,8 @@ import parsing.ast.Return;
 import parsing.ast.Type;
 import parsing.ast.UnaryExpr;
 import parsing.ast.While;
+import parsing.ast.operations.FullVisitor;
+import parsing.ast.operations.IAstVisitor;
 
 public class MutationIdentifier {
 
@@ -63,7 +63,7 @@ public class MutationIdentifier {
         return result;
     }
     
-    private class Finder implements IAstVisitor {
+    private class Finder implements IAstVisitor<Void> {
 
         private AstElement match;
         
@@ -79,93 +79,111 @@ public class MutationIdentifier {
         }
         
         @Override
-        public void visitAssignment(Assignment stmt) {
+        public Void visitAssignment(Assignment stmt) {
             check(stmt);
+            return null;
         }
 
         @Override
-        public void visitBinaryExpr(BinaryExpr expr) {
+        public Void visitBinaryExpr(BinaryExpr expr) {
             check(expr);
+            return null;
         }
 
         @Override
-        public void visitBlock(Block stmt) { 
+        public Void visitBlock(Block stmt) { 
             check(stmt);
+            return null;
         }
 
         @Override
-        public void visitDeclaration(Declaration decl) {
+        public Void visitDeclaration(Declaration decl) {
             check(decl);
+            return null;
         }
 
         @Override
-        public void visitDeclarationStmt(DeclarationStmt stmt) {
+        public Void visitDeclarationStmt(DeclarationStmt stmt) {
             check(stmt);
+            return null;
         }
 
         @Override
-        public void visitDoWhileLoop(DoWhileLoop stmt) {
+        public Void visitDoWhileLoop(DoWhileLoop stmt) {
             check(stmt);
+            return null;
         }
 
         @Override
-        public void visitEmptyStmt(EmptyStmt stmt) {
+        public Void visitEmptyStmt(EmptyStmt stmt) {
             check(stmt);
+            return null;
         }
 
         @Override
-        public void visitExpressionStmt(ExpressionStmt stmt) {
+        public Void visitExpressionStmt(ExpressionStmt stmt) {
             check(stmt);
+            return null;
         }
 
         @Override
-        public void visitFile(File file) {
+        public Void visitFile(File file) {
             check(file);
+            return null;
         }
 
         @Override
-        public void visitFunction(Function func) {
+        public Void visitFunction(Function func) {
             check(func);
+            return null;
         }
 
         @Override
-        public void visitFunctionCall(FunctionCall expr) {
+        public Void visitFunctionCall(FunctionCall expr) {
             check(expr);
+            return null;
         }
 
         @Override
-        public void visitIdentifier(Identifier expr) {
+        public Void visitIdentifier(Identifier expr) {
             check(expr);
+            return null;
         }
 
         @Override
-        public void visitIf(If stmt) {
+        public Void visitIf(If stmt) {
             check(stmt);
+            return null;
         }
 
         @Override
-        public void visitLiteral(Literal expr) {
+        public Void visitLiteral(Literal expr) {
             check(expr);
+            return null;
         }
 
         @Override
-        public void visitReturn(Return stmt) {
+        public Void visitReturn(Return stmt) {
             check(stmt);
+            return null;
         }
 
         @Override
-        public void visitType(Type type) {
+        public Void visitType(Type type) {
             check(type);
+            return null;
         }
 
         @Override
-        public void visitUnaryExpr(UnaryExpr expr) {
+        public Void visitUnaryExpr(UnaryExpr expr) {
             check(expr);
+            return null;
         }
 
         @Override
-        public void visitWhile(While stmt) {
+        public Void visitWhile(While stmt) {
             check(stmt);
+            return null;
         }
         
     }

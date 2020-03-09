@@ -2,6 +2,8 @@ package parsing.ast;
 
 import java.util.function.BiFunction;
 
+import parsing.ast.operations.IAstVisitor;
+
 public class DeclarationStmt extends Statement {
 
     public Declaration decl;
@@ -34,8 +36,8 @@ public class DeclarationStmt extends Statement {
     }
     
     @Override
-    public void accept(IAstVisitor visitor) {
-        visitor.visitDeclarationStmt(this);
+    public <T> T accept(IAstVisitor<T> visitor) {
+        return visitor.visitDeclarationStmt(this);
     }
 
     @Override

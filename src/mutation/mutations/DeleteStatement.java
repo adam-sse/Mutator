@@ -25,8 +25,7 @@ public class DeleteStatement extends Mutation {
         
         if (targetElem != null) {
             StatementDeleter deleter = new StatementDeleter();
-            deleter.delete(targetElem);
-            success = deleter.success;
+            success = deleter.delete(targetElem);
             
             if (success) {
                 this.diff = new ArrayList<>(1);

@@ -13,10 +13,8 @@ import parsing.ast.DoWhileLoop;
 import parsing.ast.EmptyStmt;
 import parsing.ast.ExpressionStmt;
 import parsing.ast.File;
-import parsing.ast.FullVisitor;
 import parsing.ast.Function;
 import parsing.ast.FunctionCall;
-import parsing.ast.IAstVisitor;
 import parsing.ast.Identifier;
 import parsing.ast.If;
 import parsing.ast.Literal;
@@ -25,8 +23,10 @@ import parsing.ast.Statement;
 import parsing.ast.Type;
 import parsing.ast.UnaryExpr;
 import parsing.ast.While;
+import parsing.ast.operations.FullVisitor;
+import parsing.ast.operations.IAstVisitor;
 
-class StatementCollector implements IAstVisitor {
+class StatementCollector implements IAstVisitor<Void> {
 
     public List<Statement> statements = new LinkedList<>();
     
@@ -36,84 +36,102 @@ class StatementCollector implements IAstVisitor {
     }
     
     @Override
-    public void visitAssignment(Assignment stmt) {
+    public Void visitAssignment(Assignment stmt) {
         statements.add(stmt);
+        return null;
     }
 
     @Override
-    public void visitBinaryExpr(BinaryExpr expr) {
+    public Void visitBinaryExpr(BinaryExpr expr) {
+        return null;
     }
 
     @Override
-    public void visitBlock(Block stmt) {
+    public Void visitBlock(Block stmt) {
         statements.add(stmt);
+        return null;
     }
 
     @Override
-    public void visitDeclaration(Declaration decl) {
+    public Void visitDeclaration(Declaration decl) {
+        return null;
     }
 
     @Override
-    public void visitDeclarationStmt(DeclarationStmt stmt) {
+    public Void visitDeclarationStmt(DeclarationStmt stmt) {
         statements.add(stmt);
+        return null;
     }
 
     @Override
-    public void visitDoWhileLoop(DoWhileLoop stmt) {
+    public Void visitDoWhileLoop(DoWhileLoop stmt) {
         statements.add(stmt);
+        return null;
     }
 
     @Override
-    public void visitEmptyStmt(EmptyStmt stmt) {
+    public Void visitEmptyStmt(EmptyStmt stmt) {
         statements.add(stmt);
+        return null;
     }
 
     @Override
-    public void visitExpressionStmt(ExpressionStmt stmt) {
+    public Void visitExpressionStmt(ExpressionStmt stmt) {
         statements.add(stmt);
+        return null;
     }
 
     @Override
-    public void visitFile(File file) {
+    public Void visitFile(File file) {
+        return null;
     }
 
     @Override
-    public void visitFunction(Function func) {
+    public Void visitFunction(Function func) {
+        return null;
     }
 
     @Override
-    public void visitFunctionCall(FunctionCall expr) {
+    public Void visitFunctionCall(FunctionCall expr) {
+        return null;
     }
 
     @Override
-    public void visitIdentifier(Identifier expr) {
+    public Void visitIdentifier(Identifier expr) {
+        return null;
     }
 
     @Override
-    public void visitIf(If stmt) {
+    public Void visitIf(If stmt) {
         statements.add(stmt);
+        return null;
     }
 
     @Override
-    public void visitLiteral(Literal expr) {
+    public Void visitLiteral(Literal expr) {
+        return null;
     }
 
     @Override
-    public void visitReturn(Return stmt) {
+    public Void visitReturn(Return stmt) {
         statements.add(stmt);
+        return null;
     }
 
     @Override
-    public void visitType(Type type) {
+    public Void visitType(Type type) {
+        return null;
     }
 
     @Override
-    public void visitUnaryExpr(UnaryExpr expr) {
+    public Void visitUnaryExpr(UnaryExpr expr) {
+        return null;
     }
 
     @Override
-    public void visitWhile(While stmt) {
+    public Void visitWhile(While stmt) {
         statements.add(stmt);
+        return null;
     }
     
 }

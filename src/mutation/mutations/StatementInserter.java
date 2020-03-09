@@ -11,7 +11,6 @@ import parsing.ast.ExpressionStmt;
 import parsing.ast.File;
 import parsing.ast.Function;
 import parsing.ast.FunctionCall;
-import parsing.ast.IAstVisitor;
 import parsing.ast.Identifier;
 import parsing.ast.If;
 import parsing.ast.Literal;
@@ -20,9 +19,10 @@ import parsing.ast.Statement;
 import parsing.ast.Type;
 import parsing.ast.UnaryExpr;
 import parsing.ast.While;
+import parsing.ast.operations.IAstVisitor;
 import util.Util;
 
-class StatementInserter implements IAstVisitor {
+class StatementInserter implements IAstVisitor<Boolean> {
     
     private Statement reference;
     
@@ -30,46 +30,47 @@ class StatementInserter implements IAstVisitor {
     
     private boolean before;
     
-    boolean success;
-    
     public boolean insert(Statement reference, boolean before, Statement toInsert) {
         this.reference = reference;
         this.toInsert = toInsert;
         this.before = before;
-        this.success = false;
         
-        reference.parent.accept(this);
-        
-        return this.success;
+        return reference.parent.accept(this);
     }
 
     @Override
-    public void visitAssignment(Assignment stmt) {
+    public Boolean visitAssignment(Assignment stmt) {
+        return false;
     }
 
     @Override
-    public void visitBinaryExpr(BinaryExpr expr) {
+    public Boolean visitBinaryExpr(BinaryExpr expr) {
+        return false;
     }
 
     @Override
-    public void visitBlock(Block stmt) {
+    public Boolean visitBlock(Block stmt) {
         int refI = Util.findIndex(stmt.statements, reference);
         if (refI != -1) {
             stmt.statements.add(refI + (before ? 0 : 1), toInsert);
-            this.success = true;
+            return true;
         }
+        
+        return false;
     }
 
     @Override
-    public void visitDeclaration(Declaration decl) {
+    public Boolean visitDeclaration(Declaration decl) {
+        return false;
     }
 
     @Override
-    public void visitDeclarationStmt(DeclarationStmt stmt) {
+    public Boolean visitDeclarationStmt(DeclarationStmt stmt) {
+        return false;
     }
 
     @Override
-    public void visitDoWhileLoop(DoWhileLoop stmt) {
+    public Boolean visitDoWhileLoop(DoWhileLoop stmt) {
         if (stmt.body == reference) {
             Block block = new Block(stmt);
             block.start = stmt.body.start;
@@ -86,24 +87,29 @@ class StatementInserter implements IAstVisitor {
             reference.parent = block;
             toInsert.parent = block;
             
-            this.success = true;
+            return true;
         }
+        
+        return false;
     }
 
     @Override
-    public void visitEmptyStmt(EmptyStmt stmt) {
+    public Boolean visitEmptyStmt(EmptyStmt stmt) {
+        return false;
     }
 
     @Override
-    public void visitExpressionStmt(ExpressionStmt stmt) {
+    public Boolean visitExpressionStmt(ExpressionStmt stmt) {
+        return false;
     }
 
     @Override
-    public void visitFile(File file) {
+    public Boolean visitFile(File file) {
+        return false;
     }
 
     @Override
-    public void visitFunction(Function func) {
+    public Boolean visitFunction(Function func) {
         if (func.body == reference) {
             Block block = new Block(func);
             block.start = func.body.start;
@@ -120,21 +126,24 @@ class StatementInserter implements IAstVisitor {
             reference.parent = block;
             toInsert.parent = block;
             
-            this.success = true;
-            
+            return true;
         }
+        
+        return false;
     }
 
     @Override
-    public void visitFunctionCall(FunctionCall expr) {
+    public Boolean visitFunctionCall(FunctionCall expr) {
+        return false;
     }
 
     @Override
-    public void visitIdentifier(Identifier expr) {
+    public Boolean visitIdentifier(Identifier expr) {
+        return false;
     }
 
     @Override
-    public void visitIf(If stmt) {
+    public Boolean visitIf(If stmt) {
         if (stmt.thenBlock == reference) {
             Block block = new Block(stmt);
             block.start = stmt.thenBlock.start;
@@ -151,9 +160,11 @@ class StatementInserter implements IAstVisitor {
             reference.parent = block;
             toInsert.parent = block;
             
-            this.success = true;
+            return true;
             
-        } else if (stmt.elseBlock == reference) {
+        }
+        
+        if (stmt.elseBlock == reference) {
             Block block = new Block(stmt);
             block.start = stmt.elseBlock.start;
             block.end = stmt.elseBlock.end;
@@ -169,28 +180,34 @@ class StatementInserter implements IAstVisitor {
             reference.parent = block;
             toInsert.parent = block;
             
-            this.success = true;
+            return true;
         }
+        
+        return false;
     }
 
     @Override
-    public void visitLiteral(Literal expr) {
+    public Boolean visitLiteral(Literal expr) {
+        return false;
     }
 
     @Override
-    public void visitReturn(Return stmt) {
+    public Boolean visitReturn(Return stmt) {
+        return false;
     }
 
     @Override
-    public void visitType(Type type) {
+    public Boolean visitType(Type type) {
+        return false;
     }
 
     @Override
-    public void visitUnaryExpr(UnaryExpr expr) {
+    public Boolean visitUnaryExpr(UnaryExpr expr) {
+        return false;
     }
 
     @Override
-    public void visitWhile(While stmt) {
+    public Boolean visitWhile(While stmt) {
         if (stmt.body == reference) {
             Block block = new Block(stmt);
             block.start = stmt.body.start;
@@ -207,8 +224,10 @@ class StatementInserter implements IAstVisitor {
             reference.parent = block;
             toInsert.parent = block;
             
-            this.success = true;
+            return true;
         }
+        
+        return false;
     }
 
 }

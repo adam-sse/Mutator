@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.StringJoiner;
 import java.util.function.BiFunction;
 
+import parsing.ast.operations.IAstVisitor;
+
 public class FunctionCall extends Expression {
 
     public String function;
@@ -40,8 +42,8 @@ public class FunctionCall extends Expression {
     }
     
     @Override
-    public void accept(IAstVisitor visitor) {
-        visitor.visitFunctionCall(this);
+    public <T> T accept(IAstVisitor<T> visitor) {
+        return visitor.visitFunctionCall(this);
     }
 
     @Override

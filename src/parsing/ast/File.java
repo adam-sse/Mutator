@@ -4,6 +4,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.function.BiFunction;
 
+import parsing.ast.operations.IAstVisitor;
+
 public class File extends AstElement {
     
     public List<Function> functions = new LinkedList<>();
@@ -41,8 +43,8 @@ public class File extends AstElement {
     }
     
     @Override
-    public void accept(IAstVisitor visitor) {
-        visitor.visitFile(this);
+    public <T> T accept(IAstVisitor<T> visitor) {
+        return visitor.visitFile(this);
     }
 
     @Override

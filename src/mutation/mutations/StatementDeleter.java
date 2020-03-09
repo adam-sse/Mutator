@@ -11,7 +11,6 @@ import parsing.ast.ExpressionStmt;
 import parsing.ast.File;
 import parsing.ast.Function;
 import parsing.ast.FunctionCall;
-import parsing.ast.IAstVisitor;
 import parsing.ast.Identifier;
 import parsing.ast.If;
 import parsing.ast.Literal;
@@ -20,134 +19,154 @@ import parsing.ast.Statement;
 import parsing.ast.Type;
 import parsing.ast.UnaryExpr;
 import parsing.ast.While;
+import parsing.ast.operations.IAstVisitor;
 import util.Util;
 
-class StatementDeleter implements IAstVisitor {
+class StatementDeleter implements IAstVisitor<Boolean> {
     
     private Statement target;
     
-    boolean success;
-    
     public boolean delete(Statement target) {
         this.target = target;
-        this.success = false;
         
-        target.parent.accept(this);
-        
-        return this.success;
+        return target.parent.accept(this);
     }
 
     @Override
-    public void visitAssignment(Assignment stmt) {
+    public Boolean visitAssignment(Assignment stmt) {
+        return false;
     }
 
     @Override
-    public void visitBinaryExpr(BinaryExpr expr) {
+    public Boolean visitBinaryExpr(BinaryExpr expr) {
+        return false;
     }
 
     @Override
-    public void visitBlock(Block stmt) {
+    public Boolean visitBlock(Block stmt) {
         int i = Util.findIndex(stmt.statements, target);
         if (i != -1) {
             stmt.statements.remove(i);
-            success = true;
+            return true;
         }
+        
+        return false;
     }
 
     @Override
-    public void visitDeclaration(Declaration decl) {
+    public Boolean visitDeclaration(Declaration decl) {
+        return false;
     }
 
     @Override
-    public void visitDeclarationStmt(DeclarationStmt stmt) {
+    public Boolean visitDeclarationStmt(DeclarationStmt stmt) {
+        return false;
     }
 
     @Override
-    public void visitDoWhileLoop(DoWhileLoop stmt) {
+    public Boolean visitDoWhileLoop(DoWhileLoop stmt) {
         if (target == stmt.body) {
             EmptyStmt replacement = new EmptyStmt(stmt);
             replacement.start = stmt.body.start;
             replacement.end = stmt.body.end;
             stmt.body = replacement;
-            success = true;
+            return true;
         }
+        
+        return false;
     }
 
     @Override
-    public void visitEmptyStmt(EmptyStmt stmt) {
+    public Boolean visitEmptyStmt(EmptyStmt stmt) {
+        return false;
     }
 
     @Override
-    public void visitExpressionStmt(ExpressionStmt stmt) {
+    public Boolean visitExpressionStmt(ExpressionStmt stmt) {
+        return false;
     }
 
     @Override
-    public void visitFile(File file) {
+    public Boolean visitFile(File file) {
+        return false;
     }
 
     @Override
-    public void visitFunction(Function func) {
+    public Boolean visitFunction(Function func) {
         if (target == func.body) {
             Block replacement = new Block(func);
             replacement.start = func.body.start;
             replacement.end = func.body.end;
             
             func.body = replacement;
-            success = true;
+            return true;
         }
+        
+        return false;
     }
 
     @Override
-    public void visitFunctionCall(FunctionCall expr) {
+    public Boolean visitFunctionCall(FunctionCall expr) {
+        return false;
     }
 
     @Override
-    public void visitIdentifier(Identifier expr) {
+    public Boolean visitIdentifier(Identifier expr) {
+        return false;
     }
 
     @Override
-    public void visitIf(If stmt) {
+    public Boolean visitIf(If stmt) {
         if (target == stmt.thenBlock) {
             EmptyStmt replacement = new EmptyStmt(stmt);
             replacement.start = stmt.thenBlock.start;
             replacement.end = stmt.thenBlock.end;
             stmt.thenBlock = replacement;
-            success = true;
-            
-        } else if (target == stmt.elseBlock) {
+            return true;
+        }
+        
+        if (target == stmt.elseBlock) {
             EmptyStmt replacement = new EmptyStmt(stmt);
             replacement.start = stmt.elseBlock.start;
             replacement.end = stmt.elseBlock.end;
             stmt.elseBlock = replacement;
-            success = true;
+            return true;
         }
+        
+        return false;
     }
 
     @Override
-    public void visitLiteral(Literal expr) {
+    public Boolean visitLiteral(Literal expr) {
+        return false;
     }
 
     @Override
-    public void visitReturn(Return stmt) {
+    public Boolean visitReturn(Return stmt) {
+        return false;
     }
 
     @Override
-    public void visitType(Type type) {
+    public Boolean visitType(Type type) {
+        return false;
     }
 
     @Override
-    public void visitUnaryExpr(UnaryExpr expr) {
+    public Boolean visitUnaryExpr(UnaryExpr expr) {
+        return false;
     }
 
     @Override
-    public void visitWhile(While stmt) {
+    public Boolean visitWhile(While stmt) {
         if (target == stmt.body) {
             EmptyStmt replacement = new EmptyStmt(stmt);
             replacement.start = stmt.body.start;
             replacement.end = stmt.body.end;
             stmt.body = replacement;
-            success = true;
+            return true;
         }
+        
+        return false;
     }
 
 }

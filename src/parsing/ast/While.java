@@ -2,6 +2,8 @@ package parsing.ast;
 
 import java.util.function.BiFunction;
 
+import parsing.ast.operations.IAstVisitor;
+
 public class While extends Loop {
 
     public While(AstElement parent) {
@@ -38,8 +40,8 @@ public class While extends Loop {
     }
     
     @Override
-    public void accept(IAstVisitor visitor) {
-        visitor.visitWhile(this);
+    public <T> T accept(IAstVisitor<T> visitor) {
+        return visitor.visitWhile(this);
     }
 
     @Override

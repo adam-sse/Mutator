@@ -2,6 +2,8 @@ package parsing.ast;
 
 import java.util.function.BiFunction;
 
+import parsing.ast.operations.IAstVisitor;
+
 public class UnaryExpr extends Expression {
     
     public Expression expr;
@@ -57,8 +59,8 @@ public class UnaryExpr extends Expression {
     }
     
     @Override
-    public void accept(IAstVisitor visitor) {
-        visitor.visitUnaryExpr(this);
+    public <T> T accept(IAstVisitor<T> visitor) {
+        return visitor.visitUnaryExpr(this);
     }
 
     @Override

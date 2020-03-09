@@ -5,6 +5,8 @@ import java.util.function.BiFunction;
 
 import org.antlr.v4.runtime.Token;
 
+import parsing.ast.operations.IAstVisitor;
+
 public abstract class AstElement {
 
     public static final class Location {
@@ -90,7 +92,7 @@ public abstract class AstElement {
      */
     public abstract String getText();
     
-    public abstract void accept(IAstVisitor visitor);
+    public abstract <T> T accept(IAstVisitor<T> visitor);
     
     /**
      * Creates a deep copy of this AST; the copied elements will have new IDs.

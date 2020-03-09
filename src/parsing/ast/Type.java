@@ -2,6 +2,8 @@ package parsing.ast;
 
 import java.util.function.BiFunction;
 
+import parsing.ast.operations.IAstVisitor;
+
 public class Type extends AstElement {
 
     public enum Modifier {
@@ -52,8 +54,8 @@ public class Type extends AstElement {
     }
     
     @Override
-    public void accept(IAstVisitor visitor) {
-        visitor.visitType(this);
+    public <T> T accept(IAstVisitor<T> visitor) {
+        return visitor.visitType(this);
     }
 
     @Override

@@ -2,6 +2,8 @@ package parsing.ast;
 
 import java.util.function.BiFunction;
 
+import parsing.ast.operations.IAstVisitor;
+
 public class Identifier extends Expression {
 
     public String identifier;
@@ -31,8 +33,8 @@ public class Identifier extends Expression {
     }
     
     @Override
-    public void accept(IAstVisitor visitor) {
-        visitor.visitIdentifier(this);
+    public <T> T accept(IAstVisitor<T> visitor) {
+        return visitor.visitIdentifier(this);
     }
 
     @Override
