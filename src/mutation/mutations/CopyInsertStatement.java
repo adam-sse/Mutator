@@ -29,24 +29,24 @@ public class CopyInsertStatement extends Mutation {
     
     @Override
     public boolean apply(AstElement ast) {
-        Statement targetElem = (Statement) reference.find(ast);
+        Statement referenceElem = (Statement) reference.find(ast);
         
         boolean success = false;
         
-        if (targetElem != null) {
+        if (referenceElem != null && new MutationIdentifier(toInsert).find(ast) == null) {
             StatementInserter inserter = new StatementInserter();
             
-            Statement toInsertClone = (Statement) toInsert.accept(new AstCloner(targetElem.parent, true));
+            Statement toInsertClone = (Statement) toInsert.accept(new AstCloner(referenceElem.parent, true));
             
-            success = inserter.insert(targetElem, this.before, toInsertClone);
+            success = inserter.insert(referenceElem, this.before, toInsertClone);
 
             if (success) {
                 this.diff = new ArrayList<>(2);
                 if (this.before) {
                     this.diff.add("+" + toInsert.getText());
-                    this.diff.add(" " + targetElem.getText());
+                    this.diff.add(" " + referenceElem.getText());
                 } else {
-                    this.diff.add(" " + targetElem.getText());
+                    this.diff.add(" " + referenceElem.getText());
                     this.diff.add("+" + toInsert.getText());
                 }
             }
