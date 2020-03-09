@@ -1,7 +1,5 @@
 package parsing.ast;
 
-import java.util.function.BiFunction;
-
 import parsing.ast.operations.IAstVisitor;
 
 public class Literal extends Expression {
@@ -32,15 +30,6 @@ public class Literal extends Expression {
         return visitor.visitLiteral(this);
     }
 
-    @Override
-    public Literal cloneImpl(AstElement parent, BiFunction<AstElement, AstElement, AstElement> cloneFct) {
-        Literal clone = new Literal(parent);
-        
-        clone.value = value;
-        
-        return clone;
-    }
-    
     @Override
     public boolean equals(Object obj) {
         boolean equals = false;

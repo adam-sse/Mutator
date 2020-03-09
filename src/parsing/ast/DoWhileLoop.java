@@ -1,7 +1,5 @@
 package parsing.ast;
 
-import java.util.function.BiFunction;
-
 import parsing.ast.operations.IAstVisitor;
 
 public class DoWhileLoop extends Loop {
@@ -24,14 +22,4 @@ public class DoWhileLoop extends Loop {
         return visitor.visitDoWhileLoop(this);
     }
 
-    @Override
-    public DoWhileLoop cloneImpl(AstElement parent, BiFunction<AstElement, AstElement, AstElement> cloneFct) {
-        DoWhileLoop clone = new DoWhileLoop(parent);
-        
-        clone.body = (Statement) cloneFct.apply(body, clone);
-        clone.condition = (Expression) cloneFct.apply(condition, clone);
-        
-        return clone;
-    }
-    
 }

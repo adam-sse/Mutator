@@ -2,7 +2,6 @@ package parsing.ast;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.function.BiFunction;
 
 import parsing.ast.operations.IAstVisitor;
 
@@ -36,18 +35,6 @@ public class FunctionCall extends Expression {
         return visitor.visitFunctionCall(this);
     }
 
-    @Override
-    public FunctionCall cloneImpl(AstElement parent, BiFunction<AstElement, AstElement, AstElement> cloneFct) {
-        FunctionCall clone = new FunctionCall(parent);
-        
-        clone.function = function;
-        for (Expression param : params) {
-            clone.params.add((Expression) cloneFct.apply(param, clone));
-        }
-        
-        return clone;
-    }
-    
     @Override
     public boolean equals(Object obj) {
         boolean equals = false;

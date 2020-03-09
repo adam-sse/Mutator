@@ -8,6 +8,7 @@ import parsing.ast.AstElement;
 import parsing.ast.File;
 import parsing.ast.Function;
 import parsing.ast.Statement;
+import parsing.ast.operations.AstCloner;
 
 public class CopyOverrideStatement extends Mutation {
 
@@ -31,7 +32,7 @@ public class CopyOverrideStatement extends Mutation {
         
         if (srcElem != null && targetElem != null && (newId == null || new MutationIdentifier(newId).find(ast) == null)) {
             ElementReplacer<AstElement> replacer = new ElementReplacer<>();
-            AstElement srcCopy = srcElem.copy(targetElem.parent);
+            AstElement srcCopy = srcElem.accept(new AstCloner(targetElem.parent, false));
             if (newId == null) {
                 newId = srcCopy.id;
             } else {

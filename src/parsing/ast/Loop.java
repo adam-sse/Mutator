@@ -1,7 +1,5 @@
 package parsing.ast;
 
-import java.util.function.BiFunction;
-
 public abstract class Loop extends Statement {
 
     public Loop(AstElement parent) {
@@ -16,9 +14,6 @@ public abstract class Loop extends Statement {
     public int getNumChildren() {
         return 2;
     }
-    
-    @Override
-    public abstract Loop cloneImpl(AstElement parent, BiFunction<AstElement, AstElement, AstElement> cloneFct);
     
     @Override
     public boolean equals(Object obj) {

@@ -1,7 +1,5 @@
 package parsing.ast;
 
-import java.util.function.BiFunction;
-
 import parsing.ast.operations.IAstVisitor;
 
 public class Assignment extends Statement {
@@ -31,16 +29,6 @@ public class Assignment extends Statement {
     @Override
     public <T> T accept(IAstVisitor<T> visitor) {
         return visitor.visitAssignment(this);
-    }
-    
-    @Override
-    public Assignment cloneImpl(AstElement parent, BiFunction<AstElement, AstElement, AstElement> cloneFct) {
-        Assignment clone = new Assignment(parent);
-        
-        clone.variable = (Expression) cloneFct.apply(variable, clone);
-        clone.value = (Expression) cloneFct.apply(value, clone);
-        
-        return clone;
     }
     
     @Override

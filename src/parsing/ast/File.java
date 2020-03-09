@@ -2,7 +2,6 @@ package parsing.ast;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.function.BiFunction;
 
 import parsing.ast.operations.IAstVisitor;
 
@@ -29,17 +28,6 @@ public class File extends AstElement {
         return visitor.visitFile(this);
     }
 
-    @Override
-    public File cloneImpl(AstElement parent, BiFunction<AstElement, AstElement, AstElement> cloneFct) {
-        File clone = new File(parent);
-        
-        for (Function f : functions) {
-            clone.functions.add((Function) cloneFct.apply(f, clone));
-        }
-        
-        return clone;
-    }
-    
     @Override
     public boolean equals(Object obj) {
         boolean equals = false;

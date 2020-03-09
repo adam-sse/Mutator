@@ -8,6 +8,7 @@ import org.junit.Test;
 
 import mutation.MutationIdentifier;
 import parsing.ast.AstElement.Location;
+import parsing.ast.operations.AstCloner;
 import parsing.ast.BinaryExpr;
 import parsing.ast.BinaryOperator;
 import parsing.ast.ExpressionStmt;
@@ -144,7 +145,7 @@ public class OverrideWithLiteralTest {
         
         long originalId = stmt.getChild(0).getChild(1).id;
         
-        ExpressionStmt clone = (ExpressionStmt) stmt.clone(null);
+        ExpressionStmt clone = new AstCloner(null, true).visitExpressionStmt(stmt);
         assertThat(stmt.getText(), is("A + 3;"));
         assertThat(clone.getText(), is("A + 3;"));
         

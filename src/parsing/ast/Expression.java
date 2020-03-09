@@ -1,7 +1,5 @@
 package parsing.ast;
 
-import java.util.function.BiFunction;
-
 public abstract class Expression extends AstElement {
 
     public Expression(AstElement parent) {
@@ -13,8 +11,5 @@ public abstract class Expression extends AstElement {
      * an argument with lower or equal precedence needs parenthesis.
      */
     public abstract int getPrecedence();
-    
-    @Override
-    public abstract Expression cloneImpl(AstElement parent, BiFunction<AstElement, AstElement, AstElement> cloneFct);
     
 }

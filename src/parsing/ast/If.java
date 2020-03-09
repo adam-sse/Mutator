@@ -1,7 +1,5 @@
 package parsing.ast;
 
-import java.util.function.BiFunction;
-
 import parsing.ast.operations.IAstVisitor;
 
 public class If extends Statement {
@@ -36,19 +34,6 @@ public class If extends Statement {
         return visitor.visitIf(this);
     }
 
-    @Override
-    public If cloneImpl(AstElement parent, BiFunction<AstElement, AstElement, AstElement> cloneFct) {
-        If clone = new If(parent);
-        
-        clone.condition = (Expression) cloneFct.apply(condition, clone);
-        clone.thenBlock = (Statement) cloneFct.apply(thenBlock, clone);
-        if (elseBlock != null) {
-            clone.elseBlock = (Statement) cloneFct.apply(elseBlock, clone);
-        }
-        
-        return clone;
-    }
-    
     @Override
     public boolean equals(Object obj) {
         boolean equals = false;

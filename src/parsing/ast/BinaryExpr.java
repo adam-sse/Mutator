@@ -1,7 +1,5 @@
 package parsing.ast;
 
-import java.util.function.BiFunction;
-
 import parsing.ast.operations.IAstVisitor;
 
 public class BinaryExpr extends Expression {
@@ -38,17 +36,6 @@ public class BinaryExpr extends Expression {
     @Override
     public <T> T accept(IAstVisitor<T> visitor) {
         return visitor.visitBinaryExpr(this);
-    }
-    
-    @Override
-    public BinaryExpr cloneImpl(AstElement parent, BiFunction<AstElement, AstElement, AstElement> cloneFct) {
-        BinaryExpr clone = new BinaryExpr(parent);
-        
-        clone.left = (Expression) cloneFct.apply(left, clone);
-        clone.operator = operator;
-        clone.right = (Expression) cloneFct.apply(right, clone);
-        
-        return clone;
     }
     
     @Override

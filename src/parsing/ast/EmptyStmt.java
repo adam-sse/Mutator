@@ -1,7 +1,5 @@
 package parsing.ast;
 
-import java.util.function.BiFunction;
-
 import parsing.ast.operations.IAstVisitor;
 
 public class EmptyStmt extends Statement {
@@ -23,12 +21,6 @@ public class EmptyStmt extends Statement {
     @Override
     public <T> T accept(IAstVisitor<T> visitor) {
         return visitor.visitEmptyStmt(this);
-    }
-    
-    @Override
-    public EmptyStmt cloneImpl(AstElement parent, BiFunction<AstElement, AstElement, AstElement> cloneFct) {
-        EmptyStmt clone = new EmptyStmt(parent);
-        return clone;
     }
     
     @Override

@@ -1,7 +1,5 @@
 package parsing.ast;
 
-import java.util.function.BiFunction;
-
 import parsing.ast.operations.IAstVisitor;
 
 public class Declaration extends AstElement {
@@ -32,16 +30,6 @@ public class Declaration extends AstElement {
         return visitor.visitDeclaration(this);
     }
 
-    @Override
-    public Declaration cloneImpl(AstElement parent, BiFunction<AstElement, AstElement, AstElement> cloneFct) {
-        Declaration clone = new Declaration(parent);
-        
-        clone.type = (Type) cloneFct.apply(type, clone);
-        clone.identifier = identifier;
-        
-        return clone;
-    }
-    
     @Override
     public boolean equals(Object obj) {
         boolean equals = false;

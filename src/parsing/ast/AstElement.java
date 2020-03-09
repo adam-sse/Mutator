@@ -1,7 +1,6 @@
 package parsing.ast;
 
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.function.BiFunction;
 
 import org.antlr.v4.runtime.Token;
 
@@ -75,37 +74,6 @@ public abstract class AstElement {
     public final String getText() {
         return accept(new AstLinePrinter());
     }
-    
-    /**
-     * Creates a deep copy of this AST; the copied elements will have new IDs.
-     */
-    public final AstElement copy(AstElement parent) {
-        return copyInternal(this, parent);
-    }
-    
-    private static AstElement copyInternal(AstElement src, AstElement parent) {
-        AstElement copy = src.cloneImpl(parent, AstElement::copyInternal);
-        copy.start = src.start;
-        copy.end = src.end;
-        return copy;
-    }
-    
-    /**
-     * Creates a deep clone of this AST; the IDs will remain the same.
-     */
-    public final AstElement clone(AstElement parent) {
-        return cloneInternal(this, parent);
-    }
-    
-    private static AstElement cloneInternal(AstElement src, AstElement parent) {
-        AstElement copy = src.cloneImpl(parent, AstElement::cloneInternal);
-        copy.start = src.start;
-        copy.end = src.end;
-        copy.id = src.id; // keep the "old" ID since we are a 1-to-1 clone
-        return copy;
-    }
-    
-    protected abstract AstElement cloneImpl(AstElement parent, BiFunction<AstElement, AstElement, AstElement> cloneFct);
     
     @Override
     public String toString() {

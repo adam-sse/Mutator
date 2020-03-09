@@ -1,7 +1,5 @@
 package parsing.ast;
 
-import java.util.function.BiFunction;
-
 import parsing.ast.operations.IAstVisitor;
 
 public class UnaryExpr extends Expression {
@@ -37,16 +35,6 @@ public class UnaryExpr extends Expression {
         return visitor.visitUnaryExpr(this);
     }
 
-    @Override
-    public UnaryExpr cloneImpl(AstElement parent, BiFunction<AstElement, AstElement, AstElement> cloneFct) {
-        UnaryExpr clone = new UnaryExpr(parent);
-        
-        clone.expr = (Expression) cloneFct.apply(expr, clone);
-        clone.operator = operator;
-        
-        return clone;
-    }
-    
     @Override
     public boolean equals(Object obj) {
         boolean equals = false;

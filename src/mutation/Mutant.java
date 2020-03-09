@@ -8,6 +8,7 @@ import java.util.StringJoiner;
 
 import mutation.mutations.Mutation;
 import parsing.ast.File;
+import parsing.ast.operations.AstCloner;
 import parsing.ast.operations.AstPrettyPrinter;
 
 public class Mutant {
@@ -20,7 +21,7 @@ public class Mutant {
     
     public Mutant(String id, File original) {
         this.id = id;
-        this.ast = (File) original.clone(null);
+        this.ast = new AstCloner(null, true).visitFile(original);
         this.mutations = new LinkedList<>();
     }
     

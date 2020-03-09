@@ -9,6 +9,7 @@ import parsing.ast.Expression;
 import parsing.ast.File;
 import parsing.ast.Function;
 import parsing.ast.Statement;
+import parsing.ast.operations.AstCloner;
 
 public class CopyOverrideExpression extends Mutation {
 
@@ -34,7 +35,7 @@ public class CopyOverrideExpression extends Mutation {
             String beforeReplacing = getParentStatementText(targetElem);
             
             ElementReplacer<AstElement> replacer = new ElementReplacer<>();
-            AstElement srcCopy = srcElem.copy(targetElem.parent);
+            AstElement srcCopy = srcElem.accept(new AstCloner(targetElem.parent, false));
             if (newId == null) {
                 newId = srcCopy.id;
             } else {

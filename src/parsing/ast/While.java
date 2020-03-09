@@ -1,7 +1,5 @@
 package parsing.ast;
 
-import java.util.function.BiFunction;
-
 import parsing.ast.operations.IAstVisitor;
 
 public class While extends Loop {
@@ -22,16 +20,6 @@ public class While extends Loop {
     @Override
     public <T> T accept(IAstVisitor<T> visitor) {
         return visitor.visitWhile(this);
-    }
-
-    @Override
-    public While cloneImpl(AstElement parent, BiFunction<AstElement, AstElement, AstElement> cloneFct) {
-        While clone = new While(parent);
-        
-        clone.condition = (Expression) cloneFct.apply(condition, clone);
-        clone.body = (Statement) cloneFct.apply(body, clone);
-        
-        return clone;
     }
 
 }

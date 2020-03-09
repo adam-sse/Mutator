@@ -8,6 +8,7 @@ import parsing.ast.AstElement;
 import parsing.ast.File;
 import parsing.ast.Function;
 import parsing.ast.Statement;
+import parsing.ast.operations.AstCloner;
 
 public class CopyInsertStatement extends Mutation {
 
@@ -35,7 +36,7 @@ public class CopyInsertStatement extends Mutation {
         if (srcElem != null && targetElem != null && (newId == null || new MutationIdentifier(newId).find(ast) == null)) {
             StatementInserter inserter = new StatementInserter();
             
-            Statement srcCopy = (Statement) srcElem.copy(targetElem.parent);
+            Statement srcCopy = (Statement) srcElem.accept(new AstCloner(targetElem.parent, false));
             if (newId == null) {
                 newId = srcCopy.id;
             } else {

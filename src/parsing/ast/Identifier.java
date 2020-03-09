@@ -1,7 +1,5 @@
 package parsing.ast;
 
-import java.util.function.BiFunction;
-
 import parsing.ast.operations.IAstVisitor;
 
 public class Identifier extends Expression {
@@ -32,15 +30,6 @@ public class Identifier extends Expression {
         return visitor.visitIdentifier(this);
     }
 
-    @Override
-    public Identifier cloneImpl(AstElement parent, BiFunction<AstElement, AstElement, AstElement> cloneFct) {
-        Identifier clone = new Identifier(parent);
-        
-        clone.identifier = identifier;
-        
-        return clone;
-    }
-    
     @Override
     public boolean equals(Object obj) {
         boolean equals = false;
