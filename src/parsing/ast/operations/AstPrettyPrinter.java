@@ -33,7 +33,7 @@ public class AstPrettyPrinter extends AbstractPrinter {
             final int idWidth = 12;
             if (id != null) {
                 String idStr = String.format("/*#%d*/ ", id);
-                sb.append(" ".repeat(idWidth - idStr.length())).append(idStr);
+                sb.append(" ".repeat(Math.max(idWidth - idStr.length(), 0))).append(idStr);
             } else {
                 sb.append(" ".repeat(idWidth));
             }
