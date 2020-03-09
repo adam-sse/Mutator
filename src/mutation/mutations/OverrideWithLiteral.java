@@ -12,23 +12,17 @@ import parsing.ast.Literal;
 import parsing.ast.Statement;
 import parsing.ast.UnaryExpr;
 import parsing.ast.UnaryOperator;
+import parsing.ast.operations.AstCloner;
 
 public class OverrideWithLiteral extends Mutation {
 
     public MutationIdentifier target;
     
-    public String literal;
+    public Expression literal;
     
-    public boolean negated;
-    
-    private Long newLitId;
-    
-    private Long newOpId;
-    
-    public OverrideWithLiteral(MutationIdentifier target, String literal, boolean negated) {
+    public OverrideWithLiteral(MutationIdentifier target, Expression literal) {
         this.target = target;
         this.literal = literal;
-        this.negated = negated;
     }
     
     @Override
@@ -37,64 +31,22 @@ public class OverrideWithLiteral extends Mutation {
         
         boolean success = false;
         
-        if (targetElem != null && !isSameLiteral(targetElem) && (newLitId == null || new MutationIdentifier(newLitId).find(ast) == null)) {
+        if (targetElem != null) {
             String beforeReplacing = getParentStatementText(targetElem);
 
-            AstElement replaceWith;
-            Literal lit = new Literal(targetElem.parent);
-            lit.start = targetElem.start;
-            lit.end = targetElem.end;
-            lit.value = literal;
-            if (newLitId == null) {
-                newLitId = lit.id;
-            } else {
-                lit.id = newLitId;
-            }
-            
-            replaceWith = lit;
-            
-            if (negated) {
-                UnaryExpr negation = new UnaryExpr(targetElem.parent);
-                negation.start = targetElem.start;
-                negation.end = targetElem.end;
-                negation.operator = UnaryOperator.MINUS;
-                if (newOpId == null) {
-                    newOpId = negation.id;
-                } else {
-                    negation.id = newOpId;
-                }
-                
-                negation.expr = lit;
-                lit.parent = negation;
-                replaceWith = negation;
-            }
-            
+            AstElement literalClone = literal.accept(new AstCloner(targetElem.parent, true));
             
             ElementReplacer<AstElement> replacer = new ElementReplacer<>();
-            success = replacer.replace(targetElem, replaceWith);
+            success = replacer.replace(targetElem, literalClone);
             
             if (success) {
                 this.diff = new ArrayList<>(2);
-                // find parents
                 this.diff.add("-" + beforeReplacing);
-                this.diff.add("+" + getParentStatementText(replaceWith));
+                this.diff.add("+" + getParentStatementText(literalClone));
             }
         }
         
         return success;
-    }
-    
-    private boolean isSameLiteral(AstElement other) {
-        boolean same = false;
-        if (other instanceof Literal) {
-            Literal oLit = (Literal) other;
-            same = oLit.value.equals(this.literal);
-            if (same && this.negated) {
-                // 1 and -1 are not same literals
-                same = (oLit.parent instanceof UnaryExpr) && ((UnaryExpr) oLit.parent).operator == UnaryOperator.MINUS;
-            }
-        }
-        return same;
     }
     
     private static String getParentStatementText(AstElement element) {
@@ -107,8 +59,7 @@ public class OverrideWithLiteral extends Mutation {
 
     @Override
     public String toString() {
-        return "OverrideWithLiteral(target=" + target + ", literal=" + (negated ? "-" : "") + literal + ")"
-                + (newOpId != null ? " -> #" + newOpId : (newLitId != null ? " -> #" + newLitId : ""));
+        return "OverrideWithLiteral(target=" + target + ", literal=" + literal.getText() + ") -> #" + literal.id;
     }
     
     @Override
@@ -117,8 +68,7 @@ public class OverrideWithLiteral extends Mutation {
         
         if (obj instanceof OverrideWithLiteral) {
             OverrideWithLiteral other = (OverrideWithLiteral) obj;
-            equal = target.equals(other.target) && literal.equals(other.literal) && negated == other.negated
-                    && this.newLitId == other.newLitId && this.newOpId == other.newOpId;
+            equal = target.equals(other.target) && literal.equals(other.literal) && this.literal.equals(other.literal);
         }
         
         return equal;
@@ -130,10 +80,36 @@ public class OverrideWithLiteral extends Mutation {
             collector.collect(func.body);
         }
         
-        Expression mutationTarget = collector.expressions.get(random.nextInt(collector.expressions.size()));
-        String literal = String.valueOf(random.nextInt(17));
+        Expression literal;
+        Expression mutationTarget;
         
-        OverrideWithLiteral mutation = new OverrideWithLiteral(new MutationIdentifier(mutationTarget), literal, random.nextBoolean());
+        do {
+            mutationTarget = collector.expressions.get(random.nextInt(collector.expressions.size()));
+            
+            String literalStr = String.valueOf(random.nextInt(17));
+            boolean negated = random.nextBoolean();
+            
+            
+            Literal lit = new Literal(null);
+            lit.start = mutationTarget.start;
+            lit.end = mutationTarget.end;
+            lit.value = literalStr;
+            
+            literal = lit;
+            
+            if (negated) {
+                UnaryExpr negation = new UnaryExpr(null);
+                negation.start = mutationTarget.start;
+                negation.end = mutationTarget.end;
+                negation.operator = UnaryOperator.MINUS;
+                
+                negation.expr = lit;
+                lit.parent = negation;
+                literal = negation;
+            }
+        } while (mutationTarget.equals(literal));
+        
+        OverrideWithLiteral mutation = new OverrideWithLiteral(new MutationIdentifier(mutationTarget), literal);
         
         return mutation;
     }

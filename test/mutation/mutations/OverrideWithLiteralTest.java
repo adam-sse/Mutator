@@ -11,34 +11,54 @@ import parsing.ast.AstElement.Location;
 import parsing.ast.operations.AstCloner;
 import parsing.ast.BinaryExpr;
 import parsing.ast.BinaryOperator;
+import parsing.ast.Expression;
 import parsing.ast.ExpressionStmt;
 import parsing.ast.Identifier;
 import parsing.ast.Literal;
+import parsing.ast.UnaryExpr;
+import parsing.ast.UnaryOperator;
 
 public class OverrideWithLiteralTest {
 
+    private Expression createLiteral(int value, boolean negated) {
+        Literal lit = new Literal(null);
+        lit.value = Integer.toString(value);
+        
+        Expression result = lit;
+        if (negated) {
+            UnaryExpr op = new UnaryExpr(null);
+            op.operator = UnaryOperator.MINUS;
+            op.expr = lit;
+            
+            lit.parent = op;
+            result = op;
+        }
+        
+        return result;
+    }
+    
     @Test
     public void testEquals() {
         MutationIdentifier id1 = new MutationIdentifier(123);
-        OverrideWithLiteral mut1 = new OverrideWithLiteral(id1, "4", false);
+        OverrideWithLiteral mut1 = new OverrideWithLiteral(id1, createLiteral(4, false));
         
         assertThat(mut1.equals(mut1), is(true));
         
         MutationIdentifier id2 = new MutationIdentifier(321);
-        OverrideWithLiteral mut2 = new OverrideWithLiteral(id2, "4", false);
+        OverrideWithLiteral mut2 = new OverrideWithLiteral(id2, createLiteral(4, false));
         assertThat(mut1.equals(mut2), is(false));
         
         MutationIdentifier id5 = new MutationIdentifier(123);
-        OverrideWithLiteral mut5 = new OverrideWithLiteral(id5, "4", false);
+        OverrideWithLiteral mut5 = new OverrideWithLiteral(id5, createLiteral(4, false));
         assertThat(mut1.equals(mut5), is(true));
         
-        OverrideWithLiteral mut6 = new OverrideWithLiteral(id1, "4", false);
+        OverrideWithLiteral mut6 = new OverrideWithLiteral(id1, createLiteral(4, false));
         assertThat(mut1.equals(mut6), is(true));
         
-        OverrideWithLiteral mut7 = new OverrideWithLiteral(id1, "3", false);
+        OverrideWithLiteral mut7 = new OverrideWithLiteral(id1, createLiteral(3, false));
         assertThat(mut1.equals(mut7), is(false));
         
-        OverrideWithLiteral mut8 = new OverrideWithLiteral(id1, "4", true);
+        OverrideWithLiteral mut8 = new OverrideWithLiteral(id1, createLiteral(4, true));
         assertThat(mut1.equals(mut8), is(false));
     }
     
@@ -69,7 +89,7 @@ public class OverrideWithLiteralTest {
         
         assertThat(stmt.getText(), is("A + B;"));
         
-        OverrideWithLiteral mut = new OverrideWithLiteral(new MutationIdentifier(var2), "3", true);
+        OverrideWithLiteral mut = new OverrideWithLiteral(new MutationIdentifier(var2), createLiteral(3, true));
         
         boolean applied = mut.apply(stmt);
         assertThat(applied, is(true));
@@ -107,7 +127,7 @@ public class OverrideWithLiteralTest {
         
         assertThat(stmt.getText(), is("A + 3;"));
         
-        OverrideWithLiteral mut = new OverrideWithLiteral(new MutationIdentifier(lit), "5", true);
+        OverrideWithLiteral mut = new OverrideWithLiteral(new MutationIdentifier(lit), createLiteral(5, true));
         
         boolean applied = mut.apply(stmt);
         assertThat(applied, is(true));
@@ -152,7 +172,7 @@ public class OverrideWithLiteralTest {
         long originalCloneId = clone.getChild(0).getChild(1).id;
         assertThat(originalCloneId, is(originalId));
         
-        OverrideWithLiteral mut = new OverrideWithLiteral(new MutationIdentifier(lit), "5", true);
+        OverrideWithLiteral mut = new OverrideWithLiteral(new MutationIdentifier(lit), createLiteral(5, true));
         
         boolean applied = mut.apply(stmt);
         assertThat(applied, is(true));

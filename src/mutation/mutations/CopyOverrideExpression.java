@@ -13,42 +13,36 @@ import parsing.ast.operations.AstCloner;
 
 public class CopyOverrideExpression extends Mutation {
 
-    public MutationIdentifier source;
+    public MutationIdentifier sourceIdentifier;
+    
+    public AstElement toInsert;
     
     public MutationIdentifier target;
     
-    private Long newId;
-    
-    public CopyOverrideExpression(MutationIdentifier source, MutationIdentifier target) {
-        this.source = source;
+    public CopyOverrideExpression(MutationIdentifier sourceIdentifier, AstElement toInsert, MutationIdentifier target) {
+        this.sourceIdentifier = sourceIdentifier;
+        this.toInsert = toInsert;
         this.target = target;
     }
     
     @Override
     public boolean apply(AstElement ast) {
-        AstElement srcElem = source.find(ast);
         AstElement targetElem = target.find(ast);
         
         boolean success = false;
         
-        if (srcElem != null && targetElem != null && (newId == null || new MutationIdentifier(newId).find(ast) == null)) {
+        if (targetElem != null) {
             String beforeReplacing = getParentStatementText(targetElem);
             
-            ElementReplacer<AstElement> replacer = new ElementReplacer<>();
-            AstElement srcCopy = srcElem.accept(new AstCloner(targetElem.parent, false));
-            if (newId == null) {
-                newId = srcCopy.id;
-            } else {
-                srcCopy.id = newId;
-            }
+            AstElement toInsertClone = toInsert.accept(new AstCloner(targetElem.parent, true));
             
-            success = replacer.replace(targetElem, srcCopy);
+            ElementReplacer<AstElement> replacer = new ElementReplacer<>();
+            success = replacer.replace(targetElem, toInsertClone);
             
             if (success) {
                 this.diff = new ArrayList<>(2);
-                // find parents
                 this.diff.add("-" + beforeReplacing);
-                this.diff.add("+" + getParentStatementText(srcCopy));
+                this.diff.add("+" + getParentStatementText(toInsertClone));
             }
         }
         
@@ -65,7 +59,7 @@ public class CopyOverrideExpression extends Mutation {
 
     @Override
     public String toString() {
-        return "CopyOverrideExpression(source=" + source + ", target=" + target + ")" + (newId != null ? " -> #" + newId : "");
+        return "CopyOverrideExpression(source=" + sourceIdentifier + ", target=" + target + ") -> #" + toInsert.id;
     }
     
     @Override
@@ -74,7 +68,7 @@ public class CopyOverrideExpression extends Mutation {
         
         if (obj instanceof CopyOverrideExpression) {
             CopyOverrideExpression other = (CopyOverrideExpression) obj;
-            equal = source.equals(other.source) && target.equals(other.target) && this.newId == other.newId;
+            equal = sourceIdentifier.equals(other.sourceIdentifier) && target.equals(other.target) && this.toInsert.equals(other.toInsert);
         }
         
         return equal;
@@ -94,7 +88,10 @@ public class CopyOverrideExpression extends Mutation {
             mutationTarget = collector.expressions.get(random.nextInt(collector.expressions.size()));
         } while (mutationSource.equals(mutationTarget));
         
-        CopyOverrideExpression mutation = new CopyOverrideExpression(new MutationIdentifier(mutationSource), new MutationIdentifier(mutationTarget));
+        CopyOverrideExpression mutation = new CopyOverrideExpression(
+                new MutationIdentifier(mutationSource),
+                mutationSource.accept(new AstCloner(null, false)),
+                new MutationIdentifier(mutationTarget));
         
         return mutation;
     }

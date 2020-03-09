@@ -12,47 +12,42 @@ import parsing.ast.operations.AstCloner;
 
 public class CopyInsertStatement extends Mutation {
 
-    public MutationIdentifier source;
+    public MutationIdentifier sourceIdentifier;
+    
+    public Statement toInsert;
     
     public MutationIdentifier reference;
     
     public boolean before;
     
-    private Long newId;
-    
-    public CopyInsertStatement(MutationIdentifier source, MutationIdentifier reference, boolean before) {
-        this.source = source;
+    public CopyInsertStatement(MutationIdentifier sourceIdentifier, Statement toInsert, MutationIdentifier reference, boolean before) {
+        this.sourceIdentifier = sourceIdentifier;
+        this.toInsert = toInsert;
         this.reference = reference;
         this.before = before;
     }
     
     @Override
     public boolean apply(AstElement ast) {
-        Statement srcElem = (Statement) source.find(ast);
         Statement targetElem = (Statement) reference.find(ast);
         
         boolean success = false;
         
-        if (srcElem != null && targetElem != null && (newId == null || new MutationIdentifier(newId).find(ast) == null)) {
+        if (targetElem != null) {
             StatementInserter inserter = new StatementInserter();
             
-            Statement srcCopy = (Statement) srcElem.accept(new AstCloner(targetElem.parent, false));
-            if (newId == null) {
-                newId = srcCopy.id;
-            } else {
-                srcCopy.id = newId;
-            }
+            Statement toInsertClone = (Statement) toInsert.accept(new AstCloner(targetElem.parent, true));
             
-            success = inserter.insert(targetElem, this.before, srcCopy);
+            success = inserter.insert(targetElem, this.before, toInsertClone);
 
             if (success) {
                 this.diff = new ArrayList<>(2);
                 if (this.before) {
-                    this.diff.add("+" + srcCopy.getText());
+                    this.diff.add("+" + toInsert.getText());
                     this.diff.add(" " + targetElem.getText());
                 } else {
                     this.diff.add(" " + targetElem.getText());
-                    this.diff.add("+" + srcCopy.getText());
+                    this.diff.add("+" + toInsert.getText());
                 }
             }
         }
@@ -62,7 +57,7 @@ public class CopyInsertStatement extends Mutation {
 
     @Override
     public String toString() {
-        return "CopyInsertStatement(source=" + source + ", reference=" + reference+ ", before=" + before + ")" + (newId != null ? " -> #" + newId : "");
+        return "CopyInsertStatement(source=" + sourceIdentifier + ", reference=" + reference+ ", before=" + before + ") -> #" + toInsert.id;
     }
     
     @Override
@@ -71,7 +66,8 @@ public class CopyInsertStatement extends Mutation {
         
         if (obj instanceof CopyInsertStatement) {
             CopyInsertStatement other = (CopyInsertStatement) obj;
-            equal = source.equals(other.source) && reference.equals(other.reference) && before == other.before && this.newId == other.newId;
+            equal = sourceIdentifier.equals(other.sourceIdentifier) && reference.equals(other.reference)
+                    && before == other.before && this.toInsert.equals(other.toInsert);
         }
         
         return equal;
@@ -93,6 +89,7 @@ public class CopyInsertStatement extends Mutation {
         } while (mutationSource.equals(mutationReference));
         
         CopyInsertStatement mutation = new CopyInsertStatement(new MutationIdentifier(mutationSource),
+                (Statement) mutationSource.accept(new AstCloner(null, false)),
                 new MutationIdentifier(mutationReference), random.nextBoolean());
         
         return mutation;
