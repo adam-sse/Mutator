@@ -26,16 +26,6 @@ public class DeclarationStmt extends Statement {
     }
     
     @Override
-    public String print(String indentation) {
-        return idComment() + indentation + getText() + "\n";
-    }
-    
-    @Override
-    public String getText() {
-        return decl.getText() + ";";
-    }
-    
-    @Override
     public <T> T accept(IAstVisitor<T> visitor) {
         return visitor.visitDeclarationStmt(this);
     }

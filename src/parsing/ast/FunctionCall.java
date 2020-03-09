@@ -2,7 +2,6 @@ package parsing.ast;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.StringJoiner;
 import java.util.function.BiFunction;
 
 import parsing.ast.operations.IAstVisitor;
@@ -18,7 +17,7 @@ public class FunctionCall extends Expression {
     }
     
     @Override
-    int getPrecedence() {
+    public int getPrecedence() {
         return 12;
     }
     
@@ -30,15 +29,6 @@ public class FunctionCall extends Expression {
     @Override
     public int getNumChildren() {
         return params.size();
-    }
-
-    @Override
-    public String getText() {
-        StringJoiner sj = new StringJoiner(", ", function + "(", ")");
-        for (Expression param : params) {
-            sj.add(param.getText());
-        }
-        return sj.toString();
     }
     
     @Override

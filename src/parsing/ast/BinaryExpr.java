@@ -36,39 +36,6 @@ public class BinaryExpr extends Expression {
     }
     
     @Override
-    public String getText() {
-        StringBuilder sb = new StringBuilder();
-        
-        if (operator == BinaryOperator.ARRAY_ACCESS) {
-            if (left.getPrecedence() <= this.getPrecedence()) {
-                sb.append("(").append(left.getText()).append(")");
-            } else {
-                sb.append(left.getText());
-            }
-            
-            sb.append("[").append(right.getText()).append("]");
-            
-        } else {
-            
-            if (left.getPrecedence() <= this.getPrecedence()) {
-                sb.append("(").append(left.getText()).append(")");
-            } else {
-                sb.append(left.getText());
-            }
-
-            sb.append(" ").append(operator).append(" ");
-            
-            if (right.getPrecedence() <= this.getPrecedence()) {
-                sb.append("(").append(right.getText()).append(")");
-            } else {
-                sb.append(right.getText());
-            }
-        }
-        
-        return sb.toString();
-    }
-    
-    @Override
     public <T> T accept(IAstVisitor<T> visitor) {
         return visitor.visitBinaryExpr(this);
     }

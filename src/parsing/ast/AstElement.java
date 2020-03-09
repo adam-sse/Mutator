@@ -5,6 +5,7 @@ import java.util.function.BiFunction;
 
 import org.antlr.v4.runtime.Token;
 
+import parsing.ast.operations.AstLinePrinter;
 import parsing.ast.operations.IAstVisitor;
 
 public abstract class AstElement {
@@ -42,8 +43,6 @@ public abstract class AstElement {
         
     }
     
-    public static boolean PRINT_IDS = true;
-    
     private static AtomicLong nextId = new AtomicLong(1);
     
     public AstElement parent;
@@ -68,31 +67,14 @@ public abstract class AstElement {
     
     public abstract int getNumChildren();
     
-    /**
-     * Pretty-prints this AST.
-     * 
-     * @param indentation The current indentation level. Use "" (empty string) when calling this for the top-level.
-     * 
-     * @return This AST pretty-printed into multiple lines. Line separator=\n, indentation=\t.
-     */
-    public abstract String print(String indentation);
-    
-    protected String idComment() {
-        if (PRINT_IDS) {
-            return "/*#" + id + "*/";
-        } else {
-            return "";
-        }
-    }
-    
-    /**
-     * Creates a single-line textual representation of this and all child elements.
-     * 
-     * @return This AST as a single text line.
-     */
-    public abstract String getText();
-    
     public abstract <T> T accept(IAstVisitor<T> visitor);
+    
+    /**
+     * Shorthand for {@link #accept(IAstVisitor)}ing an {@link AstLinePrinter}.
+     */
+    public final String getText() {
+        return accept(new AstLinePrinter());
+    }
     
     /**
      * Creates a deep copy of this AST; the copied elements will have new IDs.

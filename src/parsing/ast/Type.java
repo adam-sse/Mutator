@@ -32,28 +32,6 @@ public class Type extends AstElement {
     }
     
     @Override
-    public String print(String indentation) {
-        return getText();
-    }
-    
-    @Override
-    public String getText() {
-        StringBuilder sb = new StringBuilder();
-        
-        if (modifier != null) {
-            sb.append(modifier.name().toLowerCase()).append(" ");
-        }
-        
-        sb.append(type.str);
-        
-        if (pointer) {
-            sb.append("*");
-        }
-        
-        return sb.toString();
-    }
-    
-    @Override
     public <T> T accept(IAstVisitor<T> visitor) {
         return visitor.visitType(this);
     }

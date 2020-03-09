@@ -20,26 +20,6 @@ public class While extends Loop {
     }
     
     @Override
-    public String print(String indentation) {
-        StringBuilder sb = new StringBuilder();
-        
-        sb.append(idComment()).append(indentation).append("while (").append(condition.print(indentation)).append(")");
-        
-        if (body instanceof Block) {
-            sb.append(" ").append(body.print(indentation).substring(indentation.length()));
-        } else {
-            sb.append("\n").append(body.print(indentation + "\t"));
-        }
-        
-        return sb.toString();
-    }
-    
-    @Override
-    public String getText() {
-        return "while (" + condition.getText() + ") " + body.getText();
-    }
-    
-    @Override
     public <T> T accept(IAstVisitor<T> visitor) {
         return visitor.visitWhile(this);
     }

@@ -8,6 +8,7 @@ import java.util.StringJoiner;
 
 import mutation.mutations.Mutation;
 import parsing.ast.File;
+import parsing.ast.operations.AstPrettyPrinter;
 
 public class Mutant {
     
@@ -57,7 +58,7 @@ public class Mutant {
                 }
             }
             out.write(" */\n\n");
-            out.write(ast.print(""));
+            out.write(ast.accept(new AstPrettyPrinter(true)));
         }
     }
     

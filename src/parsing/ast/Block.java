@@ -2,7 +2,6 @@ package parsing.ast;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.StringJoiner;
 import java.util.function.BiFunction;
 
 import parsing.ast.operations.IAstVisitor;
@@ -23,26 +22,6 @@ public class Block extends Statement {
     @Override
     public int getNumChildren() {
         return statements.size();
-    }
-    
-    @Override
-    public String print(String indentation) {
-        StringBuilder sb = new StringBuilder();
-        sb.append(indentation).append(idComment()).append("{\n");
-        for (Statement st : statements) {
-            sb.append(st.print(indentation + "\t"));
-        }
-        sb.append(indentation).append("}\n");
-        return sb.toString();
-    }
-    
-    @Override
-    public String getText() {
-        StringJoiner sj = new StringJoiner(" ", "{ ", " }");
-        for (Statement st : statements) {
-            sj.add(st.getText());
-        }
-        return sj.toString();
     }
     
     @Override

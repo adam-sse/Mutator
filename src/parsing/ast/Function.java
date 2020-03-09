@@ -2,7 +2,6 @@ package parsing.ast;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.StringJoiner;
 import java.util.function.BiFunction;
 
 import parsing.ast.operations.IAstVisitor;
@@ -37,34 +36,6 @@ public class Function extends AstElement {
     @Override
     public int getNumChildren() {
         return 2 + parameters.size();
-    }
-
-    @Override
-    public String print(String indentation) {
-        StringBuilder sb = new StringBuilder();
-        sb.append(indentation).append(type.print(indentation)).append(" ").append(name).append("(");
-        
-        StringJoiner sj = new StringJoiner(", ");
-        for (Declaration decl : parameters) {
-            sj.add(decl.print(indentation));
-        }
-        sb.append(sj.toString()).append(") ").append(body.print(indentation));
-        
-        return sb.toString();
-    }
-    
-    @Override
-    public String getText() {
-        StringBuilder sb = new StringBuilder();
-        sb.append(type.getText()).append(" ").append(name).append("(");
-        
-        StringJoiner sj = new StringJoiner(", ");
-        for (Declaration decl : parameters) {
-            sj.add(decl.getText());
-        }
-        sb.append(sj.toString()).append(") ").append(body.getText());
-        
-        return sb.toString();
     }
     
     @Override

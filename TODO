@@ -2,6 +2,5 @@
     -> check ID after copy operations
 
 * cloning as visitor
-* printing as visitor?
 
 * don't mutate declaration statements?

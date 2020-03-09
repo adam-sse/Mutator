@@ -25,24 +25,6 @@ public class File extends AstElement {
     }
     
     @Override
-    public String print(String indentation) {
-        StringBuilder sb = new StringBuilder();
-        for (Function func : functions) {
-            sb.append(func.print(indentation));
-        }
-        return sb.toString();
-    }
-    
-    @Override
-    public String getText() {
-        StringBuilder sb = new StringBuilder();
-        for (Function func : functions) {
-            sb.append(func.getText()).append(" ");
-        }
-        return sb.toString();
-    }
-    
-    @Override
     public <T> T accept(IAstVisitor<T> visitor) {
         return visitor.visitFile(this);
     }

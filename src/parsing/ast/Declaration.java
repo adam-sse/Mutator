@@ -28,16 +28,6 @@ public class Declaration extends AstElement {
     }
     
     @Override
-    public String print(String indentation) {
-        return getText();
-    }
-    
-    @Override
-    public String getText() {
-        return type.getText() + " " + identifier;
-    }
-    
-    @Override
     public <T> T accept(IAstVisitor<T> visitor) {
         return visitor.visitDeclaration(this);
     }

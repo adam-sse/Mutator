@@ -21,16 +21,6 @@ public class EmptyStmt extends Statement {
     }
     
     @Override
-    public String print(String indentation) {
-        return idComment() + indentation + ";\n";
-    }
-    
-    @Override
-    public String getText() {
-        return ";";
-    }
-
-    @Override
     public <T> T accept(IAstVisitor<T> visitor) {
         return visitor.visitEmptyStmt(this);
     }

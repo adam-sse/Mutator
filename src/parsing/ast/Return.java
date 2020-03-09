@@ -26,16 +26,6 @@ public class Return extends Statement {
     }
     
     @Override
-    public String print(String indentation) {
-        return idComment() + indentation + getText() + "\n";
-    }
-    
-    @Override
-    public String getText() {
-        return "return" + (value != null ? (" " + value.getText()): "") + ";";
-    }
-    
-    @Override
     public <T> T accept(IAstVisitor<T> visitor) {
         return visitor.visitReturn(this);
     }

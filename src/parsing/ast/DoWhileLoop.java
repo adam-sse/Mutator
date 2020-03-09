@@ -18,37 +18,7 @@ public class DoWhileLoop extends Loop {
         default: throw new IndexOutOfBoundsException(index);
         }
     }
-    
-    @Override
-    public String print(String indentation) {
-        StringBuilder sb = new StringBuilder();
-        
-        sb.append(idComment()).append(indentation).append("do");
-        
-        if (body instanceof Block) {
-            sb.append(" ").append(body.print(indentation).substring(indentation.length()));
-        } else {
-            sb.append("\n").append(body.print(indentation + "\t"));
-        }
-        
-        if (body instanceof Block) {
-            // replace trailing \n with " "
-            sb.delete(sb.length() - 1, sb.length());
-            sb.append(" ");
-        } else {
-            sb.append(indentation);
-        }
-        
-        sb.append("while (").append(condition.print(indentation)).append(");\n");
-        
-        return sb.toString();
-    }
-    
-    @Override
-    public String getText() {
-        return "do " + body.getText() + " while (" + condition.getText() + ");";
-    }
-    
+
     @Override
     public <T> T accept(IAstVisitor<T> visitor) {
         return visitor.visitDoWhileLoop(this);

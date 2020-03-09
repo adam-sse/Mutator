@@ -17,7 +17,7 @@ import mutation.Mutant;
 import mutation.MutantList;
 import mutation.Mutator;
 import parsing.Converter;
-import parsing.ast.AstElement;
+import parsing.ast.operations.AstPrettyPrinter;
 import parsing.grammar.SimpleCLexer;
 import parsing.grammar.SimpleCParser;
 
@@ -121,10 +121,9 @@ public class Main {
             
             // 2) print out
             System.out.println("Writing...");
-            AstElement.PRINT_IDS = false;
             
             try (FileWriter out = new FileWriter(outpuPath)) {
-                out.write(file.print(""));
+                out.write(file.accept(new AstPrettyPrinter(false)));
             }
             
         } catch (IOException | IllegalArgumentException e) {

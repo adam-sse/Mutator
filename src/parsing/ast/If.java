@@ -32,40 +32,6 @@ public class If extends Statement {
     }
     
     @Override
-    public String print(String indentation) {
-        StringBuilder sb = new StringBuilder();
-        
-        sb.append(idComment()).append(indentation).append("if (").append(condition.print(indentation)).append(")");
-        
-        if (thenBlock instanceof Block) {
-            sb.append(" ").append(thenBlock.print(indentation).substring(indentation.length()));
-        } else {
-            sb.append("\n").append(thenBlock.print(indentation + "\t"));
-        }
-        
-        if (elseBlock != null) {
-            sb.append(indentation).append("else");
-            
-            if (elseBlock instanceof Block) {
-                sb.append(" ").append(elseBlock.print(indentation).substring(indentation.length()));
-            } else {
-                sb.append("\n").append(elseBlock.print(indentation + "\t"));
-            }
-        }
-        
-        return sb.toString();
-    }
-    
-    @Override
-    public String getText() {
-        String result = "if (" + condition.getText() + ") " + thenBlock.getText();
-        if (elseBlock != null) {
-            result += " else " + elseBlock.getText();
-        }
-        return result;
-    }
-    
-    @Override
     public <T> T accept(IAstVisitor<T> visitor) {
         return visitor.visitIf(this);
     }

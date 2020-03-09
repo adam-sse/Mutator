@@ -23,13 +23,8 @@ public class Identifier extends Expression {
     }
     
     @Override
-    int getPrecedence() {
+    public int getPrecedence() {
         return Integer.MAX_VALUE;
-    }
-    
-    @Override
-    public String getText() {
-        return identifier;
     }
     
     @Override

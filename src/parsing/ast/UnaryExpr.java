@@ -15,7 +15,7 @@ public class UnaryExpr extends Expression {
     }
     
     @Override
-    int getPrecedence() {
+    public int getPrecedence() {
         return operator.precedence;
     }
     
@@ -30,32 +30,6 @@ public class UnaryExpr extends Expression {
     @Override
     public int getNumChildren() {
         return 0;
-    }
-    
-    @Override
-    public String getText() {
-        StringBuilder sb = new StringBuilder();
-        
-        if (operator.prefix) {
-            sb.append(operator);
-            
-            if (expr.getPrecedence() <= this.getPrecedence()) {
-                sb.append("(").append(expr.getText()).append(")");
-            } else {
-                sb.append(expr.getText());
-            }
-            
-        } else {
-            if (expr.getPrecedence() <= this.getPrecedence()) {
-                sb.append("(").append(expr.getText()).append(")");
-            } else {
-                sb.append(expr.getText());
-            }
-            
-            sb.append(operator);
-        }
-        
-        return sb.toString();
     }
     
     @Override

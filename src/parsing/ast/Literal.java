@@ -13,7 +13,7 @@ public class Literal extends Expression {
     }
     
     @Override
-    int getPrecedence() {
+    public int getPrecedence() {
         return Integer.MAX_VALUE;
     }
 
@@ -25,11 +25,6 @@ public class Literal extends Expression {
     @Override
     public int getNumChildren() {
         return 0;
-    }
-    
-    @Override
-    public String getText() {
-        return value;
     }
     
     @Override

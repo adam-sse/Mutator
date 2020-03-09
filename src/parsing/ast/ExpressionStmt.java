@@ -26,16 +26,6 @@ public class ExpressionStmt extends Statement {
     }
     
     @Override
-    public String print(String indentation) {
-        return idComment() + indentation + getText() + "\n";
-    }
-    
-    @Override
-    public String getText() {
-        return expr.getText() + ";";
-    }
-    
-    @Override
     public <T> T accept(IAstVisitor<T> visitor) {
         return visitor.visitExpressionStmt(this);
     }
