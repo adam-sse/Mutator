@@ -2,6 +2,8 @@ package mutation;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
@@ -22,7 +24,11 @@ public class Mutator implements IFitnessStore {
 
     private Configuration config;
     
+    private File originalAst;
+    
     private Map<String, Double> fitnessStore;
+    
+    private Evaluator evaluator;
     
     private Random random;
     
@@ -44,8 +50,9 @@ public class Mutator implements IFitnessStore {
     }
     
     public MutantList run(File originalAst) {
-        Evaluator evaluator = EvaluatorFactory.create(config);
+        this.evaluator = EvaluatorFactory.create(config);
         this.fitnessStore = new HashMap<>(config.getGenerations() * config.getPopulationSize());
+        this.originalAst = originalAst;
         
         this.population = new MutantList();
         this.generation = 0;
@@ -55,11 +62,11 @@ public class Mutator implements IFitnessStore {
         System.out.println("Initial Creation");
         System.out.println("----------------");
         // add the default non-mutant
-        Mutant nonMutant = new Mutant(generateMutantId(), originalAst);
+        Mutant nonMutant = new Mutant(generateMutantId(), this.originalAst);
         this.population.addMutant(nonMutant);
         System.out.println(nonMutant.getId() + " is unmodified original");
         while (population.getSize() < config.getPopulationSize()) {
-            Mutant mutant = generateInitialMutant(originalAst);
+            Mutant mutant = generateInitialMutant();
             if (population.addMutant(mutant)) {
                 System.out.println(mutant.getId() + " is new mutant");
             }
@@ -79,7 +86,7 @@ public class Mutator implements IFitnessStore {
                 
                 stat_numEvaluated++;
             
-                TestResult testResult = evaluator.test(mutant);
+                TestResult testResult = this.evaluator.test(mutant);
                 if (testResult != TestResult.PASS) {
                     population.removeMutant(i);
                     i--;
@@ -102,7 +109,7 @@ public class Mutator implements IFitnessStore {
                     }
                     
                 } else {
-                    double fitness = evaluator.measureFitness(mutant);
+                    double fitness = this.evaluator.measureFitness(mutant);
                     System.out.println(mutant.getId() + ": " + fitness);
                     fitnessStore.put(mutant.getId(), fitness);
                 }
@@ -163,7 +170,7 @@ public class Mutator implements IFitnessStore {
                 } else {
                     System.out.println("Not enough mutants survived, creating new initial mutants");
                     while (nextPopulation.getSize() < config.getPopulationSize()) {
-                        Mutant mutant = generateInitialMutant(originalAst);
+                        Mutant mutant = generateInitialMutant();
                         if (nextPopulation.addMutant(mutant)) {
                             System.out.println(mutant.getId() + " is new mutant");
                         }
@@ -173,8 +180,24 @@ public class Mutator implements IFitnessStore {
                 this.population = nextPopulation;
             }
         }
+
+        if (config.getCleanThreshold() > 0) {
+            System.out.println();
+            System.out.println("Cleaning");
+            System.out.println("--------");
+            MutantList cleaned = new MutantList();
+            for (Mutant mutant : population) {
+                if (!cleaned.addMutant(cleanMutations(mutant))) {
+                    System.out.println(mutant.getId() + " is redundant after cleaning");
+                }
+            }
+            
+            cleaned.sort(this);
+            
+            this.population = cleaned;
+        }
         
-        return population;
+        return this.population;
     }
     
     private Mutant randomlySelect(MutantList population) {
@@ -236,8 +259,8 @@ public class Mutator implements IFitnessStore {
         }
     }
 
-    private Mutant generateInitialMutant(File originalAst) {
-        Mutant mutant = new Mutant(generateMutantId(), originalAst);
+    private Mutant generateInitialMutant() {
+        Mutant mutant = new Mutant(generateMutantId(), this.originalAst);
         
         for (int i = 0; i < config.getInitialMutations(); i++) {
             addNewMutation(mutant);
@@ -299,6 +322,62 @@ public class Mutator implements IFitnessStore {
         } while (mutation == null);
         
         return mutation;
+    }
+    
+    private Mutant cleanMutations(Mutant original) {
+        String cleanedId = original.getId() + "_cleaned";
+        double originalFitness = fitnessStore.get(original.getId());
+        List<Mutation> mutations = new LinkedList<>(original.getMutations());
+        
+        System.out.println("Cleaning " + original.getId());
+        boolean changed;
+        do {
+            changed = false;
+            
+            for (int i = 0; i < mutations.size(); i++) {
+                // create a temporary mutant with all mutations but the i-th.
+                Mutant temp = new Mutant("temp", this.originalAst);
+                for (int j = 0; j < mutations.size(); j++) {
+                    if (i != j) {
+                        temp.addMutation(mutations.get(j));
+                    }
+                }
+                
+                // evaluate
+                TestResult testResult = this.evaluator.test(temp);
+                if (testResult == TestResult.PASS) {
+                    double tempFitness = evaluator.measureFitness(temp);
+                    if ((originalFitness - tempFitness) / originalFitness < config.getCleanThreshold()) {
+                        System.out.println(" * Mutation " + mutations.get(i) + " is not required");
+                        System.out.println("   (original fitness: " + originalFitness + "; w/o this mutation: " + tempFitness + ")");
+                        
+                        this.fitnessStore.put(cleanedId, tempFitness);
+                        if (tempFitness > originalFitness) {
+                            originalFitness = tempFitness;
+                        }
+                        
+                        changed = true;
+                        mutations.remove(i);
+                        i--;
+                    }
+                }
+                
+            }
+            
+        } while (changed);
+        
+        if (!mutations.equals(original.getMutations())) {
+            Mutant replacement = new Mutant(cleanedId, this.originalAst);
+            for (Mutation mutation : mutations) {
+                replacement.addMutation(mutation);
+            }
+            
+            return replacement;
+            
+        } else {
+            System.out.println(" * All mutations required");
+            return original;
+        }
     }
     
     private String generateMutantId() {

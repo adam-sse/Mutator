@@ -34,6 +34,8 @@ public class Configuration {
     
     private long sleepBeforeFitness;
     
+    private double cleanThreshold;
+    
     public Configuration(Properties props) {
         this.seed = Long.parseLong(props.getProperty("mutator.seed"));
         this.saveGenerations = Boolean.parseBoolean(props.getProperty("mutator.saveGenerations"));
@@ -41,6 +43,7 @@ public class Configuration {
         this.populationSize = Integer.parseInt(props.getProperty("mutator.populationSize"));
         this.elitism = Integer.parseInt(props.getProperty("mutator.elitism"));
         this.initialMutations = Integer.parseInt(props.getProperty("mutator.initialMutations"));
+        this.cleanThreshold = Double.parseDouble(props.getProperty("mutator.cleanThreshold"));
         
         this.timeout = Integer.parseInt(props.getProperty("evaluator.timeout"));
         this.dropin = new File(props.getProperty("evaluator.dropin"));
@@ -56,7 +59,6 @@ public class Configuration {
         this.fitnessSrc = new File(props.getProperty("evaluator.fitness.src"));
         this.fitnessMeasures = Integer.parseInt(props.getProperty("evaluator.fitness.measures"));
         this.sleepBeforeFitness = Long.parseLong(props.getProperty("evaluator.fitness.sleepBefore"));
-        
     }
     
     public long getSeed() {
@@ -109,6 +111,10 @@ public class Configuration {
 
     public long getSleepBeforeFitness() {
         return sleepBeforeFitness;
+    }
+
+    public double getCleanThreshold() {
+        return cleanThreshold;
     }
     
 }
