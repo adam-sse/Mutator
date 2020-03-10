@@ -46,7 +46,8 @@ public class Type extends AstElement {
     
     @Override
     public int hashCode() {
-        return 367 * type.hashCode() + 191 * Boolean.hashCode(pointer) + 67 * modifier.hashCode();
+        return 367 * type.hashCode() + 191 * Boolean.hashCode(pointer)
+                + (modifier != null ? 67 * modifier.hashCode() : 0);
     }
     
 }
