@@ -2,13 +2,14 @@ package parsing.ast;
 
 public abstract class Loop extends Statement {
 
-    public Loop(AstElement parent) {
-        super(parent);
-    }
 
     public Expression condition;
     
     public Statement body;
+    
+    public Loop(AstElement parent) {
+        super(parent);
+    }
     
     @Override
     public int getNumChildren() {

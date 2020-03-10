@@ -349,7 +349,8 @@ public class Mutator implements IFitnessStore {
                     double tempFitness = evaluator.measureFitness(temp);
                     if ((originalFitness - tempFitness) / originalFitness < config.getCleanThreshold()) {
                         System.out.println(" * Mutation " + mutations.get(i) + " is not required");
-                        System.out.println("   (original fitness: " + originalFitness + "; w/o this mutation: " + tempFitness + ")");
+                        System.out.println("   (original fitness: " + originalFitness
+                                + "; w/o this mutation: " + tempFitness + ")");
                         
                         this.fitnessStore.put(cleanedId, tempFitness);
                         if (tempFitness > originalFitness) {

@@ -13,7 +13,8 @@ public class DummyEvaluator extends Evaluator {
         if (m.getId().equals("G001_M001")) {
             return TestResult.PASS;
         }
-        return Math.random() <= 0.8 ? TestResult.PASS : TestResult.values()[(int) ((Math.random() * (TestResult.values().length - 1)) + 1)];
+        return Math.random() <= 0.8 ? TestResult.PASS
+                : TestResult.values()[(int) ((Math.random() * (TestResult.values().length - 1)) + 1)];
     }
 
     @Override

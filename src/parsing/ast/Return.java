@@ -12,9 +12,10 @@ public class Return extends Statement {
     
     @Override
     public AstElement getChild(int index) throws IndexOutOfBoundsException {
-        switch (index) {
-        case 0: if (value != null) return value; else throw new IndexOutOfBoundsException(index);
-        default: throw new IndexOutOfBoundsException(index);
+        if (index == 0 && value != null) {
+            return value;
+        } else {
+            throw new IndexOutOfBoundsException(index);
         }
     }
     

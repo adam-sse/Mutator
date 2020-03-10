@@ -57,7 +57,8 @@ public class CopyOverrideStatement extends Mutation {
         
         if (obj instanceof CopyOverrideStatement) {
             CopyOverrideStatement other = (CopyOverrideStatement) obj;
-            equal = sourceIdentifier.equals(other.sourceIdentifier) && target.equals(other.target) && this.toInsert.equals(other.toInsert);
+            equal = sourceIdentifier.equals(other.sourceIdentifier) && target.equals(other.target)
+                    && this.toInsert.equals(other.toInsert);
         }
         
         return equal;

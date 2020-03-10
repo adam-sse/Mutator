@@ -19,7 +19,12 @@ public class If extends Statement {
         switch (index) {
         case 0: return condition;
         case 1: return thenBlock;
-        case 2: if (elseBlock != null) return elseBlock; else throw new IndexOutOfBoundsException(index);
+        case 2:
+            if (elseBlock != null) {
+                return elseBlock;
+            } else {
+                throw new IndexOutOfBoundsException(index);
+            }
         default: throw new IndexOutOfBoundsException(index);
         }
     }

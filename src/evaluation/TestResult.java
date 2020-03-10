@@ -10,9 +10,7 @@ public enum TestResult {
     
     COMPILATION_FAILED("failed compilation"),
     
-    ERROR("error"),
-    
-    ;
+    ERROR("error");
     
     private String msg;
     

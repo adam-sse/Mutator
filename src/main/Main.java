@@ -26,9 +26,12 @@ public class Main {
     private static int help() {
         System.out.println("Usage: <command> <command-specific arguments>*");
         System.out.println("Available commands:");
-        System.out.println("  help                             : Display this help message");
-        System.out.println("  run <configuration> <input file> : Run the main Mutator program with the given configuration");
-        System.out.println("  clean <input file> <output file> : Pretty-print the given file");
+        System.out.println("  help                             : "
+                + "Display this help message");
+        System.out.println("  run <configuration> <input file> : "
+                + "Run the main Mutator program with the given configuration");
+        System.out.println("  clean <input file> <output file> : "
+                + "Pretty-print the given file");
         return 0;
     }
     
@@ -50,8 +53,9 @@ public class Main {
             parser.addErrorListener(new BaseErrorListener() {
                 @Override
                 public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol, int line,
-                        int charPositionInLine, String msg, RecognitionException e) {
-                    throw new IllegalArgumentException("Parsing failed: in line " + line + ":" + charPositionInLine + " " + msg);
+                        int charPositionInLine, String msg, RecognitionException exc) {
+                    throw new IllegalArgumentException("Parsing failed: in line " + line + ":" + charPositionInLine
+                            + " " + msg);
                 }
             });
             
@@ -82,7 +86,8 @@ public class Main {
                 int dotIndex = input.getName().lastIndexOf('.');
                 String inputBase = input.getName().substring(0, dotIndex);
                 String suffix = input.getName().substring(dotIndex + 1);
-                File output = new File(input.getParentFile(), inputBase + "_" + (i + 1) + "_" + mutant.getId() + "." + suffix);
+                File output = new File(input.getParentFile(), inputBase + "_" + (i + 1) + "_"
+                        + mutant.getId() + "." + suffix);
                 mutant.write(output);
             }
             
@@ -111,8 +116,9 @@ public class Main {
             parser.addErrorListener(new BaseErrorListener() {
                 @Override
                 public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol, int line,
-                        int charPositionInLine, String msg, RecognitionException e) {
-                    throw new IllegalArgumentException("Parsing failed: in line " + line + ":" + charPositionInLine + " " + msg);
+                        int charPositionInLine, String msg, RecognitionException exc) {
+                    throw new IllegalArgumentException("Parsing failed: in line " + line + ":" + charPositionInLine
+                            + " " + msg);
                 }
             });
             

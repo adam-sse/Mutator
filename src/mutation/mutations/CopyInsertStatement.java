@@ -20,7 +20,8 @@ public class CopyInsertStatement extends Mutation {
     
     public boolean before;
     
-    public CopyInsertStatement(MutationIdentifier sourceIdentifier, Statement toInsert, MutationIdentifier reference, boolean before) {
+    public CopyInsertStatement(MutationIdentifier sourceIdentifier, Statement toInsert,
+            MutationIdentifier reference, boolean before) {
         this.sourceIdentifier = sourceIdentifier;
         this.toInsert = toInsert;
         this.reference = reference;
@@ -57,7 +58,8 @@ public class CopyInsertStatement extends Mutation {
 
     @Override
     public String toString() {
-        return "CopyInsertStatement(source=" + sourceIdentifier + ", reference=" + reference+ ", before=" + before + ") -> #" + toInsert.id;
+        return "CopyInsertStatement(source=" + sourceIdentifier + ", reference=" + reference + ", before=" + before
+                + ") -> #" + toInsert.id;
     }
     
     @Override

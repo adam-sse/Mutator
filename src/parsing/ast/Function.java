@@ -47,7 +47,8 @@ public class Function extends AstElement {
         boolean equals = false;
         if (super.equals(obj)) {
             Function other = (Function) obj;
-            equals = type.equals(other.type) && name.equals(other.name) && parameters.equals(other.parameters) && body.equals(other.body);
+            equals = type.equals(other.type) && name.equals(other.name) && parameters.equals(other.parameters)
+                    && body.equals(other.body);
         }
         return equals;
     }

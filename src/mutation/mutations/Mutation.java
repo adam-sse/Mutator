@@ -13,7 +13,8 @@ public abstract class Mutation {
     /**
      * Creates a diff-like representation for the last {@link #apply(AstElement)} call.
      * 
-     * @return The diff; a list of lines. May be <code>null</code> if {@link #apply(AstElement)} wasn't called yet or was not successful.
+     * @return The diff; a list of lines. May be <code>null</code> if {@link #apply(AstElement)} wasn't called yet
+     *      or was not successful.
      */
     public List<String> getDiff() {
         return diff;

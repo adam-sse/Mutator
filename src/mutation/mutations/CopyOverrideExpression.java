@@ -68,7 +68,8 @@ public class CopyOverrideExpression extends Mutation {
         
         if (obj instanceof CopyOverrideExpression) {
             CopyOverrideExpression other = (CopyOverrideExpression) obj;
-            equal = sourceIdentifier.equals(other.sourceIdentifier) && target.equals(other.target) && this.toInsert.equals(other.toInsert);
+            equal = sourceIdentifier.equals(other.sourceIdentifier) && target.equals(other.target)
+                    && this.toInsert.equals(other.toInsert);
         }
         
         return equal;
