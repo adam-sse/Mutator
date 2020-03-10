@@ -20,6 +20,10 @@ public class Configuration {
     
     private int initialMutations;
     
+    private int cleanFrequency;
+    
+    private double cleanThreshold;
+    
     private int timeout;
     
     private File dropin;
@@ -34,8 +38,6 @@ public class Configuration {
     
     private long sleepBeforeFitness;
     
-    private double cleanThreshold;
-    
     public Configuration(Properties props) {
         this.seed = Long.parseLong(props.getProperty("mutator.seed"));
         this.saveGenerations = Boolean.parseBoolean(props.getProperty("mutator.saveGenerations"));
@@ -43,7 +45,9 @@ public class Configuration {
         this.populationSize = Integer.parseInt(props.getProperty("mutator.populationSize"));
         this.elitism = Integer.parseInt(props.getProperty("mutator.elitism"));
         this.initialMutations = Integer.parseInt(props.getProperty("mutator.initialMutations"));
-        this.cleanThreshold = Double.parseDouble(props.getProperty("mutator.cleanThreshold"));
+        
+        this.cleanFrequency = Integer.parseInt(props.getProperty("mutator.clean.frequency"));
+        this.cleanThreshold = Double.parseDouble(props.getProperty("mutator.clean.threshold"));
         
         this.timeout = Integer.parseInt(props.getProperty("evaluator.timeout"));
         this.dropin = new File(props.getProperty("evaluator.dropin"));
@@ -85,6 +89,14 @@ public class Configuration {
         return initialMutations;
     }
     
+    public int getCleanFrequency() {
+        return cleanFrequency;
+    }
+    
+    public double getCleanThreshold() {
+        return cleanThreshold;
+    }
+    
     public int getTimeout() {
         return timeout;
     }
@@ -111,10 +123,6 @@ public class Configuration {
 
     public long getSleepBeforeFitness() {
         return sleepBeforeFitness;
-    }
-
-    public double getCleanThreshold() {
-        return cleanThreshold;
     }
     
 }

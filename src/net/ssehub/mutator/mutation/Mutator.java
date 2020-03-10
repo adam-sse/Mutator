@@ -118,6 +118,10 @@ public class Mutator implements IFitnessStore {
             
             population.sort(this);
             
+            if (this.generation % config.getCleanFrequency() == 0) {
+                cleanPopulation();
+            }
+            
             nextGeneration();
             if (generation <= config.getGenerations()) {
                 
@@ -181,6 +185,12 @@ public class Mutator implements IFitnessStore {
             }
         }
 
+        cleanPopulation();
+        
+        return this.population;
+    }
+    
+    private void cleanPopulation() {
         if (config.getCleanThreshold() > 0) {
             System.out.println();
             System.out.println("Cleaning");
@@ -196,8 +206,6 @@ public class Mutator implements IFitnessStore {
             
             this.population = cleaned;
         }
-        
-        return this.population;
     }
     
     private Mutant randomlySelect(MutantList population) {
@@ -328,7 +336,11 @@ public class Mutator implements IFitnessStore {
     }
     
     private Mutant cleanMutations(Mutant original) {
-        String cleanedId = original.getId() + "_cleaned";
+        if (original.getId().endsWith("c")) {
+            return original;
+        }
+        
+        String cleanedId = original.getId() + "c";
         double originalFitness = fitnessStore.get(original.getId());
         List<Mutation> mutations = new LinkedList<>(original.getMutations());
         

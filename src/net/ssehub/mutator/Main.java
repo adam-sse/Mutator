@@ -72,12 +72,12 @@ public class Main {
             System.out.println("Writing " + mutants.getSize() + " mutants...");
             double bestFitness = mutants.getSize() > 0 ? mutator.getFitness(mutants.getMutant(0).getId()) : 0.0;
             double originalFitness = mutator.getFitness("G001_M001");
-            System.out.println(" Rank |  Mutant   |  Best  | Original ");
-            System.out.println("------+-----------+--------+----------");
+            System.out.println(" Rank |   Mutant   |  Best  | Original ");
+            System.out.println("------+------------+--------+----------");
             for (int i = 0; i < mutants.getSize(); i++) {
                 Mutant mutant = mutants.getMutant(i);
                 
-                System.out.printf(Locale.ROOT, "  %2d  | %s | %5.1f%% | %6.1f%%\n",
+                System.out.printf(Locale.ROOT, "  %2d  | %10s | %5.1f%% | %6.1f%%\n",
                         i + 1,
                         mutant.getId(),
                         mutator.getFitness(mutant.getId()) / bestFitness * 100,
