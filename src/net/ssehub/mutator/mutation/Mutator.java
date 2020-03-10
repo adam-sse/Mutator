@@ -1,9 +1,9 @@
 package net.ssehub.mutator.mutation;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -56,7 +56,7 @@ public class Mutator implements IFitnessStore {
         this.fitnessStore = new HashMap<>(config.getGenerations() * config.getPopulationSize());
         this.originalAst = originalAst;
         
-        this.statBestGenFitness = new LinkedList<>();
+        this.statBestGenFitness = new ArrayList<>(config.getGenerations());
         
         this.population = new MutantList();
         this.generation = 0;
@@ -352,7 +352,7 @@ public class Mutator implements IFitnessStore {
         
         String cleanedId = original.getId() + "c";
         double originalFitness = fitnessStore.get(original.getId());
-        List<Mutation> mutations = new LinkedList<>(original.getMutations());
+        List<Mutation> mutations = new ArrayList<>(original.getMutations());
         
         System.out.println("Cleaning " + original.getId());
         boolean changed;
