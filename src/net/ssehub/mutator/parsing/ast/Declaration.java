@@ -39,5 +39,10 @@ public class Declaration extends AstElement {
         }
         return equals;
     }
+    
+    @Override
+    public int hashCode() {
+        return 397 * type.hashCode() + 173 * identifier.hashCode();
+    }
 
 }

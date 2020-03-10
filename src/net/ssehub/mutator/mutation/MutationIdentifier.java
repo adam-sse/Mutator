@@ -51,6 +51,11 @@ public class MutationIdentifier {
         return equal;
     }
     
+    @Override
+    public int hashCode() {
+        return Long.hashCode(id);
+    }
+    
     public AstElement find(AstElement ast) {
         Finder finder = new Finder();
         ast.accept(new FullVisitor(finder));

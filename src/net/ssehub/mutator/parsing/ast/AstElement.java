@@ -89,4 +89,9 @@ public abstract class AstElement {
         return obj != null && this.getClass() == obj.getClass();
     }
     
+    @Override
+    public int hashCode() {
+        return 97;
+    }
+    
 }

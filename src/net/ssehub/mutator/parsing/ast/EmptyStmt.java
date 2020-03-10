@@ -28,4 +28,9 @@ public class EmptyStmt extends Statement {
         return super.equals(obj);
     }
     
+    @Override
+    public int hashCode() {
+        return 499;
+    }
+    
 }

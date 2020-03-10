@@ -41,4 +41,9 @@ public class Assignment extends Statement {
         return equals;
     }
     
+    @Override
+    public int hashCode() {
+        return 13 * variable.hashCode() + 31 * value.hashCode();
+    }
+    
 }

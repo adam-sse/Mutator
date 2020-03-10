@@ -39,5 +39,10 @@ public class Identifier extends Expression {
         }
         return equals;
     }
+    
+    @Override
+    public int hashCode() {
+        return 277 * identifier.hashCode();
+    }
 
 }

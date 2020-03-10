@@ -47,5 +47,10 @@ public class BinaryExpr extends Expression {
         }
         return equals;
     }
+    
+    @Override
+    public int hashCode() {
+        return operator.hashCode() + 179 * left.hashCode() + 59 * right.hashCode();
+    }
 
 }

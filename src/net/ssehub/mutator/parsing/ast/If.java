@@ -1,5 +1,7 @@
 package net.ssehub.mutator.parsing.ast;
 
+import java.util.Objects;
+
 import net.ssehub.mutator.parsing.ast.operations.IAstVisitor;
 
 public class If extends Statement {
@@ -52,6 +54,12 @@ public class If extends Statement {
             }
         }
         return equals;
+    }
+    
+    @Override
+    public int hashCode() {
+        return 401 * condition.hashCode() + 353 * thenBlock.hashCode()
+                + (elseBlock != null ? 373 * elseBlock.hashCode() : 13);
     }
     
 }

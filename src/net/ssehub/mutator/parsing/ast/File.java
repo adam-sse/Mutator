@@ -38,4 +38,9 @@ public class File extends AstElement {
         return equals;
     }
     
+    @Override
+    public int hashCode() {
+        return functions.hashCode();
+    }
+    
 }

@@ -91,5 +91,10 @@ public class Mutant {
         
         return equal;
     }
+    
+    @Override
+    public int hashCode() {
+        return 223 * mutations.hashCode();
+    }
 
 }

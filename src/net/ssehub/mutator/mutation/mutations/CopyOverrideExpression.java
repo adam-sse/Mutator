@@ -75,6 +75,11 @@ public class CopyOverrideExpression extends Mutation {
         return equal;
     }
     
+    @Override
+    public int hashCode() {
+        return sourceIdentifier.hashCode() + 233 * target.hashCode() + 241 * toInsert.hashCode();
+    }
+    
     public static CopyOverrideExpression find(File file, Random random) {
         ExpressionCollector collector = new ExpressionCollector();
         for (Function func : file.functions) {

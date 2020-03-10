@@ -44,5 +44,10 @@ public class UnaryExpr extends Expression {
         }
         return equals;
     }
+    
+    @Override
+    public int hashCode() {
+        return 31 * operator.hashCode() + 233 * expr.hashCode();
+    }
 
 }

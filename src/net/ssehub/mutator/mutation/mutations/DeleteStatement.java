@@ -52,6 +52,11 @@ public class DeleteStatement extends Mutation {
         
         return equal;
     }
+    
+    @Override
+    public int hashCode() {
+        return target.hashCode();
+    }
 
     public static DeleteStatement find(File file, Random random) {
         StatementCollector collector = new StatementCollector();

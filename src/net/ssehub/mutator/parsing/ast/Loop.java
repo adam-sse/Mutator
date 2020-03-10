@@ -26,4 +26,9 @@ public abstract class Loop extends Statement {
         return equals;
     }
     
+    @Override
+    public int hashCode() {
+        return 293 * condition.hashCode() + 509 * body.hashCode();
+    }
+    
 }

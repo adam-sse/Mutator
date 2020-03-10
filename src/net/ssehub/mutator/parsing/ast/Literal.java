@@ -40,4 +40,9 @@ public class Literal extends Expression {
         return equals;
     }
     
+    @Override
+    public int hashCode() {
+        return 199 * value.hashCode();
+    }
+    
 }

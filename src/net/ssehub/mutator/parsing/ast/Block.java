@@ -37,5 +37,10 @@ public class Block extends Statement {
         }
         return equals;
     }
+    
+    @Override
+    public int hashCode() {
+        return statements.hashCode();
+    }
 
 }

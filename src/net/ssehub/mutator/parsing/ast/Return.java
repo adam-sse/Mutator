@@ -43,4 +43,9 @@ public class Return extends Statement {
         return equals;
     }
     
+    @Override
+    public int hashCode() {
+        return 509 + (value != null ? 457 * value.hashCode() : 523);
+    }
+    
 }

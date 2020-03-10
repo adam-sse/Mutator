@@ -38,4 +38,9 @@ public class ExpressionStmt extends Statement {
         return equals;
     }
     
+    @Override
+    public int hashCode() {
+        return 149 * expr.hashCode();
+    }
+    
 }

@@ -75,6 +75,12 @@ public class CopyInsertStatement extends Mutation {
         return equal;
     }
     
+    @Override
+    public int hashCode() {
+        return sourceIdentifier.hashCode() + 137 * reference.hashCode()
+                + 211 * Boolean.hashCode(before) + 109 * toInsert.hashCode();
+    }
+    
     public static CopyInsertStatement find(File file, Random random) {
         StatementCollector collector = new StatementCollector();
         for (Function func : file.functions) {

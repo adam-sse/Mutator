@@ -45,4 +45,9 @@ public class FunctionCall extends Expression {
         return equals;
     }
     
+    @Override
+    public int hashCode() {
+        return 281 * function.hashCode() + 521 * params.hashCode();
+    }
+    
 }

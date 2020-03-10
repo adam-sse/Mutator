@@ -68,10 +68,15 @@ public class OverrideWithLiteral extends Mutation {
         
         if (obj instanceof OverrideWithLiteral) {
             OverrideWithLiteral other = (OverrideWithLiteral) obj;
-            equal = target.equals(other.target) && literal.equals(other.literal) && this.literal.equals(other.literal);
+            equal = target.equals(other.target) && literal.equals(other.literal);
         }
         
         return equal;
+    }
+    
+    @Override
+    public int hashCode() {
+        return 193 * target.hashCode() + 479 * literal.hashCode();
     }
     
     public static OverrideWithLiteral find(File file, Random random) {

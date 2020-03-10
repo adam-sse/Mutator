@@ -64,6 +64,11 @@ public class CopyOverrideStatement extends Mutation {
         return equal;
     }
     
+    @Override
+    public int hashCode() {
+        return sourceIdentifier.hashCode() + 401 * target.hashCode() + 181 * toInsert.hashCode();
+    }
+    
     public static CopyOverrideStatement find(File file, Random random) {
         StatementCollector collector = new StatementCollector();
         for (Function func : file.functions) {

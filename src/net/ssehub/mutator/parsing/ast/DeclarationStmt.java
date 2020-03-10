@@ -38,4 +38,9 @@ public class DeclarationStmt extends Statement {
         return equals;
     }
     
+    @Override
+    public int hashCode() {
+        return 349 * decl.hashCode();
+    }
+    
 }

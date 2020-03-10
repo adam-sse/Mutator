@@ -53,4 +53,9 @@ public class Function extends AstElement {
         return equals;
     }
     
+    @Override
+    public int hashCode() {
+        return name.hashCode() + 389 * type.hashCode() + 101 * parameters.hashCode() + 541 * body.hashCode();
+    }
+    
 }
