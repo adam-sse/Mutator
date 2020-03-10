@@ -30,6 +30,10 @@ public class Mutant {
     }
     
     public boolean addMutation(Mutation mutation) {
+        if (mutations.contains(mutation)) {
+            return false;
+        }
+        
         boolean applies = mutation.apply(this.ast);
         
         if (applies) {
