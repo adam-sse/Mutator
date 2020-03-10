@@ -68,8 +68,7 @@ public class CopyOverrideExpression extends Mutation {
         
         if (obj instanceof CopyOverrideExpression) {
             CopyOverrideExpression other = (CopyOverrideExpression) obj;
-            equal = sourceIdentifier.equals(other.sourceIdentifier) && target.equals(other.target)
-                    && this.toInsert.equals(other.toInsert);
+            equal = sourceIdentifier.equals(other.sourceIdentifier) && target.equals(other.target);
         }
         
         return equal;
@@ -77,7 +76,7 @@ public class CopyOverrideExpression extends Mutation {
     
     @Override
     public int hashCode() {
-        return sourceIdentifier.hashCode() + 233 * target.hashCode() + 241 * toInsert.hashCode();
+        return sourceIdentifier.hashCode() + 233 * target.hashCode();
     }
     
     public static CopyOverrideExpression find(File file, Random random) {

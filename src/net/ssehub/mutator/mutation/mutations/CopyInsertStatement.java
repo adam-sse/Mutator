@@ -69,7 +69,7 @@ public class CopyInsertStatement extends Mutation {
         if (obj instanceof CopyInsertStatement) {
             CopyInsertStatement other = (CopyInsertStatement) obj;
             equal = sourceIdentifier.equals(other.sourceIdentifier) && reference.equals(other.reference)
-                    && before == other.before && this.toInsert.equals(other.toInsert);
+                    && before == other.before;
         }
         
         return equal;
@@ -77,8 +77,7 @@ public class CopyInsertStatement extends Mutation {
     
     @Override
     public int hashCode() {
-        return sourceIdentifier.hashCode() + 137 * reference.hashCode()
-                + 211 * Boolean.hashCode(before) + 109 * toInsert.hashCode();
+        return sourceIdentifier.hashCode() + 137 * reference.hashCode() + 211 * Boolean.hashCode(before);
     }
     
     public static CopyInsertStatement find(File file, Random random) {
