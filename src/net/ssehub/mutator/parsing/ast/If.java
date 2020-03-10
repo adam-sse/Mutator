@@ -1,7 +1,5 @@
 package net.ssehub.mutator.parsing.ast;
 
-import java.util.Objects;
-
 import net.ssehub.mutator.parsing.ast.operations.IAstVisitor;
 
 public class If extends Statement {

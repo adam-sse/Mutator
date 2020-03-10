@@ -72,9 +72,9 @@ public enum BinaryOperator {
         case "&&": return AND;
         
         case "||": return OR;
-        }
         
-        throw new IllegalArgumentException();
+        default: throw new IllegalArgumentException();
+        }
     }
     
     @Override

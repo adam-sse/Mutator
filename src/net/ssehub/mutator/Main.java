@@ -18,8 +18,8 @@ import net.ssehub.mutator.mutation.MutantList;
 import net.ssehub.mutator.mutation.Mutator;
 import net.ssehub.mutator.parsing.Converter;
 import net.ssehub.mutator.parsing.ast.operations.AstPrettyPrinter;
-import parsing.grammar.SimpleCLexer;
-import parsing.grammar.SimpleCParser;
+import net.ssehub.mutator.parsing.grammar.SimpleCLexer;
+import net.ssehub.mutator.parsing.grammar.SimpleCParser;
 
 public class Main {
     

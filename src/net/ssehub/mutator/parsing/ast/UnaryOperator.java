@@ -42,9 +42,9 @@ public enum UnaryOperator {
         case "-": return MINUS;
         
         case "~": return BIT_NEGATION;
-        }
         
-        throw new IllegalArgumentException();
+        default: throw new IllegalArgumentException();
+        }
     }
     
     @Override

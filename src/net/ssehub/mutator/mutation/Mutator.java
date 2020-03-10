@@ -38,11 +38,11 @@ public class Mutator implements IFitnessStore {
     
     private int nextMutantId;
     
-    private int stat_numEvaluated;
-    private int stat_numCompileError;
-    private int stat_numTimeout;
-    private int stat_numFailed;
-    private int stat_numError;
+    private int statNumEvaluated;
+    private int statNumCompileError;
+    private int statNumTimeout;
+    private int statNumFailed;
+    private int statNumError;
     
     public Mutator(Configuration config) {
         this.config = config;
@@ -84,7 +84,7 @@ public class Mutator implements IFitnessStore {
             for (int i = 0; i < population.getSize(); i++) {
                 Mutant mutant = population.getMutant(i);
                 
-                stat_numEvaluated++;
+                statNumEvaluated++;
             
                 TestResult testResult = this.evaluator.test(mutant);
                 if (testResult != TestResult.PASS) {
@@ -94,16 +94,16 @@ public class Mutator implements IFitnessStore {
                     
                     switch (testResult) {
                     case COMPILATION_FAILED:
-                        stat_numCompileError++;
+                        statNumCompileError++;
                         break;
                     case ERROR:
-                        stat_numError++;
+                        statNumError++;
                         break;
                     case TEST_FAILED:
-                        stat_numFailed++;
+                        statNumFailed++;
                         break;
                     case TIMEOUT:
-                        stat_numTimeout++;
+                        statNumTimeout++;
                         break;
                     default:
                     }
@@ -317,6 +317,9 @@ public class Mutator implements IFitnessStore {
             case 4:
                 mutation = OverrideWithLiteral.find(ast, random);
                 break;
+                
+            default:
+                // can't happen
             }
             
         } while (mutation == null);
@@ -391,11 +394,11 @@ public class Mutator implements IFitnessStore {
     }
     
     public void printStatistics() {
-        System.out.println("Evaluated: " + stat_numEvaluated);
-        System.out.println("    failed compilation: " + stat_numCompileError);
-        System.out.println("    timed-out: " + stat_numTimeout);
-        System.out.println("    failed tests: " + stat_numFailed);
-        System.out.println("    error: " + stat_numError);
+        System.out.println("Evaluated: " + statNumEvaluated);
+        System.out.println("    failed compilation: " + statNumCompileError);
+        System.out.println("    timed-out: " + statNumTimeout);
+        System.out.println("    failed tests: " + statNumFailed);
+        System.out.println("    error: " + statNumError);
     }
     
 }

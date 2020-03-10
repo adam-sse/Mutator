@@ -8,11 +8,10 @@ import java.util.Arrays;
 import org.junit.Test;
 
 import net.ssehub.mutator.mutation.MutationIdentifier;
-import net.ssehub.mutator.mutation.mutations.DeleteStatement;
+import net.ssehub.mutator.parsing.ast.AstElement.Location;
 import net.ssehub.mutator.parsing.ast.Block;
 import net.ssehub.mutator.parsing.ast.EmptyStmt;
 import net.ssehub.mutator.parsing.ast.Statement;
-import net.ssehub.mutator.parsing.ast.AstElement.Location;
 
 public class DeleteStatementTest {
 

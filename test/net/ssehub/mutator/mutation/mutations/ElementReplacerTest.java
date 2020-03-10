@@ -6,7 +6,6 @@ import static org.junit.Assert.assertThat;
 
 import org.junit.Test;
 
-import net.ssehub.mutator.mutation.mutations.ElementReplacer;
 import net.ssehub.mutator.parsing.ast.AstElement;
 import net.ssehub.mutator.parsing.ast.Block;
 import net.ssehub.mutator.parsing.ast.ExpressionStmt;

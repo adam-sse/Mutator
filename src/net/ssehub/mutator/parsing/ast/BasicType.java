@@ -31,9 +31,8 @@ public enum BasicType {
         case "float": return FLOAT;
         case "double": return DOUBLE;
         case "longdouble": return LONG_DOUBLE;
+        default: throw new IllegalArgumentException();
         }
-        
-        throw new IllegalArgumentException();
     }
     
 }
