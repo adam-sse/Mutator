@@ -28,7 +28,11 @@ import net.ssehub.mutator.parsing.ast.operations.IAstVisitor;
 
 class ExpressionCollector implements IAstVisitor<Void> {
 
-    public List<Expression> expressions = new LinkedList<>();
+    private List<Expression> expressions = new LinkedList<>();
+    
+    public List<Expression> getExpressions() {
+        return expressions;
+    }
     
     public void collect(AstElement element) {
         FullVisitor visitor = new FullVisitor(this);

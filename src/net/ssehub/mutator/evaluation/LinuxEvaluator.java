@@ -122,7 +122,7 @@ public class LinuxEvaluator extends Evaluator {
         Process p = pb.start();
         
         class ResultHolder {
-            String result = "";
+            private String result = "";
         }
         ResultHolder holder = new ResultHolder();
         

@@ -12,11 +12,11 @@ import net.ssehub.mutator.parsing.ast.operations.AstCloner;
 
 public class CopyOverrideStatement extends Mutation {
 
-    public MutationIdentifier sourceIdentifier;
+    private MutationIdentifier sourceIdentifier;
     
-    public AstElement toInsert;
+    private AstElement toInsert;
     
-    public MutationIdentifier target;
+    private MutationIdentifier target;
     
     public CopyOverrideStatement(MutationIdentifier sourceIdentifier, AstElement toInsert, MutationIdentifier target) {
         this.sourceIdentifier = sourceIdentifier;
@@ -73,15 +73,15 @@ public class CopyOverrideStatement extends Mutation {
         StatementCollector collector = new StatementCollector();
         for (Function func : file.functions) {
             collector.collect(func.body);
-            collector.statements.remove(func.body);
+            collector.getStatements().remove(func.body);
         }
         
         Statement mutationSource;
         Statement mutationTarget;
         
         do {
-            mutationSource = collector.statements.get(random.nextInt(collector.statements.size()));
-            mutationTarget = collector.statements.get(random.nextInt(collector.statements.size()));
+            mutationSource = collector.getStatements().get(random.nextInt(collector.getStatements().size()));
+            mutationTarget = collector.getStatements().get(random.nextInt(collector.getStatements().size()));
         } while (mutationSource.equals(mutationTarget));
         
         CopyOverrideStatement mutation = new CopyOverrideStatement(

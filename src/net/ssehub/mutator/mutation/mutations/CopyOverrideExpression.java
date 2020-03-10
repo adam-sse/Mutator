@@ -13,11 +13,11 @@ import net.ssehub.mutator.parsing.ast.operations.AstCloner;
 
 public class CopyOverrideExpression extends Mutation {
 
-    public MutationIdentifier sourceIdentifier;
+    private MutationIdentifier sourceIdentifier;
     
-    public AstElement toInsert;
+    private AstElement toInsert;
     
-    public MutationIdentifier target;
+    private MutationIdentifier target;
     
     public CopyOverrideExpression(MutationIdentifier sourceIdentifier, AstElement toInsert, MutationIdentifier target) {
         this.sourceIdentifier = sourceIdentifier;
@@ -90,8 +90,8 @@ public class CopyOverrideExpression extends Mutation {
         Expression mutationTarget;
         
         do {
-            mutationSource = collector.expressions.get(random.nextInt(collector.expressions.size()));
-            mutationTarget = collector.expressions.get(random.nextInt(collector.expressions.size()));
+            mutationSource = collector.getExpressions().get(random.nextInt(collector.getExpressions().size()));
+            mutationTarget = collector.getExpressions().get(random.nextInt(collector.getExpressions().size()));
         } while (mutationSource.equals(mutationTarget));
         
         CopyOverrideExpression mutation = new CopyOverrideExpression(

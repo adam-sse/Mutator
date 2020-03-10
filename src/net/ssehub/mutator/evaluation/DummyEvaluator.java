@@ -9,8 +9,8 @@ public class DummyEvaluator extends Evaluator {
     }
     
     @Override
-    public TestResult test(Mutant m) {
-        if (m.getId().equals("G001_M001")) {
+    public TestResult test(Mutant mutant) {
+        if (mutant.getId().equals("G001_M001")) {
             return TestResult.PASS;
         }
         return Math.random() <= 0.8 ? TestResult.PASS
@@ -18,7 +18,7 @@ public class DummyEvaluator extends Evaluator {
     }
 
     @Override
-    public double measureFitness(Mutant m) {
+    public double measureFitness(Mutant mutant) {
         return Math.random() * 10;
     }
 

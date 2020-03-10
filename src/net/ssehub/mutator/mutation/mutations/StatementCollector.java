@@ -28,7 +28,11 @@ import net.ssehub.mutator.parsing.ast.operations.IAstVisitor;
 
 class StatementCollector implements IAstVisitor<Void> {
 
-    public List<Statement> statements = new LinkedList<>();
+    private List<Statement> statements = new LinkedList<>();
+    
+    public List<Statement> getStatements() {
+        return statements;
+    }
     
     public void collect(AstElement element) {
         FullVisitor visitor = new FullVisitor(this);

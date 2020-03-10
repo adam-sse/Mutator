@@ -11,7 +11,7 @@ import net.ssehub.mutator.parsing.ast.Statement;
 
 public class DeleteStatement extends Mutation {
 
-    public MutationIdentifier target;
+    private MutationIdentifier target;
     
     public DeleteStatement(MutationIdentifier target) {
         this.target = target;
@@ -62,10 +62,10 @@ public class DeleteStatement extends Mutation {
         StatementCollector collector = new StatementCollector();
         for (Function func : file.functions) {
             collector.collect(func.body);
-            collector.statements.remove(func.body);
+            collector.getStatements().remove(func.body);
         }
         
-        Statement mutationTarget = collector.statements.get(random.nextInt(collector.statements.size()));
+        Statement mutationTarget = collector.getStatements().get(random.nextInt(collector.getStatements().size()));
         
         DeleteStatement mutation = new DeleteStatement(new MutationIdentifier(mutationTarget));
         

@@ -12,13 +12,13 @@ import net.ssehub.mutator.parsing.ast.operations.AstCloner;
 
 public class CopyInsertStatement extends Mutation {
 
-    public MutationIdentifier sourceIdentifier;
+    private MutationIdentifier sourceIdentifier;
     
-    public Statement toInsert;
+    private Statement toInsert;
     
-    public MutationIdentifier reference;
+    private MutationIdentifier reference;
     
-    public boolean before;
+    private boolean before;
     
     public CopyInsertStatement(MutationIdentifier sourceIdentifier, Statement toInsert,
             MutationIdentifier reference, boolean before) {
@@ -85,15 +85,15 @@ public class CopyInsertStatement extends Mutation {
         StatementCollector collector = new StatementCollector();
         for (Function func : file.functions) {
             collector.collect(func.body);
-            collector.statements.remove(func.body);
+            collector.getStatements().remove(func.body);
         }
         
         Statement mutationSource;
         Statement mutationReference;
         
         do {
-            mutationSource = collector.statements.get(random.nextInt(collector.statements.size()));
-            mutationReference = collector.statements.get(random.nextInt(collector.statements.size()));
+            mutationSource = collector.getStatements().get(random.nextInt(collector.getStatements().size()));
+            mutationReference = collector.getStatements().get(random.nextInt(collector.getStatements().size()));
         } while (mutationSource.equals(mutationReference));
         
         CopyInsertStatement mutation = new CopyInsertStatement(new MutationIdentifier(mutationSource),

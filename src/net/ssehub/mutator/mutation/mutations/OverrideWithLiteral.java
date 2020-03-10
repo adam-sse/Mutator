@@ -16,9 +16,9 @@ import net.ssehub.mutator.parsing.ast.operations.AstCloner;
 
 public class OverrideWithLiteral extends Mutation {
 
-    public MutationIdentifier target;
+    private MutationIdentifier target;
     
-    public Expression literal;
+    private Expression literal;
     
     public OverrideWithLiteral(MutationIdentifier target, Expression literal) {
         this.target = target;
@@ -89,7 +89,7 @@ public class OverrideWithLiteral extends Mutation {
         Expression mutationTarget;
         
         do {
-            mutationTarget = collector.expressions.get(random.nextInt(collector.expressions.size()));
+            mutationTarget = collector.getExpressions().get(random.nextInt(collector.getExpressions().size()));
             
             String literalStr = String.valueOf(random.nextInt(17));
             boolean negated = random.nextBoolean();
