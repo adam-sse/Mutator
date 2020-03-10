@@ -1,6 +1,7 @@
 package net.ssehub.mutator.mutation;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -43,6 +44,7 @@ public class Mutator implements IFitnessStore {
     private int statNumTimeout;
     private int statNumFailed;
     private int statNumError;
+    private List<Double> statBestGenFitness;
     
     public Mutator(Configuration config) {
         this.config = config;
@@ -53,6 +55,8 @@ public class Mutator implements IFitnessStore {
         this.evaluator = EvaluatorFactory.create(config);
         this.fitnessStore = new HashMap<>(config.getGenerations() * config.getPopulationSize());
         this.originalAst = originalAst;
+        
+        this.statBestGenFitness = new LinkedList<>();
         
         this.population = new MutantList();
         this.generation = 0;
@@ -120,6 +124,12 @@ public class Mutator implements IFitnessStore {
             
             if (this.generation % config.getCleanFrequency() == 0) {
                 cleanPopulation();
+            }
+            
+            if (population.getSize() > 0) {
+                this.statBestGenFitness.add(fitnessStore.get(population.getMutant(0).getId()));
+            } else {
+                this.statBestGenFitness.add(0.0);
             }
             
             nextGeneration();
@@ -411,6 +421,37 @@ public class Mutator implements IFitnessStore {
         System.out.println("    timed-out: " + statNumTimeout);
         System.out.println("    failed tests: " + statNumFailed);
         System.out.println("    error: " + statNumError);
+        
+        System.out.println();
+        System.out.println("Best Fitness per Generation:");
+        
+        double max = Collections.max(statBestGenFitness);
+        double min = Collections.min(statBestGenFitness);
+        
+        final int NUM_LINES = 20;
+        double range = (max - min) / NUM_LINES;
+        for (int line = 0; line < NUM_LINES; line++) {
+            double upper = max - (line * range);
+            double lower = upper - range;
+            
+            System.out.printf("%10.2f |", (upper + lower) / 2);
+            
+            for (int gen = 0; gen < statBestGenFitness.size(); gen++) {
+                double fitness = statBestGenFitness.get(gen);
+                if (fitness <= upper  && fitness >= lower) {
+                    System.out.print(" *  ");
+                } else {
+                    System.out.print("    ");
+                }
+            }
+            
+            System.out.println();
+        }
+        System.out.println("-----------+" + "----".repeat(statBestGenFitness.size()));
+        System.out.print("           |");
+        for (int gen = 0; gen < statBestGenFitness.size(); gen++) {
+            System.out.printf("%3d ", gen + 1);
+        }
     }
     
 }
