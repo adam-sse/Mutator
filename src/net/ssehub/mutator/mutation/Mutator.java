@@ -450,7 +450,7 @@ public class Mutator implements IFitnessStore {
         System.out.println("-----------+" + "----".repeat(statBestGenFitness.size()));
         System.out.print("           |");
         for (int gen = 0; gen < statBestGenFitness.size(); gen++) {
-            System.out.printf("%3d ", gen + 1);
+            System.out.printf("%03d ", gen + 1);
         }
     }
     
