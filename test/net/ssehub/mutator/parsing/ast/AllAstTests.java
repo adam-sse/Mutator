@@ -8,9 +8,14 @@ import org.junit.runners.Suite.SuiteClasses;
 @SuiteClasses({
     AssignmentTest.class,
     BinaryExprTest.class,
+    DeclarationStmtTest.class,
     DeclarationTest.class,
+    EmptyStmtTest.class,
+    ExpressionStmtTest.class,
+    FunctionCallTest.class,
     IdentifierTest.class,
     LiteralTest.class,
+    ReturnTest.class,
     TypeTest.class,
     UnaryExprTest.class,
 })
