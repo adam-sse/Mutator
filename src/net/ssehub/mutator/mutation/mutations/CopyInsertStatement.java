@@ -30,11 +30,13 @@ public class CopyInsertStatement extends Mutation {
     
     @Override
     public boolean apply(AstElement ast) {
+        Statement sourceElem = (Statement) sourceIdentifier.find(ast);
         Statement referenceElem = (Statement) reference.find(ast);
         
         boolean success = false;
         
-        if (referenceElem != null && new MutationIdentifier(toInsert).find(ast) == null) {
+        if (referenceElem != null && sourceElem != null && new MutationIdentifier(toInsert).find(ast) == null
+                && sourceElem.equals(toInsert)) {
             StatementInserter inserter = new StatementInserter();
             
             Statement toInsertClone = (Statement) toInsert.accept(new AstCloner(referenceElem.parent, true));

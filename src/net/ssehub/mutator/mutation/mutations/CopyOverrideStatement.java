@@ -26,11 +26,12 @@ public class CopyOverrideStatement extends Mutation {
     
     @Override
     public boolean apply(AstElement ast) {
+        AstElement sourceElem = sourceIdentifier.find(ast);
         AstElement targetElem = target.find(ast);
         
         boolean success = false;
         
-        if (targetElem != null) {
+        if (targetElem != null && sourceElem != null && sourceElem.equals(toInsert)) {
             AstElement toInsertClone = toInsert.accept(new AstCloner(targetElem.parent, true));
             
             ElementReplacer<AstElement> replacer = new ElementReplacer<>();
