@@ -8,7 +8,6 @@ import net.ssehub.mutator.parsing.ast.AstElement;
 import net.ssehub.mutator.parsing.ast.Expression;
 import net.ssehub.mutator.parsing.ast.File;
 import net.ssehub.mutator.parsing.ast.Function;
-import net.ssehub.mutator.parsing.ast.Statement;
 import net.ssehub.mutator.parsing.ast.operations.AstCloner;
 
 public class CopyOverrideExpression extends Mutation {
@@ -33,7 +32,7 @@ public class CopyOverrideExpression extends Mutation {
         boolean success = false;
         
         if (targetElem != null && sourceElem != null && sourceElem.equals(toInsert)) {
-            String beforeReplacing = getParentStatementText(targetElem);
+            String beforeReplacing = Util.getParentStatementText(targetElem);
             
             AstElement toInsertClone = toInsert.accept(new AstCloner(targetElem.parent, true));
             
@@ -43,21 +42,13 @@ public class CopyOverrideExpression extends Mutation {
             if (success) {
                 this.diff = new ArrayList<>(2);
                 this.diff.add("-" + beforeReplacing);
-                this.diff.add("+" + getParentStatementText(toInsertClone));
+                this.diff.add("+" + Util.getParentStatementText(toInsertClone));
             }
         }
         
         return success;
     }
     
-    private static String getParentStatementText(AstElement element) {
-        if (element instanceof Statement) {
-            return element.getText();
-        } else {
-            return getParentStatementText(element.parent);
-        }
-    }
-
     @Override
     public String toString() {
         return "CopyOverrideExpression(source=" + sourceIdentifier + ", target=" + target + ") -> #" + toInsert.id;

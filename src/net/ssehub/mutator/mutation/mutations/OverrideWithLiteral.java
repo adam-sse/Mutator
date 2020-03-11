@@ -9,7 +9,6 @@ import net.ssehub.mutator.parsing.ast.Expression;
 import net.ssehub.mutator.parsing.ast.File;
 import net.ssehub.mutator.parsing.ast.Function;
 import net.ssehub.mutator.parsing.ast.Literal;
-import net.ssehub.mutator.parsing.ast.Statement;
 import net.ssehub.mutator.parsing.ast.UnaryExpr;
 import net.ssehub.mutator.parsing.ast.UnaryOperator;
 import net.ssehub.mutator.parsing.ast.operations.AstCloner;
@@ -32,7 +31,7 @@ public class OverrideWithLiteral extends Mutation {
         boolean success = false;
         
         if (targetElem != null) {
-            String beforeReplacing = getParentStatementText(targetElem);
+            String beforeReplacing = Util.getParentStatementText(targetElem);
 
             AstElement literalClone = literal.accept(new AstCloner(targetElem.parent, true));
             
@@ -42,21 +41,13 @@ public class OverrideWithLiteral extends Mutation {
             if (success) {
                 this.diff = new ArrayList<>(2);
                 this.diff.add("-" + beforeReplacing);
-                this.diff.add("+" + getParentStatementText(literalClone));
+                this.diff.add("+" + Util.getParentStatementText(literalClone));
             }
         }
         
         return success;
     }
     
-    private static String getParentStatementText(AstElement element) {
-        if (element instanceof Statement) {
-            return element.getText();
-        } else {
-            return getParentStatementText(element.parent);
-        }
-    }
-
     @Override
     public String toString() {
         return "OverrideWithLiteral(target=" + target + ", literal=" + literal.getText() + ") -> #" + literal.id;

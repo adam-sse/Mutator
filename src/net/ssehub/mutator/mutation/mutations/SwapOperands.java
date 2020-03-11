@@ -1,5 +1,6 @@
 package net.ssehub.mutator.mutation.mutations;
 
+import java.util.ArrayList;
 import java.util.Random;
 
 import net.ssehub.mutator.mutation.MutationIdentifier;
@@ -31,6 +32,8 @@ public class SwapOperands extends Mutation {
         
         if (targetElem != null && leftId == targetElem.left.id && rightId == targetElem.right.id) {
             
+            String before = Util.getParentStatementText(targetElem);
+            
             Expression left = targetElem.left;
             Expression right = targetElem.right;
             
@@ -38,6 +41,9 @@ public class SwapOperands extends Mutation {
             targetElem.right = left;
             
             applied = true;
+            this.diff = new ArrayList<>(2);
+            this.diff.add("-" + before);
+            this.diff.add("+" + Util.getParentStatementText(targetElem));
         }
         
         return applied;
