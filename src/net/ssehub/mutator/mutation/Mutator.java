@@ -13,12 +13,8 @@ import net.ssehub.mutator.Configuration;
 import net.ssehub.mutator.evaluation.Evaluator;
 import net.ssehub.mutator.evaluation.EvaluatorFactory;
 import net.ssehub.mutator.evaluation.TestResult;
-import net.ssehub.mutator.mutation.mutations.CopyInsertStatement;
-import net.ssehub.mutator.mutation.mutations.CopyOverrideExpression;
-import net.ssehub.mutator.mutation.mutations.CopyOverrideStatement;
-import net.ssehub.mutator.mutation.mutations.DeleteStatement;
 import net.ssehub.mutator.mutation.mutations.Mutation;
-import net.ssehub.mutator.mutation.mutations.OverrideWithLiteral;
+import net.ssehub.mutator.mutation.mutations.MutationFactory;
 import net.ssehub.mutator.parsing.ast.File;
 
 public class Mutator implements IFitnessStore {
@@ -307,42 +303,13 @@ public class Mutator implements IFitnessStore {
     }
     
     private void addNewMutation(Mutant mutant) {
+        MutationFactory factory = new MutationFactory(config.getMutations());
+        
         boolean added;
         do {
-            Mutation mutation = createMutation(mutant.getAst());
+            Mutation mutation = factory.createRandomMutation(mutant.getAst(), random);
             added = mutant.addMutation(mutation);
         } while (!added);
-    }
-    
-    private Mutation createMutation(File ast) {
-        Mutation mutation = null;
-        
-        do {
-            
-            switch (random.nextInt(5)) {
-            case 0:
-                mutation = CopyOverrideStatement.find(ast, random);
-                break;
-            case 1:
-                mutation = CopyOverrideExpression.find(ast, random);
-                break;
-            case 2:
-                mutation = DeleteStatement.find(ast, random);
-                break;
-            case 3:
-                mutation = CopyInsertStatement.find(ast, random);
-                break;
-            case 4:
-                mutation = OverrideWithLiteral.find(ast, random);
-                break;
-                
-            default:
-                // can't happen
-            }
-            
-        } while (mutation == null);
-        
-        return mutation;
     }
     
     private Mutant cleanMutations(Mutant original) {

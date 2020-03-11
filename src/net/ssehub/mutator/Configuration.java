@@ -1,6 +1,7 @@
 package net.ssehub.mutator;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -19,6 +20,8 @@ public class Configuration {
     private int elitism;
     
     private int initialMutations;
+    
+    private List<String> mutations;
     
     private int cleanFrequency;
     
@@ -45,6 +48,12 @@ public class Configuration {
         this.populationSize = Integer.parseInt(props.getProperty("mutator.populationSize"));
         this.elitism = Integer.parseInt(props.getProperty("mutator.elitism"));
         this.initialMutations = Integer.parseInt(props.getProperty("mutator.initialMutations"));
+        
+        String[] tmp = props.getProperty("mutator.mutations").split(",");
+        this.mutations = new ArrayList<>(tmp.length);
+        for (String mutation : tmp) {
+            this.mutations.add(mutation.trim());
+        }
         
         this.cleanFrequency = Integer.parseInt(props.getProperty("mutator.clean.frequency"));
         this.cleanThreshold = Double.parseDouble(props.getProperty("mutator.clean.threshold"));
@@ -87,6 +96,10 @@ public class Configuration {
     
     public int getInitialMutations() {
         return initialMutations;
+    }
+    
+    public List<String> getMutations() {
+        return mutations;
     }
     
     public int getCleanFrequency() {
