@@ -83,18 +83,18 @@ public class CopyInsertStatement extends Mutation {
     }
     
     public static CopyInsertStatement find(File file, Random random) {
-        StatementCollector collector = new StatementCollector();
+        Collector<Statement> collector = new Collector<>(Statement.class);
         for (Function func : file.functions) {
             collector.collect(func.body);
-            collector.getStatements().remove(func.body);
+            collector.getFoundElements().remove(func.body);
         }
         
         Statement mutationSource;
         Statement mutationReference;
         
         do {
-            mutationSource = collector.getStatements().get(random.nextInt(collector.getStatements().size()));
-            mutationReference = collector.getStatements().get(random.nextInt(collector.getStatements().size()));
+            mutationSource = collector.getFoundElements().get(random.nextInt(collector.getFoundElements().size()));
+            mutationReference = collector.getFoundElements().get(random.nextInt(collector.getFoundElements().size()));
         } while (mutationSource.equals(mutationReference));
         
         CopyInsertStatement mutation = new CopyInsertStatement(new MutationIdentifier(mutationSource),

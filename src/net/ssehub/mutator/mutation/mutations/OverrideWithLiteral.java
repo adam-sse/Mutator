@@ -80,7 +80,7 @@ public class OverrideWithLiteral extends Mutation {
     }
     
     public static OverrideWithLiteral find(File file, Random random) {
-        ExpressionCollector collector = new ExpressionCollector();
+        Collector<Expression> collector = new Collector<>(Expression.class);
         for (Function func : file.functions) {
             collector.collect(func.body);
         }
@@ -89,7 +89,7 @@ public class OverrideWithLiteral extends Mutation {
         Expression mutationTarget;
         
         do {
-            mutationTarget = collector.getExpressions().get(random.nextInt(collector.getExpressions().size()));
+            mutationTarget = collector.getFoundElements().get(random.nextInt(collector.getFoundElements().size()));
             
             String literalStr = String.valueOf(random.nextInt(17));
             boolean negated = random.nextBoolean();

@@ -59,13 +59,13 @@ public class DeleteStatement extends Mutation {
     }
 
     public static DeleteStatement find(File file, Random random) {
-        StatementCollector collector = new StatementCollector();
+        Collector<Statement> collector = new Collector<>(Statement.class);
         for (Function func : file.functions) {
             collector.collect(func.body);
-            collector.getStatements().remove(func.body);
+            collector.getFoundElements().remove(func.body);
         }
         
-        Statement mutationTarget = collector.getStatements().get(random.nextInt(collector.getStatements().size()));
+        Statement mutationTarget = collector.getFoundElements().get(random.nextInt(collector.getFoundElements().size()));
         
         DeleteStatement mutation = new DeleteStatement(new MutationIdentifier(mutationTarget));
         

@@ -81,7 +81,7 @@ public class CopyOverrideExpression extends Mutation {
     }
     
     public static CopyOverrideExpression find(File file, Random random) {
-        ExpressionCollector collector = new ExpressionCollector();
+        Collector<Expression> collector = new Collector<>(Expression.class);
         for (Function func : file.functions) {
             collector.collect(func.body);
         }
@@ -90,8 +90,8 @@ public class CopyOverrideExpression extends Mutation {
         Expression mutationTarget;
         
         do {
-            mutationSource = collector.getExpressions().get(random.nextInt(collector.getExpressions().size()));
-            mutationTarget = collector.getExpressions().get(random.nextInt(collector.getExpressions().size()));
+            mutationSource = collector.getFoundElements().get(random.nextInt(collector.getFoundElements().size()));
+            mutationTarget = collector.getFoundElements().get(random.nextInt(collector.getFoundElements().size()));
         } while (mutationSource.equals(mutationTarget));
         
         CopyOverrideExpression mutation = new CopyOverrideExpression(
