@@ -20,7 +20,7 @@ public class CopyInsertStatement extends Mutation {
     
     private boolean before;
     
-    public CopyInsertStatement(MutationIdentifier sourceIdentifier, Statement toInsert,
+    CopyInsertStatement(MutationIdentifier sourceIdentifier, Statement toInsert,
             MutationIdentifier reference, boolean before) {
         this.sourceIdentifier = sourceIdentifier;
         this.toInsert = toInsert;

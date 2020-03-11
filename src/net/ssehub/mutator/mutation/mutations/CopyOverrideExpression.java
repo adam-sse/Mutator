@@ -19,7 +19,7 @@ public class CopyOverrideExpression extends Mutation {
     
     private MutationIdentifier target;
     
-    public CopyOverrideExpression(MutationIdentifier sourceIdentifier, AstElement toInsert, MutationIdentifier target) {
+    CopyOverrideExpression(MutationIdentifier sourceIdentifier, AstElement toInsert, MutationIdentifier target) {
         this.sourceIdentifier = sourceIdentifier;
         this.toInsert = toInsert;
         this.target = target;

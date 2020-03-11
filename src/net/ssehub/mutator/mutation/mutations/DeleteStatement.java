@@ -13,7 +13,7 @@ public class DeleteStatement extends Mutation {
 
     private MutationIdentifier target;
     
-    public DeleteStatement(MutationIdentifier target) {
+    DeleteStatement(MutationIdentifier target) {
         this.target = target;
     }
     

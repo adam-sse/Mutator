@@ -20,7 +20,7 @@ public class OverrideWithLiteral extends Mutation {
     
     private Expression literal;
     
-    public OverrideWithLiteral(MutationIdentifier target, Expression literal) {
+    OverrideWithLiteral(MutationIdentifier target, Expression literal) {
         this.target = target;
         this.literal = literal;
     }

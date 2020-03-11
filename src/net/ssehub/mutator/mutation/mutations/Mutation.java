@@ -25,5 +25,8 @@ public abstract class Mutation {
     
     @Override
     public abstract boolean equals(Object obj);
+
+    @Override
+    public abstract int hashCode();
     
 }

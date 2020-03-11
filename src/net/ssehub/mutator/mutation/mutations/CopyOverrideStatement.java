@@ -18,7 +18,7 @@ public class CopyOverrideStatement extends Mutation {
     
     private MutationIdentifier target;
     
-    public CopyOverrideStatement(MutationIdentifier sourceIdentifier, AstElement toInsert, MutationIdentifier target) {
+    CopyOverrideStatement(MutationIdentifier sourceIdentifier, AstElement toInsert, MutationIdentifier target) {
         this.sourceIdentifier = sourceIdentifier;
         this.toInsert = toInsert;
         this.target = target;
