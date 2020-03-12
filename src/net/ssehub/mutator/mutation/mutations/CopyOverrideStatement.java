@@ -73,7 +73,6 @@ public class CopyOverrideStatement extends Mutation {
         Collector<Statement> collector = new Collector<>(Statement.class);
         for (Function func : file.functions) {
             collector.collect(func.body);
-            collector.getFoundElements().remove(func.body);
         }
         
         Statement mutationSource;
@@ -82,7 +81,8 @@ public class CopyOverrideStatement extends Mutation {
         do {
             mutationSource = collector.getFoundElements().get(random.nextInt(collector.getFoundElements().size()));
             mutationTarget = collector.getFoundElements().get(random.nextInt(collector.getFoundElements().size()));
-        } while (mutationSource.equals(mutationTarget));
+        } while (mutationSource.id == mutationTarget.id || mutationTarget.parent instanceof Function
+                || mutationSource.equals(mutationTarget));
         
         CopyOverrideStatement mutation = new CopyOverrideStatement(
                 new MutationIdentifier(mutationSource),

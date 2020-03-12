@@ -83,7 +83,7 @@ public class CopyOverrideExpression extends Mutation {
         do {
             mutationSource = collector.getFoundElements().get(random.nextInt(collector.getFoundElements().size()));
             mutationTarget = collector.getFoundElements().get(random.nextInt(collector.getFoundElements().size()));
-        } while (mutationSource.equals(mutationTarget));
+        } while (mutationSource.id == mutationTarget.id || mutationSource.equals(mutationTarget));
         
         CopyOverrideExpression mutation = new CopyOverrideExpression(
                 new MutationIdentifier(mutationSource),
