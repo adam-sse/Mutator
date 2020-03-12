@@ -56,7 +56,7 @@ public class LinuxEvaluator extends Evaluator {
 
     @Override
     public double measureFitness(Mutant mutant) {
-        double fitness = -1000;
+        double fitness = RUNTIME_ERROR;
         
         try {
             mutant.write(config.getDropin());

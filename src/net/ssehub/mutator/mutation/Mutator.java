@@ -39,6 +39,7 @@ public class Mutator implements IFitnessStore {
     private int statNumCompileError;
     private int statNumTimeout;
     private int statNumFailed;
+    private int statNumRuntimeError;
     private int statNumError;
     private List<Double> statBestGenFitness;
     
@@ -110,8 +111,16 @@ public class Mutator implements IFitnessStore {
                     
                 } else {
                     double fitness = this.evaluator.measureFitness(mutant);
-                    System.out.println(mutant.getId() + ": " + fitness);
-                    fitnessStore.put(mutant.getId(), fitness);
+                    if (fitness == Evaluator.RUNTIME_ERROR) {
+                        System.out.println(mutant.getId() + " had a runtime error during fitness evaluation");
+                        population.removeMutant(i);
+                        i--;
+                        statNumRuntimeError++;
+                        
+                    } else {
+                        System.out.println(mutant.getId() + ": " + fitness);
+                        fitnessStore.put(mutant.getId(), fitness);
+                    }
                 }
                 
             }
@@ -384,10 +393,18 @@ public class Mutator implements IFitnessStore {
     
     public void printStatistics() {
         System.out.println("Evaluated: " + statNumEvaluated);
-        System.out.println("    failed compilation: " + statNumCompileError);
-        System.out.println("    timed-out: " + statNumTimeout);
-        System.out.println("    failed tests: " + statNumFailed);
-        System.out.println("    error: " + statNumError);
+        System.out.printf(Locale.ROOT, "    failed compilation: %d (%5.2f %%)", statNumCompileError,
+                (double) statNumCompileError / statNumEvaluated);
+        System.out.println();
+        System.out.printf(Locale.ROOT, "    timed-out: %d (%5.2f %%)", statNumTimeout, (double) statNumTimeout / statNumEvaluated);
+        System.out.println();
+        System.out.printf(Locale.ROOT, "    failed tests: %d (%5.2f %%)", statNumFailed, (double) statNumFailed / statNumEvaluated);
+        System.out.println();
+        System.out.printf(Locale.ROOT, "    runtime error: %d (%5.2f %%)", statNumRuntimeError,
+                (double) statNumRuntimeError / statNumEvaluated);
+        System.out.println();
+        System.out.printf(Locale.ROOT, "    error: %d (%5.2f %%)", statNumError, (double) statNumError / statNumEvaluated);
+        System.out.println();
         
         System.out.println();
         System.out.println("Best Fitness per Generation:");
@@ -401,7 +418,7 @@ public class Mutator implements IFitnessStore {
             double upper = max - (line * range);
             double lower = upper - range;
             
-            System.out.printf("%10.2f |", (upper + lower) / 2);
+            System.out.printf(Locale.ROOT, "%10.2f |", (upper + lower) / 2);
             
             for (int gen = 0; gen < statBestGenFitness.size(); gen++) {
                 double fitness = statBestGenFitness.get(gen);
@@ -417,7 +434,7 @@ public class Mutator implements IFitnessStore {
         System.out.println("-----------+" + "----".repeat(statBestGenFitness.size()));
         System.out.print("           |");
         for (int gen = 0; gen < statBestGenFitness.size(); gen++) {
-            System.out.printf("%03d ", gen + 1);
+            System.out.printf(Locale.ROOT, "%03d ", gen + 1);
         }
     }
     
