@@ -393,17 +393,20 @@ public class Mutator implements IFitnessStore {
     
     public void printStatistics() {
         System.out.println("Evaluated: " + statNumEvaluated);
-        System.out.printf(Locale.ROOT, "    failed compilation: %d (%5.2f %%)", statNumCompileError,
-                (double) statNumCompileError / statNumEvaluated);
+        System.out.printf(Locale.ROOT, "    failed compilation: %d (%.2f %%)", statNumCompileError,
+                (double) statNumCompileError / statNumEvaluated * 100.0);
         System.out.println();
-        System.out.printf(Locale.ROOT, "    timed-out: %d (%5.2f %%)", statNumTimeout, (double) statNumTimeout / statNumEvaluated);
+        System.out.printf(Locale.ROOT, "    timed-out: %d (%.2f %%)", statNumTimeout,
+                (double) statNumTimeout / statNumEvaluated * 100.0);
         System.out.println();
-        System.out.printf(Locale.ROOT, "    failed tests: %d (%5.2f %%)", statNumFailed, (double) statNumFailed / statNumEvaluated);
+        System.out.printf(Locale.ROOT, "    failed tests: %d (%.2f %%)", statNumFailed,
+                (double) statNumFailed / statNumEvaluated * 100.0);
         System.out.println();
-        System.out.printf(Locale.ROOT, "    runtime error: %d (%5.2f %%)", statNumRuntimeError,
-                (double) statNumRuntimeError / statNumEvaluated);
+        System.out.printf(Locale.ROOT, "    runtime error: %d (%.2f %%)", statNumRuntimeError,
+                (double) statNumRuntimeError / statNumEvaluated * 100.0);
         System.out.println();
-        System.out.printf(Locale.ROOT, "    error: %d (%5.2f %%)", statNumError, (double) statNumError / statNumEvaluated);
+        System.out.printf(Locale.ROOT, "    error: %d (%.2f %%)", statNumError,
+                (double) statNumError / statNumEvaluated * 100.0);
         System.out.println();
         
         System.out.println();
