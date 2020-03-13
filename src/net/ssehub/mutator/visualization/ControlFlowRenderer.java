@@ -2,8 +2,10 @@ package net.ssehub.mutator.visualization;
 
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 import java.util.StringJoiner;
 
 import net.ssehub.mutator.parsing.ast.Assignment;
@@ -13,6 +15,7 @@ import net.ssehub.mutator.parsing.ast.Declaration;
 import net.ssehub.mutator.parsing.ast.DeclarationStmt;
 import net.ssehub.mutator.parsing.ast.DoWhileLoop;
 import net.ssehub.mutator.parsing.ast.EmptyStmt;
+import net.ssehub.mutator.parsing.ast.Expression;
 import net.ssehub.mutator.parsing.ast.ExpressionStmt;
 import net.ssehub.mutator.parsing.ast.File;
 import net.ssehub.mutator.parsing.ast.Function;
@@ -42,8 +45,24 @@ public class ControlFlowRenderer {
         
         preamble();
         
+        Set<String> localFunctions = new HashSet<>();
+        List<FunctionCallEdge> functionCalls = new LinkedList<>();
+        
         for (Function func : file.functions) {
-            function(func);
+            localFunctions.add(func.name);
+            function(func, localFunctions, functionCalls);
+        }
+        
+     // write function calls
+        for (FunctionCallEdge functionCall : functionCalls) {
+            String attributes = "; headport=_; tailport=_; color=grey; style=dashed";
+            
+            this.dot.append("    ").append(functionCall.block).append(" -> ")
+                    .append("\"" + functionCall.function + " Start\"")
+                    .append(" [lhead=cluster_" + functionCall.function + attributes + "];\n");
+//            this.dot.append("    ").append("\"" + functionCall.function + " End\"").append(" -> ")
+//                    .append(functionCall.block)
+//                    .append(" [ltail=cluster_" + functionCall.function + attributes + "];\n");
         }
         
         epilog();
@@ -72,7 +91,7 @@ public class ControlFlowRenderer {
     private void preamble() {
         this.dot.append("digraph ast {\n")
             .append("    graph [fontname=\"Liberation Mono\"; fontsize=9];\n")
-            .append("    node [fontname=\"Liberation Mono\"; fontsize=9; shape=\"rectangle\"; nojustify=\"true\"; margin=\"0.02\"];\n")
+            .append("    node [fontname=\"Liberation Mono\"; fontsize=9; shape=\"rectangle\"; nojustify=\"true\"; margin=\"0.1\"; style=filled; fillcolor=white];\n")
             .append("    edge [fontname=\"Liberation Mono\"; fontsize=9; tailport=\"s\"; headport=\"n\"; arrowhead=\"vee\"; arrowsize=0.8];\n")
             .append("    compound=true;\n")
             .append("\n");
@@ -83,7 +102,7 @@ public class ControlFlowRenderer {
         this.dot.append("}\n");
     }
     
-    private void function(Function func) {
+    private void function(Function func, Set<String> localFunctions, List<FunctionCallEdge> functionCalls) {
         String startNode = "\"" + func.name + " Start\"";
         String endNode = "\"" + func.name + " End\"";
         
@@ -96,11 +115,14 @@ public class ControlFlowRenderer {
         
         this.dot.append("    subgraph cluster_" + func.name + " {\n")
             .append("        label=\"" + header + "\";\n")
+            .append("        style=filled;\n")
+            .append("        bgcolor=whitesmoke;\n")
             .append("        " + startNode + " [shape=\"circle\"; label=\"\"; width=0.2; style=\"filled\"; fillcolor=\"black\"];\n")
             .append("        " + endNode + " [shape=\"circle\"; label=\"\"; width=0.2];\n");
         
-        ControlBlockCollector collector = new ControlBlockCollector(func.name, endNode);
+        ControlBlockCollector collector = new ControlBlockCollector(func.name, endNode, localFunctions);
         func.body.accept(collector);
+        functionCalls.addAll(collector.functionCalls);
         
         // write nodes
         for (ControlBlock block : collector.allBlocks) {
@@ -179,9 +201,26 @@ public class ControlFlowRenderer {
         
     }
     
-    private static class ControlBlockCollector implements IAstVisitor<Void> {
+    private static final class FunctionCallEdge {
+        
+        private String block;
+        
+        private String function;
+
+        public FunctionCallEdge(String block, String function) {
+            this.block = block;
+            this.function = function;
+        }
+        
+    }
+    
+    private static final class ControlBlockCollector implements IAstVisitor<Void> {
 
         private List<ControlBlock> allBlocks;
+        
+        private List<FunctionCallEdge> functionCalls;
+        
+        private Set<String> localFunctions;
         
         private String funcName;
         
@@ -193,10 +232,12 @@ public class ControlFlowRenderer {
         
         private ControlBlock currentBlock;
         
-        public ControlBlockCollector(String funcName, String endNode) {
+        public ControlBlockCollector(String funcName, String endNode, Set<String> localFunctions) {
             this.funcName = funcName;
             this.endNode = endNode;
+            this.localFunctions = localFunctions;
             allBlocks = new LinkedList<>();
+            functionCalls = new LinkedList<>();
         }
 
         private ControlBlock createBlock() {
@@ -209,11 +250,16 @@ public class ControlFlowRenderer {
         @Override
         public Void visitAssignment(Assignment stmt) {
             currentBlock.addLine(stmt.getText());
+            
+            stmt.variable.accept(this);
+            stmt.value.accept(this);
             return null;
         }
 
         @Override
         public Void visitBinaryExpr(BinaryExpr expr) {
+            expr.left.accept(this);
+            expr.right.accept(this);
             return null;
         }
 
@@ -240,12 +286,14 @@ public class ControlFlowRenderer {
 
         @Override
         public Void visitDeclaration(Declaration decl) {
+            decl.type.accept(this);
             return null;
         }
 
         @Override
         public Void visitDeclarationStmt(DeclarationStmt stmt) {
-            currentBlock.addLine(stmt.getText());
+            // don't print this kind of statement
+            stmt.decl.accept(this);
             return null;
         }
 
@@ -255,18 +303,20 @@ public class ControlFlowRenderer {
             
             ControlBlock bodyStart = createBlock();
             currentBlock = bodyStart;
+            
             stmt.body.accept(this);
+            
             ControlBlock bodyEnd = currentBlock;
             
+            bodyEnd.addLine(stmt.condition.getText() + "?");
+            stmt.condition.accept(this);
 
             ControlBlock after = createBlock();
             
             prev.addNext(bodyStart, null);
             
-            String condition = stmt.condition.getText();
-            bodyEnd.addNext(bodyStart, condition);
-            
-            bodyEnd.addNext(after, "else");
+            bodyEnd.addNext(bodyStart, "1");
+            bodyEnd.addNext(after, "0");
             
             currentBlock = after;
             
@@ -282,21 +332,30 @@ public class ControlFlowRenderer {
         @Override
         public Void visitExpressionStmt(ExpressionStmt stmt) {
             currentBlock.addLine(stmt.getText());
+            stmt.expr.accept(this);
             return null;
         }
 
         @Override
         public Void visitFile(File file) {
-            return null;
+            throw new IllegalArgumentException();
         }
 
         @Override
         public Void visitFunction(Function func) {
-            return null;
+            throw new IllegalArgumentException();
         }
 
         @Override
         public Void visitFunctionCall(FunctionCall expr) {
+            if (localFunctions.contains(expr.function)) {
+                functionCalls.add(new FunctionCallEdge(currentBlock.name, expr.function));
+            }
+            
+            for (Expression param : expr.params) {
+                param.accept(this);
+            }
+            
             return null;
         }
 
@@ -308,6 +367,9 @@ public class ControlFlowRenderer {
         @Override
         public Void visitIf(If stmt) {
             ControlBlock prev = currentBlock;
+            
+            prev.addLine(stmt.condition.getText() + "?");
+            stmt.condition.accept(this);
             
             ControlBlock thenStart = createBlock();
             currentBlock = thenStart;
@@ -323,20 +385,31 @@ public class ControlFlowRenderer {
                 elseEnd = currentBlock;
             }
             
-            ControlBlock after = createBlock();
+            ControlBlock after = null;
+            if (thenEnd != null || elseEnd != null || stmt.elseBlock == null) {
+                
+                // try to re-use trailing end blocks
+                if (thenEnd != null && thenEnd.statements.length() == 0) {
+                    after = thenEnd;
+                } else if (elseEnd != null && elseEnd.statements.length() == 0) {
+                    after = elseEnd;
+                } else {
+                    after = createBlock();
+                }
+            }
             
-            prev.addNext(thenStart, stmt.condition.getText());
-            if (thenEnd != null) {
+            prev.addNext(thenStart, "1");
+            if (thenEnd != null && thenEnd != after) {
                 thenEnd.addNext(after, null);
             }
             
             if (stmt.elseBlock != null) {
-                prev.addNext(elseStart, "else");
-                if (elseEnd != null) {
+                prev.addNext(elseStart, "0");
+                if (elseEnd != null && elseEnd != after) {
                     elseEnd.addNext(after, null);
                 }
-            } else {
-                prev.addNext(after, "else");
+            } else if (after != null) {
+                prev.addNext(after, "0");
             }
             
             currentBlock = after;
@@ -352,6 +425,9 @@ public class ControlFlowRenderer {
         @Override
         public Void visitReturn(Return stmt) {
             currentBlock.addLine(stmt.getText());
+            if (stmt.value != null) {
+                stmt.value.accept(this);
+            }
             
             currentBlock.outgoing.add(new ControlEdge(endNode, null));
             
@@ -367,6 +443,7 @@ public class ControlFlowRenderer {
 
         @Override
         public Void visitUnaryExpr(UnaryExpr expr) {
+            expr.expr.accept(this);
             return null;
         }
 
@@ -374,27 +451,39 @@ public class ControlFlowRenderer {
         public Void visitWhile(While stmt) {
             ControlBlock prev = currentBlock;
             
+            ControlBlock condBlock;
+            if (prev.statements.length() == 0) {
+                condBlock = prev;
+            } else {
+                condBlock = createBlock();
+            }
+            
+            currentBlock = condBlock;
+            
+            stmt.condition.accept(this);
+            condBlock.addLine(stmt.condition.getText() + "?");
+            
             ControlBlock bodyStart = createBlock();
             currentBlock = bodyStart;
             stmt.body.accept(this);
             ControlBlock bodyEnd = currentBlock;
             
+            stmt.condition.accept(this);
 
             ControlBlock after = createBlock();
             
-            String condition = stmt.condition.getText();
-            bodyEnd.addNext(bodyStart, condition);
-            prev.addNext(bodyStart, condition);
-            
-            bodyEnd.addNext(after, "else");
-            prev.addNext(after, "else");
+            bodyEnd.addNext(condBlock, null);
+            if (prev != condBlock) {
+                prev.addNext(condBlock, null);
+            }
+
+            condBlock.addNext(bodyStart, "1");
+            condBlock.addNext(after, "0");
             
             currentBlock = after;
             
             return null;
         }
-        
-        
         
     }
     

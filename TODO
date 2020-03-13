@@ -1,1 +1,21 @@
 * don't mutate declaration statements?
+* turn ControlFlowRenderer into a data structure creator
+    * store ControlBlocks instead of just names for outgoing
+    * also store keep incoming edges
+    * prune more empty blocks:
+        ```
+        int a() {
+            if (a) {
+                ;
+            }
+        }
+        ```
+        ```
+        void a() {
+            while (d) {
+                while (c) {
+                    ;
+                }
+            }
+        }
+        ```
