@@ -20,6 +20,7 @@ import net.ssehub.mutator.parsing.Converter;
 import net.ssehub.mutator.parsing.ast.operations.AstPrettyPrinter;
 import net.ssehub.mutator.parsing.grammar.SimpleCLexer;
 import net.ssehub.mutator.parsing.grammar.SimpleCParser;
+import net.ssehub.mutator.visualization.ControlFlowRenderer;
 
 public class Main {
     
@@ -32,6 +33,8 @@ public class Main {
                 + "Run the main Mutator program with the given configuration");
         System.out.println("  clean <input file> <output file> : "
                 + "Pretty-print the given file");
+        System.out.println("  render <dot exe> <input file> <output file> : "
+                + "Renders the control-flow graph of the given source code file");
         return 0;
     }
     
@@ -46,21 +49,7 @@ public class Main {
             
             // 1) parse file to mutate
             System.out.println("Parsing...");
-            SimpleCLexer lexer = new SimpleCLexer(CharStreams.fromPath(input.toPath()));
-            CommonTokenStream tokens = new CommonTokenStream(lexer);
-            SimpleCParser parser = new SimpleCParser(tokens);
-            parser.removeErrorListeners();
-            parser.addErrorListener(new BaseErrorListener() {
-                @Override
-                public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol, int line,
-                        int charPositionInLine, String msg, RecognitionException exc) {
-                    throw new IllegalArgumentException("Parsing failed: in line " + line + ":" + charPositionInLine
-                            + " " + msg);
-                }
-            });
-            
-            Converter converter = new Converter();
-            net.ssehub.mutator.parsing.ast.File file = converter.convert(parser.file());
+            net.ssehub.mutator.parsing.ast.File file = parse(input);
             
             // 2) mutate file
             System.out.println("Mutating...");
@@ -109,21 +98,7 @@ public class Main {
             
             // 1) parse file
             System.out.println("Parsing...");
-            SimpleCLexer lexer = new SimpleCLexer(CharStreams.fromPath(input.toPath()));
-            CommonTokenStream tokens = new CommonTokenStream(lexer);
-            SimpleCParser parser = new SimpleCParser(tokens);
-            parser.removeErrorListeners();
-            parser.addErrorListener(new BaseErrorListener() {
-                @Override
-                public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol, int line,
-                        int charPositionInLine, String msg, RecognitionException exc) {
-                    throw new IllegalArgumentException("Parsing failed: in line " + line + ":" + charPositionInLine
-                            + " " + msg);
-                }
-            });
-            
-            Converter converter = new Converter();
-            net.ssehub.mutator.parsing.ast.File file = converter.convert(parser.file());
+            net.ssehub.mutator.parsing.ast.File file = parse(input);
             
             // 2) print out
             System.out.println("Writing...");
@@ -131,6 +106,33 @@ public class Main {
             try (FileWriter out = new FileWriter(outpuPath)) {
                 out.write(file.accept(new AstPrettyPrinter(false)));
             }
+            
+        } catch (IOException | IllegalArgumentException e) {
+            e.printStackTrace(System.out);
+            return 2;
+        }
+        
+        return 0;
+    }
+    
+    private static int render(String dotExe, String inputPath, String outputPath) {
+        try {
+            if (!outputPath.endsWith(".png") && !outputPath.endsWith(".svg") && !outputPath.endsWith(".pdf")) {
+                System.out.println("Output must be either .png, .svg or .pdf");
+                return 2;
+            }
+            
+            File input = new File(inputPath);
+            File ouput = new File(outputPath);
+            
+            // 1) parse file
+            System.out.println("Parsing...");
+            net.ssehub.mutator.parsing.ast.File file = parse(input);
+            
+            // 2) print out
+            System.out.println("Rendering...");
+            ControlFlowRenderer renderer = new ControlFlowRenderer(dotExe);
+            renderer.render(file, ouput);
             
         } catch (IOException | IllegalArgumentException e) {
             e.printStackTrace(System.out);
@@ -167,6 +169,13 @@ public class Main {
                 result = clean(args[1], args[2]);
             }
             break;
+        case "render":
+            if (args.length != 4) {
+                help();
+            } else {
+                result = render(args[1], args[2], args[3]);
+            }
+            break;
             
         default:
             help();
@@ -174,6 +183,25 @@ public class Main {
         }
         
         System.exit(result);
+    }
+    
+    private static net.ssehub.mutator.parsing.ast.File parse(File input) throws IOException {
+        SimpleCLexer lexer = new SimpleCLexer(CharStreams.fromPath(input.toPath()));
+        CommonTokenStream tokens = new CommonTokenStream(lexer);
+        SimpleCParser parser = new SimpleCParser(tokens);
+        parser.removeErrorListeners();
+        parser.addErrorListener(new BaseErrorListener() {
+            @Override
+            public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol, int line,
+                    int charPositionInLine, String msg, RecognitionException exc) {
+                throw new IllegalArgumentException("Parsing failed: in line " + line + ":" + charPositionInLine
+                        + " " + msg);
+            }
+        });
+        
+        Converter converter = new Converter();
+        net.ssehub.mutator.parsing.ast.File file = converter.convert(parser.file());
+        return file;
     }
 
 }
