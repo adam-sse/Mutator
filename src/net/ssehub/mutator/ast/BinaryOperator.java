@@ -31,7 +31,17 @@ public enum BinaryOperator {
     
     OR("||", 1),
     
-    ASSIGNMENT("=", 0);
+    ASSIGNMENT("=", 0),
+    ASSIGNMENT_PLUS("+=", 0),
+    ASSIGNMENT_MINUX("-=", 0),
+    ASSIGNMENT_MULT("*=", 0),
+    ASSIGNMENT_DIV("/=", 0),
+    ASSIGNMENT_MOD("%=", 0),
+    ASSIGNMENT_SHL("<<=", 0),
+    ASSIGNMENT_SHR(">>=", 0),
+    ASSIGNMENT_AND("&=", 0),
+    ASSIGNMENT_XOR("^=", 0),
+    ASSIGNMENT_OR("|=", 0);
     
     public String str;
     
@@ -76,6 +86,16 @@ public enum BinaryOperator {
         case "||": return OR;
         
         case "=": return ASSIGNMENT;
+        case "+=": return ASSIGNMENT_PLUS;
+        case "-=": return ASSIGNMENT_MINUX;
+        case "*=": return ASSIGNMENT_MULT;
+        case "/=": return ASSIGNMENT_DIV;
+        case "%=": return ASSIGNMENT_MOD;
+        case "<<=": return ASSIGNMENT_SHL;
+        case ">>=": return ASSIGNMENT_SHR;
+        case "&=": return ASSIGNMENT_AND;
+        case "^=": return ASSIGNMENT_XOR;
+        case "|=": return ASSIGNMENT_OR;
         
         default: throw new IllegalArgumentException();
         }

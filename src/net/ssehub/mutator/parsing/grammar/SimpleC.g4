@@ -70,9 +70,9 @@ expr
     | l=expr op='|' r=expr
     | l=expr op='&&' r=expr
     | l=expr op='||' r=expr
-    | l=expr op='=' r=expr
+    | l=expr op=('='|'+='|'-='|'*='|'/='|'%='|'<<='|'>>='|'&='|'^='|'|=') r=expr
     ;
-    
+
 exprList: expr (',' expr)*;
 
 BASIC_TYPE
