@@ -163,10 +163,6 @@ public class ControlFlowRenderer {
         return result.toString();
     }
     
-//    private static String edgeToString() {
-//        
-//    }
-    
     private static String escapeName(String name) {
         return '\"' + name + '\"';
     }

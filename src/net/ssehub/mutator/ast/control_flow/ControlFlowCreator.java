@@ -238,16 +238,7 @@ public class ControlFlowCreator {
             ControlFlowBlock after = null;
             
             if (thenEnd != null || elseEnd != null || !hasElse) {
-                
                 after = func.createBlock();
-//                // try to re-use empty blocks
-//                if (thenEnd != null && thenEnd.getSequence().isEmpty()) {
-//                    after = thenEnd;
-//                } else if (elseEnd != null && elseEnd.getSequence().isEmpty()) {
-//                    after = elseEnd;
-//                }  else {
-//                    after = func.createBlock();
-//                }
             }
             
             prev.setOutTrue(thenStart);
@@ -304,13 +295,6 @@ public class ControlFlowCreator {
             ControlFlowBlock prev = this.currentBlock;
             
             ControlFlowBlock cond = func.createBlock();
-            
-//            // try to re-use previous empty block
-//            if (prev.getSequence().isEmpty()) {
-//                cond = prev;
-//            } else {
-//                cond = func.createBlock();
-//            }
             
             cond.setOutCondition(stmt.condition);
             this.currentBlock = cond;
