@@ -2,7 +2,6 @@ package net.ssehub.mutator.ast.operations;
 
 import java.util.StringJoiner;
 
-import net.ssehub.mutator.ast.Assignment;
 import net.ssehub.mutator.ast.BinaryExpr;
 import net.ssehub.mutator.ast.BinaryOperator;
 import net.ssehub.mutator.ast.Declaration;
@@ -19,11 +18,6 @@ import net.ssehub.mutator.ast.UnaryExpr;
 
 abstract class AbstractPrinter implements IAstVisitor<String> {
 
-    @Override
-    public String visitAssignment(Assignment stmt) {
-        return stmt.variable.accept(this) + " = " + stmt.value.accept(this) + ";";
-    }
-    
     @Override
     public String visitBinaryExpr(BinaryExpr expr) {
         StringBuilder sb = new StringBuilder();

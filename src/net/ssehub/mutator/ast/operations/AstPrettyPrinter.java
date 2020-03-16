@@ -2,7 +2,6 @@ package net.ssehub.mutator.ast.operations;
 
 import java.util.StringJoiner;
 
-import net.ssehub.mutator.ast.Assignment;
 import net.ssehub.mutator.ast.Block;
 import net.ssehub.mutator.ast.Declaration;
 import net.ssehub.mutator.ast.DeclarationStmt;
@@ -44,11 +43,6 @@ public class AstPrettyPrinter extends AbstractPrinter {
         return sb.toString();
     }
     
-    @Override
-    public String visitAssignment(Assignment stmt) {
-        return indentation(stmt.id) + super.visitAssignment(stmt) + "\n";
-    }
-
     @Override
     public String visitBlock(Block stmt) {
         StringBuilder sb = new StringBuilder();

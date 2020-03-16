@@ -27,11 +27,9 @@ unsigned int *sha1(unsigned char *in_data, unsigned long in_length) {
 
     m = malloc(ml_bytes);
 
-    int i;
-    i = 0;
-    while (i < in_length) {
+    int i = 0;
+    for (; i < in_length; i++) {
         m[i] = in_data[i];
-        i++;
     }
 
     // append 0x80 = 0b10000000
@@ -55,11 +53,9 @@ unsigned int *sha1(unsigned char *in_data, unsigned long in_length) {
     unsigned int *w;
     w = malloc(4 * 80);
 
-    int chunk_start;
-    chunk_start = 0;
-    while (chunk_start < ml_bytes) {
+    for (int chunk_start = 0; chunk_start < ml_bytes; chunk_start = chunk_start + 64) {
         i = 0;
-        while (i < 16) {
+        for (; i < 16; i++) {
             unsigned int tmp;
             tmp = 0;
             tmp = tmp | (m[chunk_start + i * 4] << 24);
@@ -67,13 +63,10 @@ unsigned int *sha1(unsigned char *in_data, unsigned long in_length) {
             tmp = tmp | (m[chunk_start + i * 4 + 2] << 8);
             tmp = tmp | (m[chunk_start + i * 4 + 3]);
             w[i] = tmp;
-
-            i++;
         }
 
-        while (i < 80) {
+        for (; i < 80; i++) {
             w[i] = rotleft((w[i-3] ^ w[i-8] ^ w[i-14] ^ w[i-16]), 1);
-            i++;
         }
 
         unsigned int a;
@@ -89,7 +82,7 @@ unsigned int *sha1(unsigned char *in_data, unsigned long in_length) {
         e = hh[4];
 
         i = 0;
-        while (i < 80) {
+        for (; i < 80; i++) {
             unsigned int f;
             unsigned int k;
             if (i <= 19) {
@@ -113,18 +106,13 @@ unsigned int *sha1(unsigned char *in_data, unsigned long in_length) {
             c = rotleft(b, 30);
             b = a;
             a = temp;
-
-            i++;
         }
-
 
         hh[0] = hh[0] + a;
         hh[1] = hh[1] + b;
         hh[2] = hh[2] + c;
         hh[3] = hh[3] + d;
         hh[4] = hh[4] + e;
-
-        chunk_start = chunk_start + 64;
     }
 
     free(w);

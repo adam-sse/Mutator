@@ -29,7 +29,9 @@ public enum BinaryOperator {
     
     AND("&&", 2),
     
-    OR("||", 1);
+    OR("||", 1),
+    
+    ASSIGNMENT("=", 0);
     
     public String str;
     
@@ -72,6 +74,8 @@ public enum BinaryOperator {
         case "&&": return AND;
         
         case "||": return OR;
+        
+        case "=": return ASSIGNMENT;
         
         default: throw new IllegalArgumentException();
         }

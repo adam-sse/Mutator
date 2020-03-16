@@ -3,7 +3,6 @@ package net.ssehub.mutator.mutation.mutations;
 import java.util.LinkedList;
 import java.util.List;
 
-import net.ssehub.mutator.ast.Assignment;
 import net.ssehub.mutator.ast.AstElement;
 import net.ssehub.mutator.ast.BinaryExpr;
 import net.ssehub.mutator.ast.Block;
@@ -52,12 +51,6 @@ class Collector<T> implements IAstVisitor<Void> {
         }
     }
     
-    @Override
-    public Void visitAssignment(Assignment stmt) {
-        check(stmt);
-        return null;
-    }
-
     @Override
     public Void visitBinaryExpr(BinaryExpr expr) {
         check(expr);

@@ -1,6 +1,5 @@
 package net.ssehub.mutator.mutation.mutations;
 
-import net.ssehub.mutator.ast.Assignment;
 import net.ssehub.mutator.ast.AstElement;
 import net.ssehub.mutator.ast.BinaryExpr;
 import net.ssehub.mutator.ast.Block;
@@ -35,21 +34,6 @@ class ElementReplacer<T extends AstElement> implements IAstVisitor<Boolean> {
         this.toReplace = toReplace;
         this.replacement = replacement;
         return toReplace.parent.accept(this);
-    }
-
-    @Override
-    public Boolean visitAssignment(Assignment stmt) {
-        if (toReplace == stmt.variable) {
-            stmt.variable = (Expression) replacement;
-            return true;
-        }
-        
-        if (toReplace == stmt.value) {
-            stmt.value = (Expression) replacement;
-            return true;
-        }
-        
-        return false;
     }
 
     @Override

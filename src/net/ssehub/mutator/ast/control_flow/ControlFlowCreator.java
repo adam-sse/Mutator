@@ -5,7 +5,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.StringJoiner;
 
-import net.ssehub.mutator.ast.Assignment;
 import net.ssehub.mutator.ast.BinaryExpr;
 import net.ssehub.mutator.ast.Block;
 import net.ssehub.mutator.ast.Declaration;
@@ -99,16 +98,6 @@ public class ControlFlowCreator {
             }
         }
         
-        @Override
-        public Void visitAssignment(Assignment stmt) {
-            currentBlock.addStatement(stmt);
-            
-            stmt.variable.accept(this);
-            stmt.value.accept(this);
-            
-            return null;
-        }
-
         @Override
         public Void visitBinaryExpr(BinaryExpr expr) {
             expr.left.accept(this);

@@ -3,7 +3,6 @@ package net.ssehub.mutator.ast.operations;
 import java.util.Deque;
 import java.util.LinkedList;
 
-import net.ssehub.mutator.ast.Assignment;
 import net.ssehub.mutator.ast.AstElement;
 import net.ssehub.mutator.ast.BinaryExpr;
 import net.ssehub.mutator.ast.Block;
@@ -56,20 +55,6 @@ public class AstCloner implements IAstVisitor<AstElement> {
         return (Statement) source.accept(this);
     }
     
-    @Override
-    public Assignment visitAssignment(Assignment stmt) {
-        Assignment clone = new Assignment(parents.peek());
-        initBasics(stmt, clone);
-        
-        parents.push(clone);
-        
-        clone.variable = cloneExpression(stmt.variable);
-        clone.value = cloneExpression(stmt.value);
-        
-        parents.pop();
-        return clone;
-    }
-
     @Override
     public BinaryExpr visitBinaryExpr(BinaryExpr expr) {
         BinaryExpr clone = new BinaryExpr(parents.peek());

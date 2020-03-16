@@ -3,7 +3,6 @@ package net.ssehub.mutator.parsing;
 import java.util.Deque;
 import java.util.LinkedList;
 
-import net.ssehub.mutator.ast.Assignment;
 import net.ssehub.mutator.ast.AstElement;
 import net.ssehub.mutator.ast.BasicType;
 import net.ssehub.mutator.ast.BinaryExpr;
@@ -26,16 +25,15 @@ import net.ssehub.mutator.ast.Loop;
 import net.ssehub.mutator.ast.Return;
 import net.ssehub.mutator.ast.Statement;
 import net.ssehub.mutator.ast.Type;
+import net.ssehub.mutator.ast.Type.Modifier;
 import net.ssehub.mutator.ast.UnaryExpr;
 import net.ssehub.mutator.ast.UnaryOperator;
 import net.ssehub.mutator.ast.While;
-import net.ssehub.mutator.ast.Type.Modifier;
 import net.ssehub.mutator.parsing.grammar.SimpleCParser.DeclTypeContext;
 import net.ssehub.mutator.parsing.grammar.SimpleCParser.DeclarationContext;
 import net.ssehub.mutator.parsing.grammar.SimpleCParser.ExprContext;
 import net.ssehub.mutator.parsing.grammar.SimpleCParser.FileContext;
 import net.ssehub.mutator.parsing.grammar.SimpleCParser.FunctionContext;
-import net.ssehub.mutator.parsing.grammar.SimpleCParser.StmtAssignmentContext;
 import net.ssehub.mutator.parsing.grammar.SimpleCParser.StmtBranchContext;
 import net.ssehub.mutator.parsing.grammar.SimpleCParser.StmtCompoundContext;
 import net.ssehub.mutator.parsing.grammar.SimpleCParser.StmtContext;
@@ -92,9 +90,7 @@ public class Converter {
     private Statement convertStatement(StmtContext tree) {
         Statement result = null;
         
-        if (tree.stmtAssignment() != null) {
-            result = convertAssignment(tree.stmtAssignment());
-        } else if (tree.stmtBranch() != null) {
+        if (tree.stmtBranch() != null) {
             result = convertBranchStatement(tree.stmtBranch());
         } else if (tree.stmtLoop() != null) {
             result = convertLoopStatement(tree.stmtLoop());
@@ -117,18 +113,6 @@ public class Converter {
         }
         
         return result;
-    }
-    
-    private Assignment convertAssignment(StmtAssignmentContext tree) {
-        Assignment stmt = new Assignment(parents.peek());
-        stmt.initLocation(tree.start, tree.stop);
-        parents.push(stmt);
-        
-        stmt.variable = convertExpression(tree.var);
-        stmt.value = convertExpression(tree.value);
-        
-        parents.pop();
-        return stmt;
     }
     
     private If convertBranchStatement(StmtBranchContext tree) {

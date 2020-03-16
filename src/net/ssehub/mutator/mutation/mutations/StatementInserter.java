@@ -1,6 +1,5 @@
 package net.ssehub.mutator.mutation.mutations;
 
-import net.ssehub.mutator.ast.Assignment;
 import net.ssehub.mutator.ast.BinaryExpr;
 import net.ssehub.mutator.ast.Block;
 import net.ssehub.mutator.ast.Declaration;
@@ -63,11 +62,6 @@ class StatementInserter implements IAstVisitor<Boolean> {
         return false;
     }
     
-    @Override
-    public Boolean visitAssignment(Assignment stmt) {
-        return false;
-    }
-
     @Override
     public Boolean visitBinaryExpr(BinaryExpr expr) {
         return false;

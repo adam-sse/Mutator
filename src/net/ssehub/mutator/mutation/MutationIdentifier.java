@@ -1,6 +1,5 @@
 package net.ssehub.mutator.mutation;
 
-import net.ssehub.mutator.ast.Assignment;
 import net.ssehub.mutator.ast.AstElement;
 import net.ssehub.mutator.ast.BinaryExpr;
 import net.ssehub.mutator.ast.Block;
@@ -84,12 +83,6 @@ public class MutationIdentifier {
             }
         }
         
-        @Override
-        public Void visitAssignment(Assignment stmt) {
-            check(stmt);
-            return null;
-        }
-
         @Override
         public Void visitBinaryExpr(BinaryExpr expr) {
             check(expr);

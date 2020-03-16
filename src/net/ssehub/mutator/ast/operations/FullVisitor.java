@@ -1,6 +1,5 @@
 package net.ssehub.mutator.ast.operations;
 
-import net.ssehub.mutator.ast.Assignment;
 import net.ssehub.mutator.ast.BinaryExpr;
 import net.ssehub.mutator.ast.Block;
 import net.ssehub.mutator.ast.Declaration;
@@ -28,16 +27,6 @@ public class FullVisitor implements IAstVisitor<Void> {
     
     public FullVisitor(IAstVisitor<?> other) {
         this.other = other;
-    }
-
-    @Override
-    public Void visitAssignment(Assignment stmt) {
-        other.visitAssignment(stmt);
-        
-        stmt.variable.accept(this);
-        stmt.value.accept(this);
-        
-        return null;
     }
 
     @Override

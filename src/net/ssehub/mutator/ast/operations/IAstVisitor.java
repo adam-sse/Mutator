@@ -1,6 +1,5 @@
 package net.ssehub.mutator.ast.operations;
 
-import net.ssehub.mutator.ast.Assignment;
 import net.ssehub.mutator.ast.BinaryExpr;
 import net.ssehub.mutator.ast.Block;
 import net.ssehub.mutator.ast.Declaration;
@@ -22,8 +21,6 @@ import net.ssehub.mutator.ast.While;
 
 public interface IAstVisitor<T> {
 
-    public T visitAssignment(Assignment stmt);
-    
     public T visitBinaryExpr(BinaryExpr expr);
     
     public T visitBlock(Block stmt);

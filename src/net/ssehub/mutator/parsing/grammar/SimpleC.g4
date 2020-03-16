@@ -32,12 +32,10 @@ stmt
     | stmtExpr
     | stmtReturn
     | stmtDeclaration
-    | stmtAssignment
     ;
 
 stmtEmpty: ';';
 stmtDeclaration: declaration ';';
-stmtAssignment: var=expr '=' value=expr ';';
 stmtReturn: 'return' expr? ';'; 
 stmtExpr: expr ';';
 
@@ -70,6 +68,7 @@ expr
     | l=expr op='|' r=expr
     | l=expr op='&&' r=expr
     | l=expr op='||' r=expr
+    | l=expr op='=' r=expr
     ;
     
 exprList: expr (',' expr)*;

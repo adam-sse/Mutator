@@ -6,6 +6,7 @@ import static org.junit.Assert.assertThat;
 
 import org.junit.Test;
 
+import net.ssehub.mutator.ast.AstElement.Location;
 import net.ssehub.mutator.ast.BinaryExpr;
 import net.ssehub.mutator.ast.BinaryOperator;
 import net.ssehub.mutator.ast.Expression;
@@ -14,7 +15,6 @@ import net.ssehub.mutator.ast.Identifier;
 import net.ssehub.mutator.ast.Literal;
 import net.ssehub.mutator.ast.UnaryExpr;
 import net.ssehub.mutator.ast.UnaryOperator;
-import net.ssehub.mutator.ast.AstElement.Location;
 import net.ssehub.mutator.ast.operations.AstCloner;
 import net.ssehub.mutator.mutation.MutationIdentifier;
 
