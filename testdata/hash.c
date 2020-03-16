@@ -4,8 +4,6 @@ unsigned int rotleft(unsigned int v, int c) {
 
 unsigned int *sha1(unsigned char *in_data, unsigned long in_length) {
 
-    /*test*/
-
     unsigned int *hh;
     hh = malloc(4 * 5);
 
