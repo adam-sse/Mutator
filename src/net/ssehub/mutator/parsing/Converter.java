@@ -97,7 +97,7 @@ public class Converter {
         } else if (tree.stmtLoop() != null) {
             result = convertLoopStatement(tree.stmtLoop());
         } else if (tree.stmtDeclaration() != null) {
-            result = convertDeclaration(tree.stmtDeclaration());
+            result = convertDeclarationStmt(tree.stmtDeclaration());
         } else if (tree.stmtExpr() != null) {
             result = convertExpressionStatement(tree.stmtExpr());
         } else if (tree.stmtReturn() != null) {
@@ -186,7 +186,7 @@ public class Converter {
         return loop;
     }
     
-    private DeclarationStmt convertDeclaration(StmtDeclarationContext tree) {
+    private DeclarationStmt convertDeclarationStmt(StmtDeclarationContext tree) {
         DeclarationStmt stmt = new DeclarationStmt(parents.peek());
         stmt.initLocation(tree.start, tree.stop);
         parents.push(stmt);
@@ -347,6 +347,9 @@ public class Converter {
         
         decl.identifier = tree.name.getText();
         decl.type = convertType(tree.declType());
+        if (tree.init != null) {
+            decl.initExpr = convertExpression(tree.init);
+        }
         
         parents.pop();
         return decl;

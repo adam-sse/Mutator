@@ -54,7 +54,12 @@ abstract class AbstractPrinter implements IAstVisitor<String> {
 
     @Override
     public String visitDeclaration(Declaration decl) {
-        return decl.type.accept(this) + " " + decl.identifier;
+        StringBuilder sb = new StringBuilder();
+        sb.append(decl.type.accept(this)).append(' ').append(decl.identifier);
+        if (decl.initExpr != null) {
+            sb.append(" = ").append(decl.initExpr.accept(this));
+        }
+        return sb.toString();
     }
 
     @Override

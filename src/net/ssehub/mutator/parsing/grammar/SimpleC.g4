@@ -13,7 +13,7 @@ declList
     ;
 
 declaration
-    : declType name=IDENTIFIER
+    : declType name=IDENTIFIER ('=' init=expr)?
     ;
 
 declType

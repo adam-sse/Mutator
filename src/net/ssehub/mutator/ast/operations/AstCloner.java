@@ -108,6 +108,9 @@ public class AstCloner implements IAstVisitor<AstElement> {
         
         clone.type = visitType(decl.type);
         clone.identifier = decl.identifier;
+        if (decl.initExpr != null) {
+            clone.initExpr = cloneExpression(decl.initExpr);
+        }
         
         parents.pop();
         return clone;

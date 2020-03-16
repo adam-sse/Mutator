@@ -49,7 +49,7 @@ public class ControlFlowCreator {
         
         ControlFlowFunction result = new ControlFlowFunction(ast.name, header);
         
-        VisitorImpl visitor = new VisitorImpl(result);
+        ControlFlowVisitor visitor = new ControlFlowVisitor(result);
         ast.body.accept(visitor);
         visitor.finish();
 
@@ -80,13 +80,13 @@ public class ControlFlowCreator {
         
     }
     
-    private static class VisitorImpl implements IAstVisitor<Void> {
+    private static class ControlFlowVisitor implements IAstVisitor<Void> {
 
         private ControlFlowFunction func;
         
         private ControlFlowBlock currentBlock;
         
-        public VisitorImpl(ControlFlowFunction func) {
+        public ControlFlowVisitor(ControlFlowFunction func) {
             this.func = func;
             this.currentBlock = func.createBlock();
             func.getStartBlock().setOutTrue(this.currentBlock);
@@ -127,6 +127,9 @@ public class ControlFlowCreator {
         @Override
         public Void visitDeclaration(Declaration decl) {
             decl.type.accept(this);
+            if (decl.initExpr != null) {
+                decl.initExpr.accept(this);
+            }
             return null;
         }
 

@@ -82,6 +82,9 @@ class ElementReplacer<T extends AstElement> implements IAstVisitor<Boolean> {
         if (toReplace == decl.type) {
             decl.type = (Type) replacement;
             return true;
+        } else if (toReplace == decl.initExpr) {
+            decl.initExpr = (Expression) replacement;
+            return true;
         }
         
         return false;

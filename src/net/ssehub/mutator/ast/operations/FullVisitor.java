@@ -65,6 +65,9 @@ public class FullVisitor implements IAstVisitor<Void> {
         other.visitDeclaration(decl);
         
         decl.type.accept(this);
+        if (decl.initExpr != null) {
+            decl.initExpr.accept(this);
+        }
         
         return null;
     }
