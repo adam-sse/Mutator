@@ -10,12 +10,12 @@ import java.util.Map;
 import java.util.Random;
 
 import net.ssehub.mutator.Configuration;
+import net.ssehub.mutator.ast.File;
 import net.ssehub.mutator.evaluation.Evaluator;
 import net.ssehub.mutator.evaluation.EvaluatorFactory;
 import net.ssehub.mutator.evaluation.TestResult;
 import net.ssehub.mutator.mutation.mutations.Mutation;
 import net.ssehub.mutator.mutation.mutations.MutationFactory;
-import net.ssehub.mutator.parsing.ast.File;
 
 public class Mutator implements IFitnessStore {
 

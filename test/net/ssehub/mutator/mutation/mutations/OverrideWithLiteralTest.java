@@ -6,17 +6,17 @@ import static org.junit.Assert.assertThat;
 
 import org.junit.Test;
 
+import net.ssehub.mutator.ast.BinaryExpr;
+import net.ssehub.mutator.ast.BinaryOperator;
+import net.ssehub.mutator.ast.Expression;
+import net.ssehub.mutator.ast.ExpressionStmt;
+import net.ssehub.mutator.ast.Identifier;
+import net.ssehub.mutator.ast.Literal;
+import net.ssehub.mutator.ast.UnaryExpr;
+import net.ssehub.mutator.ast.UnaryOperator;
+import net.ssehub.mutator.ast.AstElement.Location;
+import net.ssehub.mutator.ast.operations.AstCloner;
 import net.ssehub.mutator.mutation.MutationIdentifier;
-import net.ssehub.mutator.parsing.ast.AstElement.Location;
-import net.ssehub.mutator.parsing.ast.BinaryExpr;
-import net.ssehub.mutator.parsing.ast.BinaryOperator;
-import net.ssehub.mutator.parsing.ast.Expression;
-import net.ssehub.mutator.parsing.ast.ExpressionStmt;
-import net.ssehub.mutator.parsing.ast.Identifier;
-import net.ssehub.mutator.parsing.ast.Literal;
-import net.ssehub.mutator.parsing.ast.UnaryExpr;
-import net.ssehub.mutator.parsing.ast.UnaryOperator;
-import net.ssehub.mutator.parsing.ast.operations.AstCloner;
 
 public class OverrideWithLiteralTest {
 

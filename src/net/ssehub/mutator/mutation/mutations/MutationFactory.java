@@ -3,7 +3,7 @@ package net.ssehub.mutator.mutation.mutations;
 import java.util.List;
 import java.util.Random;
 
-import net.ssehub.mutator.parsing.ast.File;
+import net.ssehub.mutator.ast.File;
 
 public class MutationFactory {
 

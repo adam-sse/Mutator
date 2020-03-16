@@ -3,12 +3,12 @@ package net.ssehub.mutator.mutation.mutations;
 import java.util.ArrayList;
 import java.util.Random;
 
+import net.ssehub.mutator.ast.AstElement;
+import net.ssehub.mutator.ast.Expression;
+import net.ssehub.mutator.ast.File;
+import net.ssehub.mutator.ast.Function;
+import net.ssehub.mutator.ast.operations.AstCloner;
 import net.ssehub.mutator.mutation.MutationIdentifier;
-import net.ssehub.mutator.parsing.ast.AstElement;
-import net.ssehub.mutator.parsing.ast.Expression;
-import net.ssehub.mutator.parsing.ast.File;
-import net.ssehub.mutator.parsing.ast.Function;
-import net.ssehub.mutator.parsing.ast.operations.AstCloner;
 
 public class CopyOverrideExpression extends Mutation {
 

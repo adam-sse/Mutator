@@ -1,7 +1,7 @@
 package net.ssehub.mutator.mutation.mutations;
 
-import net.ssehub.mutator.parsing.ast.AstElement;
-import net.ssehub.mutator.parsing.ast.Statement;
+import net.ssehub.mutator.ast.AstElement;
+import net.ssehub.mutator.ast.Statement;
 
 class Util {
 

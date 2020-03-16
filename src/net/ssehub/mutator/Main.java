@@ -13,11 +13,11 @@ import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.RecognitionException;
 import org.antlr.v4.runtime.Recognizer;
 
+import net.ssehub.mutator.ast.operations.AstPrettyPrinter;
 import net.ssehub.mutator.mutation.Mutant;
 import net.ssehub.mutator.mutation.MutantList;
 import net.ssehub.mutator.mutation.Mutator;
 import net.ssehub.mutator.parsing.Converter;
-import net.ssehub.mutator.parsing.ast.operations.AstPrettyPrinter;
 import net.ssehub.mutator.parsing.grammar.SimpleCLexer;
 import net.ssehub.mutator.parsing.grammar.SimpleCParser;
 import net.ssehub.mutator.visualization.ControlFlowRenderer;
@@ -49,7 +49,7 @@ public class Main {
             
             // 1) parse file to mutate
             System.out.println("Parsing...");
-            net.ssehub.mutator.parsing.ast.File file = parse(input);
+            net.ssehub.mutator.ast.File file = parse(input);
             
             // 2) mutate file
             System.out.println("Mutating...");
@@ -98,7 +98,7 @@ public class Main {
             
             // 1) parse file
             System.out.println("Parsing...");
-            net.ssehub.mutator.parsing.ast.File file = parse(input);
+            net.ssehub.mutator.ast.File file = parse(input);
             
             // 2) print out
             System.out.println("Writing...");
@@ -127,7 +127,7 @@ public class Main {
             
             // 1) parse file
             System.out.println("Parsing...");
-            net.ssehub.mutator.parsing.ast.File file = parse(input);
+            net.ssehub.mutator.ast.File file = parse(input);
             
             // 2) print out
             System.out.println("Rendering...");
@@ -185,7 +185,7 @@ public class Main {
         System.exit(result);
     }
     
-    private static net.ssehub.mutator.parsing.ast.File parse(File input) throws IOException {
+    private static net.ssehub.mutator.ast.File parse(File input) throws IOException {
         SimpleCLexer lexer = new SimpleCLexer(CharStreams.fromPath(input.toPath()));
         CommonTokenStream tokens = new CommonTokenStream(lexer);
         SimpleCParser parser = new SimpleCParser(tokens);
@@ -200,7 +200,7 @@ public class Main {
         });
         
         Converter converter = new Converter();
-        net.ssehub.mutator.parsing.ast.File file = converter.convert(parser.file());
+        net.ssehub.mutator.ast.File file = converter.convert(parser.file());
         return file;
     }
 

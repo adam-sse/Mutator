@@ -2,7 +2,7 @@ package net.ssehub.mutator.mutation.mutations;
 
 import java.util.List;
 
-import net.ssehub.mutator.parsing.ast.AstElement;
+import net.ssehub.mutator.ast.AstElement;
 
 public abstract class Mutation {
 

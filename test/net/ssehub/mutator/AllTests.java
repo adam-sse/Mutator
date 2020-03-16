@@ -4,8 +4,8 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
+import net.ssehub.mutator.ast.AllAstTests;
 import net.ssehub.mutator.mutation.mutations.AllMutationTests;
-import net.ssehub.mutator.parsing.ast.AllAstTests;
 
 @RunWith(Suite.class)
 @SuiteClasses({

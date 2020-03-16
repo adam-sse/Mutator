@@ -6,11 +6,11 @@ import static org.junit.Assert.assertThat;
 
 import org.junit.Test;
 
-import net.ssehub.mutator.parsing.ast.AstElement;
-import net.ssehub.mutator.parsing.ast.Block;
-import net.ssehub.mutator.parsing.ast.ExpressionStmt;
-import net.ssehub.mutator.parsing.ast.Literal;
-import net.ssehub.mutator.parsing.ast.Statement;
+import net.ssehub.mutator.ast.AstElement;
+import net.ssehub.mutator.ast.Block;
+import net.ssehub.mutator.ast.ExpressionStmt;
+import net.ssehub.mutator.ast.Literal;
+import net.ssehub.mutator.ast.Statement;
 
 public class ElementReplacerTest {
 

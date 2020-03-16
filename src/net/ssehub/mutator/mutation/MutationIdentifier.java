@@ -1,26 +1,26 @@
 package net.ssehub.mutator.mutation;
 
-import net.ssehub.mutator.parsing.ast.Assignment;
-import net.ssehub.mutator.parsing.ast.AstElement;
-import net.ssehub.mutator.parsing.ast.BinaryExpr;
-import net.ssehub.mutator.parsing.ast.Block;
-import net.ssehub.mutator.parsing.ast.Declaration;
-import net.ssehub.mutator.parsing.ast.DeclarationStmt;
-import net.ssehub.mutator.parsing.ast.DoWhileLoop;
-import net.ssehub.mutator.parsing.ast.EmptyStmt;
-import net.ssehub.mutator.parsing.ast.ExpressionStmt;
-import net.ssehub.mutator.parsing.ast.File;
-import net.ssehub.mutator.parsing.ast.Function;
-import net.ssehub.mutator.parsing.ast.FunctionCall;
-import net.ssehub.mutator.parsing.ast.Identifier;
-import net.ssehub.mutator.parsing.ast.If;
-import net.ssehub.mutator.parsing.ast.Literal;
-import net.ssehub.mutator.parsing.ast.Return;
-import net.ssehub.mutator.parsing.ast.Type;
-import net.ssehub.mutator.parsing.ast.UnaryExpr;
-import net.ssehub.mutator.parsing.ast.While;
-import net.ssehub.mutator.parsing.ast.operations.FullVisitor;
-import net.ssehub.mutator.parsing.ast.operations.IAstVisitor;
+import net.ssehub.mutator.ast.Assignment;
+import net.ssehub.mutator.ast.AstElement;
+import net.ssehub.mutator.ast.BinaryExpr;
+import net.ssehub.mutator.ast.Block;
+import net.ssehub.mutator.ast.Declaration;
+import net.ssehub.mutator.ast.DeclarationStmt;
+import net.ssehub.mutator.ast.DoWhileLoop;
+import net.ssehub.mutator.ast.EmptyStmt;
+import net.ssehub.mutator.ast.ExpressionStmt;
+import net.ssehub.mutator.ast.File;
+import net.ssehub.mutator.ast.Function;
+import net.ssehub.mutator.ast.FunctionCall;
+import net.ssehub.mutator.ast.Identifier;
+import net.ssehub.mutator.ast.If;
+import net.ssehub.mutator.ast.Literal;
+import net.ssehub.mutator.ast.Return;
+import net.ssehub.mutator.ast.Type;
+import net.ssehub.mutator.ast.UnaryExpr;
+import net.ssehub.mutator.ast.While;
+import net.ssehub.mutator.ast.operations.FullVisitor;
+import net.ssehub.mutator.ast.operations.IAstVisitor;
 
 public class MutationIdentifier {
 

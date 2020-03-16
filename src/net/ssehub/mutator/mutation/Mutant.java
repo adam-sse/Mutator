@@ -6,10 +6,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.StringJoiner;
 
+import net.ssehub.mutator.ast.File;
+import net.ssehub.mutator.ast.operations.AstCloner;
+import net.ssehub.mutator.ast.operations.AstPrettyPrinter;
 import net.ssehub.mutator.mutation.mutations.Mutation;
-import net.ssehub.mutator.parsing.ast.File;
-import net.ssehub.mutator.parsing.ast.operations.AstCloner;
-import net.ssehub.mutator.parsing.ast.operations.AstPrettyPrinter;
 
 public class Mutant {
     
