@@ -167,7 +167,7 @@ public class ControlFlowRenderer {
         return '\"' + name + '\"';
     }
     
-    private String getClusterName(String funcName) {
+    private static String getClusterName(String funcName) {
         return escapeName("cluster_" + funcName);
     }
     
