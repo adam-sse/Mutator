@@ -16,6 +16,7 @@ import net.ssehub.mutator.ast.EmptyStmt;
 import net.ssehub.mutator.ast.Expression;
 import net.ssehub.mutator.ast.ExpressionStmt;
 import net.ssehub.mutator.ast.File;
+import net.ssehub.mutator.ast.For;
 import net.ssehub.mutator.ast.Function;
 import net.ssehub.mutator.ast.FunctionCall;
 import net.ssehub.mutator.ast.Identifier;
@@ -42,6 +43,7 @@ import net.ssehub.mutator.parsing.grammar.SimpleCParser.StmtDeclarationContext;
 import net.ssehub.mutator.parsing.grammar.SimpleCParser.StmtDoWhileLoopContext;
 import net.ssehub.mutator.parsing.grammar.SimpleCParser.StmtEmptyContext;
 import net.ssehub.mutator.parsing.grammar.SimpleCParser.StmtExprContext;
+import net.ssehub.mutator.parsing.grammar.SimpleCParser.StmtForLoopContext;
 import net.ssehub.mutator.parsing.grammar.SimpleCParser.StmtLoopContext;
 import net.ssehub.mutator.parsing.grammar.SimpleCParser.StmtReturnContext;
 import net.ssehub.mutator.parsing.grammar.SimpleCParser.StmtWhileLoopContext;
@@ -151,6 +153,8 @@ public class Converter {
             result = convertWhileLoop(tree.stmtWhileLoop());
         } else if (tree.stmtDoWhileLoop() != null) {
             result = convertDoWhileLoop(tree.stmtDoWhileLoop());
+        } else if (tree.stmtForLoop() != null) {
+            result = convertForLoop(tree.stmtForLoop());
         } else {
             if (tree.children.size() >= 1) {
                 throw new IllegalArgumentException(tree.getChild(0).getClass().getName());
@@ -180,6 +184,27 @@ public class Converter {
         parents.push(loop);
         
         loop.condition = convertExpression(tree.condition);
+        loop.body = convertStatement(tree.body);
+        
+        parents.pop();
+        return loop;
+    }
+    
+    private For convertForLoop(StmtForLoopContext tree) {
+        For loop = new For(parents.peek());
+        loop.initLocation(tree.start, tree.stop);
+        parents.push(loop);
+
+        if (tree.init != null) {
+            loop.init = convertDeclaration(tree.init);
+        }
+        if (tree.condition != null) {
+            loop.condition = convertExpression(tree.condition);
+        }
+        if (tree.increment != null) {
+            loop.increment = convertExpression(tree.increment);
+        }
+        
         loop.body = convertStatement(tree.body);
         
         parents.pop();

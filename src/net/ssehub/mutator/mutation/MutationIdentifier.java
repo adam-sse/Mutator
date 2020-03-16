@@ -10,6 +10,7 @@ import net.ssehub.mutator.ast.DoWhileLoop;
 import net.ssehub.mutator.ast.EmptyStmt;
 import net.ssehub.mutator.ast.ExpressionStmt;
 import net.ssehub.mutator.ast.File;
+import net.ssehub.mutator.ast.For;
 import net.ssehub.mutator.ast.Function;
 import net.ssehub.mutator.ast.FunctionCall;
 import net.ssehub.mutator.ast.Identifier;
@@ -137,6 +138,12 @@ public class MutationIdentifier {
             return null;
         }
 
+        @Override
+        public Void visitFor(For stmt) {
+            check(stmt);
+            return null;
+        }
+        
         @Override
         public Void visitFunction(Function func) {
             check(func);

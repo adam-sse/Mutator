@@ -11,6 +11,7 @@ import net.ssehub.mutator.ast.EmptyStmt;
 import net.ssehub.mutator.ast.Expression;
 import net.ssehub.mutator.ast.ExpressionStmt;
 import net.ssehub.mutator.ast.File;
+import net.ssehub.mutator.ast.For;
 import net.ssehub.mutator.ast.Function;
 import net.ssehub.mutator.ast.FunctionCall;
 import net.ssehub.mutator.ast.Identifier;
@@ -135,6 +136,31 @@ class ElementReplacer<T extends AstElement> implements IAstVisitor<Boolean> {
         int i = Util.findIndex(file.functions, (Function) toReplace);
         if (i != -1) {
             file.functions.set(i, (Function) replacement);
+            return true;
+        }
+        
+        return false;
+    }
+    
+    @Override
+    public Boolean visitFor(For stmt) {
+        if (toReplace == stmt.init) {
+            stmt.init = (Declaration) replacement;
+            return true;
+        }
+        
+        if (toReplace == stmt.condition) {
+            stmt.condition = (Expression) replacement;
+            return true;
+        }
+        
+        if (toReplace == stmt.increment) {
+            stmt.increment = (Expression) replacement;
+            return true;
+        }
+        
+        if (toReplace == stmt.body) {
+            stmt.body = (Statement) replacement;
             return true;
         }
         

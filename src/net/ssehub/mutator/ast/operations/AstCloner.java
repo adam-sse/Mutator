@@ -14,6 +14,7 @@ import net.ssehub.mutator.ast.EmptyStmt;
 import net.ssehub.mutator.ast.Expression;
 import net.ssehub.mutator.ast.ExpressionStmt;
 import net.ssehub.mutator.ast.File;
+import net.ssehub.mutator.ast.For;
 import net.ssehub.mutator.ast.Function;
 import net.ssehub.mutator.ast.FunctionCall;
 import net.ssehub.mutator.ast.Identifier;
@@ -174,6 +175,29 @@ public class AstCloner implements IAstVisitor<AstElement> {
         for (Function func : file.functions) {
             clone.functions.add(visitFunction(func));
         }
+        
+        parents.pop();
+        return clone;
+    }
+    
+    @Override
+    public AstElement visitFor(For stmt) {
+        For clone = new For(parents.peek());
+        initBasics(stmt, clone);
+        
+        parents.push(clone);
+        
+        if (stmt.init != null) {
+            clone.init = visitDeclaration(stmt.init);
+        }
+        if (stmt.condition != null) {
+            clone.condition = cloneExpression(stmt.condition);
+        }
+        if (stmt.increment != null) {
+            clone.increment = cloneExpression(stmt.increment);
+        }
+        
+        clone.body = cloneStatement(stmt.body);
         
         parents.pop();
         return clone;

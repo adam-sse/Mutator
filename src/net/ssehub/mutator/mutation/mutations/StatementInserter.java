@@ -9,11 +9,13 @@ import net.ssehub.mutator.ast.DoWhileLoop;
 import net.ssehub.mutator.ast.EmptyStmt;
 import net.ssehub.mutator.ast.ExpressionStmt;
 import net.ssehub.mutator.ast.File;
+import net.ssehub.mutator.ast.For;
 import net.ssehub.mutator.ast.Function;
 import net.ssehub.mutator.ast.FunctionCall;
 import net.ssehub.mutator.ast.Identifier;
 import net.ssehub.mutator.ast.If;
 import net.ssehub.mutator.ast.Literal;
+import net.ssehub.mutator.ast.Loop;
 import net.ssehub.mutator.ast.Return;
 import net.ssehub.mutator.ast.Statement;
 import net.ssehub.mutator.ast.Type;
@@ -38,6 +40,29 @@ class StatementInserter implements IAstVisitor<Boolean> {
         return reference.parent.accept(this);
     }
 
+    private Boolean visitLoop(Loop stmt) {
+        if (stmt.body == reference) {
+            Block block = new Block(stmt);
+            block.start = stmt.body.start;
+            block.end = stmt.body.end;
+            stmt.body = block;
+            
+            if (before) {
+                block.statements.add(toInsert);
+                block.statements.add(reference);
+            } else {
+                block.statements.add(reference);
+                block.statements.add(toInsert);
+            }
+            reference.parent = block;
+            toInsert.parent = block;
+            
+            return true;
+        }
+        
+        return false;
+    }
+    
     @Override
     public Boolean visitAssignment(Assignment stmt) {
         return false;
@@ -71,26 +96,7 @@ class StatementInserter implements IAstVisitor<Boolean> {
 
     @Override
     public Boolean visitDoWhileLoop(DoWhileLoop stmt) {
-        if (stmt.body == reference) {
-            Block block = new Block(stmt);
-            block.start = stmt.body.start;
-            block.end = stmt.body.end;
-            stmt.body = block;
-            
-            if (before) {
-                block.statements.add(toInsert);
-                block.statements.add(reference);
-            } else {
-                block.statements.add(reference);
-                block.statements.add(toInsert);
-            }
-            reference.parent = block;
-            toInsert.parent = block;
-            
-            return true;
-        }
-        
-        return false;
+        return visitLoop(stmt);
     }
 
     @Override
@@ -108,6 +114,11 @@ class StatementInserter implements IAstVisitor<Boolean> {
         return false;
     }
 
+    @Override
+    public Boolean visitFor(For stmt) {
+        return visitLoop(stmt);
+    }
+    
     @Override
     public Boolean visitFunction(Function func) {
         if (func.body == reference) {
@@ -208,26 +219,7 @@ class StatementInserter implements IAstVisitor<Boolean> {
 
     @Override
     public Boolean visitWhile(While stmt) {
-        if (stmt.body == reference) {
-            Block block = new Block(stmt);
-            block.start = stmt.body.start;
-            block.end = stmt.body.end;
-            stmt.body = block;
-            
-            if (before) {
-                block.statements.add(toInsert);
-                block.statements.add(reference);
-            } else {
-                block.statements.add(reference);
-                block.statements.add(toInsert);
-            }
-            reference.parent = block;
-            toInsert.parent = block;
-            
-            return true;
-        }
-        
-        return false;
+        return visitLoop(stmt);
     }
 
 }

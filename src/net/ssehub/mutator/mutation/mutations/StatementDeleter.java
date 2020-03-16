@@ -9,11 +9,13 @@ import net.ssehub.mutator.ast.DoWhileLoop;
 import net.ssehub.mutator.ast.EmptyStmt;
 import net.ssehub.mutator.ast.ExpressionStmt;
 import net.ssehub.mutator.ast.File;
+import net.ssehub.mutator.ast.For;
 import net.ssehub.mutator.ast.Function;
 import net.ssehub.mutator.ast.FunctionCall;
 import net.ssehub.mutator.ast.Identifier;
 import net.ssehub.mutator.ast.If;
 import net.ssehub.mutator.ast.Literal;
+import net.ssehub.mutator.ast.Loop;
 import net.ssehub.mutator.ast.Return;
 import net.ssehub.mutator.ast.Statement;
 import net.ssehub.mutator.ast.Type;
@@ -32,6 +34,18 @@ class StatementDeleter implements IAstVisitor<Boolean> {
         return target.parent.accept(this);
     }
 
+    private Boolean visitLoop(Loop stmt) {
+        if (target == stmt.body) {
+            EmptyStmt replacement = new EmptyStmt(stmt);
+            replacement.start = stmt.body.start;
+            replacement.end = stmt.body.end;
+            stmt.body = replacement;
+            return true;
+        }
+        
+        return false;
+    }
+    
     @Override
     public Boolean visitAssignment(Assignment stmt) {
         return false;
@@ -65,15 +79,7 @@ class StatementDeleter implements IAstVisitor<Boolean> {
 
     @Override
     public Boolean visitDoWhileLoop(DoWhileLoop stmt) {
-        if (target == stmt.body) {
-            EmptyStmt replacement = new EmptyStmt(stmt);
-            replacement.start = stmt.body.start;
-            replacement.end = stmt.body.end;
-            stmt.body = replacement;
-            return true;
-        }
-        
-        return false;
+        return visitLoop(stmt);
     }
 
     @Override
@@ -89,6 +95,11 @@ class StatementDeleter implements IAstVisitor<Boolean> {
     @Override
     public Boolean visitFile(File file) {
         return false;
+    }
+    
+    @Override
+    public Boolean visitFor(For stmt) {
+        return visitLoop(stmt);
     }
 
     @Override
@@ -158,15 +169,7 @@ class StatementDeleter implements IAstVisitor<Boolean> {
 
     @Override
     public Boolean visitWhile(While stmt) {
-        if (target == stmt.body) {
-            EmptyStmt replacement = new EmptyStmt(stmt);
-            replacement.start = stmt.body.start;
-            replacement.end = stmt.body.end;
-            stmt.body = replacement;
-            return true;
-        }
-        
-        return false;
+        return visitLoop(stmt);
     }
 
 }

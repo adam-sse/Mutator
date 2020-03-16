@@ -15,6 +15,7 @@ import net.ssehub.mutator.ast.EmptyStmt;
 import net.ssehub.mutator.ast.Expression;
 import net.ssehub.mutator.ast.ExpressionStmt;
 import net.ssehub.mutator.ast.File;
+import net.ssehub.mutator.ast.For;
 import net.ssehub.mutator.ast.Function;
 import net.ssehub.mutator.ast.FunctionCall;
 import net.ssehub.mutator.ast.Identifier;
@@ -188,6 +189,61 @@ public class ControlFlowCreator {
         @Override
         public Void visitFile(File file) {
             throw new IllegalArgumentException();
+        }
+        
+        @Override
+        public Void visitFor(For stmt) {
+            ControlFlowBlock prev = this.currentBlock;
+            if (stmt.init != null) {
+                stmt.init.accept(this);
+                
+                DeclarationStmt declStmt = new DeclarationStmt(stmt);
+                declStmt.decl = stmt.init;
+                prev.addStatement(declStmt);
+            }
+            
+            ControlFlowBlock condBlock = null;
+            if (stmt.condition != null) {
+                condBlock = func.createBlock();
+                condBlock.setOutCondition(stmt.condition);
+                
+                this.currentBlock = condBlock;
+                stmt.condition.accept(this);
+            }
+            
+            ControlFlowBlock bodyStart = func.createBlock();
+            this.currentBlock = bodyStart;
+            
+            stmt.body.accept(this);
+            
+            ControlFlowBlock bodyEnd = this.currentBlock;
+            
+            if (stmt.increment != null) {
+                stmt.increment.accept(this);
+                
+                ExpressionStmt incrStmt = new ExpressionStmt(stmt);
+                incrStmt.expr = stmt.increment;
+                bodyEnd.addStatement(incrStmt);
+            }
+            
+            ControlFlowBlock after = func.createBlock();
+            
+            if (condBlock != null) {
+                prev.setOutTrue(condBlock);
+                
+                condBlock.setOutTrue(bodyStart);
+                condBlock.setOutFalse(after);
+                
+                bodyEnd.setOutTrue(condBlock);
+            } else {
+                prev.setOutTrue(bodyStart);
+                
+                bodyEnd.setOutTrue(bodyStart);
+            }
+            
+            this.currentBlock = after;
+            
+            return null;
         }
 
         @Override

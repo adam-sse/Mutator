@@ -46,10 +46,12 @@ stmtBranch: 'if' '(' condition=expr ')' thenBody=stmt ('else' elseBody=stmt)?;
 stmtLoop
     : stmtWhileLoop
     | stmtDoWhileLoop
+    | stmtForLoop
     ;
 
 stmtWhileLoop: 'while' '(' condition=expr ')' body=stmt;
 stmtDoWhileLoop: 'do' body=stmt 'while' '(' condition=expr ')' ';';
+stmtForLoop: 'for' '(' init=declaration? ';' condition=expr? ';' increment=expr? ')' body=stmt;
 
 expr
     : '(' nested=expr ')'

@@ -6,6 +6,7 @@ import net.ssehub.mutator.ast.Block;
 import net.ssehub.mutator.ast.Declaration;
 import net.ssehub.mutator.ast.DoWhileLoop;
 import net.ssehub.mutator.ast.File;
+import net.ssehub.mutator.ast.For;
 import net.ssehub.mutator.ast.Function;
 import net.ssehub.mutator.ast.If;
 import net.ssehub.mutator.ast.Statement;
@@ -38,6 +39,30 @@ public class AstLinePrinter extends AbstractPrinter {
         }
         
         return sj.toString();
+    }
+    
+    @Override
+    public String visitFor(For stmt) {
+        StringBuilder sb = new StringBuilder();
+        
+        sb.append("for (");
+        
+        if (stmt.init != null) {
+            sb.append(stmt.init.accept(this));
+        }
+        sb.append(';');
+        
+        if (stmt.condition != null) {
+            sb.append(' ').append(stmt.condition.accept(this));
+        }
+        sb.append(';');
+        
+        if (stmt.increment != null) {
+            sb.append(' ').append(stmt.increment.accept(this));
+        }
+        sb.append(") ").append(stmt.body.accept(this));
+        
+        return sb.toString();
     }
     
     @Override

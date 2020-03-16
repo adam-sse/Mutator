@@ -10,6 +10,7 @@ import net.ssehub.mutator.ast.EmptyStmt;
 import net.ssehub.mutator.ast.Expression;
 import net.ssehub.mutator.ast.ExpressionStmt;
 import net.ssehub.mutator.ast.File;
+import net.ssehub.mutator.ast.For;
 import net.ssehub.mutator.ast.Function;
 import net.ssehub.mutator.ast.FunctionCall;
 import net.ssehub.mutator.ast.Identifier;
@@ -114,6 +115,25 @@ public class FullVisitor implements IAstVisitor<Void> {
         for (Function f : file.functions) {
             f.accept(this);
         }
+        
+        return null;
+    }
+    
+    @Override
+    public Void visitFor(For stmt) {
+        other.visitFor(stmt);
+        
+        if (stmt.init != null) {
+            stmt.init.accept(this);
+        }
+        if (stmt.condition != null) {
+            stmt.condition.accept(this);
+        }
+        if (stmt.increment != null) {
+            stmt.increment.accept(this);
+        }
+        
+        stmt.body.accept(this);
         
         return null;
     }

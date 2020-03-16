@@ -9,6 +9,7 @@ import net.ssehub.mutator.ast.DoWhileLoop;
 import net.ssehub.mutator.ast.EmptyStmt;
 import net.ssehub.mutator.ast.ExpressionStmt;
 import net.ssehub.mutator.ast.File;
+import net.ssehub.mutator.ast.For;
 import net.ssehub.mutator.ast.Function;
 import net.ssehub.mutator.ast.FunctionCall;
 import net.ssehub.mutator.ast.Identifier;
@@ -38,6 +39,8 @@ public interface IAstVisitor<T> {
     public T visitExpressionStmt(ExpressionStmt stmt);
     
     public T visitFile(File file);
+    
+    public T visitFor(For stmt);
     
     public T visitFunction(Function func);
     

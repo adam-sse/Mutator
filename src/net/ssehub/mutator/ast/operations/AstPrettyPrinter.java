@@ -10,6 +10,7 @@ import net.ssehub.mutator.ast.DoWhileLoop;
 import net.ssehub.mutator.ast.EmptyStmt;
 import net.ssehub.mutator.ast.ExpressionStmt;
 import net.ssehub.mutator.ast.File;
+import net.ssehub.mutator.ast.For;
 import net.ssehub.mutator.ast.Function;
 import net.ssehub.mutator.ast.If;
 import net.ssehub.mutator.ast.Return;
@@ -112,6 +113,38 @@ public class AstPrettyPrinter extends AbstractPrinter {
         }
         
         return sj.toString();
+    }
+    
+    @Override
+    public String visitFor(For stmt) {
+        StringBuilder sb = new StringBuilder();
+        
+        sb.append(indentation(stmt.id)).append("for (");
+        
+        if (stmt.init != null) {
+            sb.append(stmt.init.accept(this));
+        }
+        sb.append(';');
+        
+        if (stmt.condition != null) {
+            sb.append(' ').append(stmt.condition.accept(this));
+        }
+        sb.append(';');
+        
+        if (stmt.increment != null) {
+            sb.append(' ').append(stmt.increment.accept(this));
+        }
+        sb.append(")\n");
+        
+        if (stmt.body instanceof Block) {
+            sb.append(stmt.body.accept(this));
+        } else {
+            indentation++;
+            sb.append(stmt.body.accept(this));
+            indentation--;
+        }
+        
+        return sb.toString();
     }
     
     @Override
