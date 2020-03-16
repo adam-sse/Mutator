@@ -14,6 +14,7 @@ import net.ssehub.mutator.ast.Function;
 import net.ssehub.mutator.ast.FunctionCall;
 import net.ssehub.mutator.ast.Identifier;
 import net.ssehub.mutator.ast.If;
+import net.ssehub.mutator.ast.JumpStmt;
 import net.ssehub.mutator.ast.Literal;
 import net.ssehub.mutator.ast.Return;
 import net.ssehub.mutator.ast.Statement;
@@ -167,6 +168,13 @@ public class FullVisitor implements IAstVisitor<Void> {
         if (stmt.elseBlock != null) {
             stmt.elseBlock.accept(this);
         }
+        
+        return null;
+    }
+    
+    @Override
+    public Void visitJumpStmt(JumpStmt stmt) {
+        other.visitJumpStmt(stmt);
         
         return null;
     }

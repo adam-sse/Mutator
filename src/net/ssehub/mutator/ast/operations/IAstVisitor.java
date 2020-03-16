@@ -13,6 +13,7 @@ import net.ssehub.mutator.ast.Function;
 import net.ssehub.mutator.ast.FunctionCall;
 import net.ssehub.mutator.ast.Identifier;
 import net.ssehub.mutator.ast.If;
+import net.ssehub.mutator.ast.JumpStmt;
 import net.ssehub.mutator.ast.Literal;
 import net.ssehub.mutator.ast.Return;
 import net.ssehub.mutator.ast.Type;
@@ -46,6 +47,8 @@ public interface IAstVisitor<T> {
     public T visitIdentifier(Identifier expr);
     
     public T visitIf(If stmt);
+    
+    public T visitJumpStmt(JumpStmt stmt);
     
     public T visitLiteral(Literal expr);
     

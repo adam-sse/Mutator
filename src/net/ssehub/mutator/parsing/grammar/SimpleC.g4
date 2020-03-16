@@ -29,15 +29,17 @@ stmt
     | stmtCompound
     | stmtBranch
     | stmtLoop
-    | stmtExpr
+    | stmtJump
     | stmtReturn
     | stmtDeclaration
+    | stmtExpr
     ;
 
 stmtEmpty: ';';
 stmtDeclaration: declaration ';';
 stmtReturn: 'return' expr? ';'; 
 stmtExpr: expr ';';
+stmtJump: type=('break'|'continue') ';';
 
 stmtBranch: 'if' '(' condition=expr ')' thenBody=stmt ('else' elseBody=stmt)?;
 

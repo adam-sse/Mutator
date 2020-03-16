@@ -18,6 +18,7 @@ import net.ssehub.mutator.ast.Function;
 import net.ssehub.mutator.ast.FunctionCall;
 import net.ssehub.mutator.ast.Identifier;
 import net.ssehub.mutator.ast.If;
+import net.ssehub.mutator.ast.JumpStmt;
 import net.ssehub.mutator.ast.Literal;
 import net.ssehub.mutator.ast.Return;
 import net.ssehub.mutator.ast.Statement;
@@ -245,6 +246,19 @@ public class AstCloner implements IAstVisitor<AstElement> {
         if (stmt.elseBlock != null) {
             clone.elseBlock = cloneStatement(stmt.elseBlock);
         }
+        
+        parents.pop();
+        return clone;
+    }
+    
+    @Override
+    public AstElement visitJumpStmt(JumpStmt stmt) {
+        JumpStmt clone = new JumpStmt(parents.peek());
+        initBasics(stmt, clone);
+        
+        parents.push(clone);
+
+        clone.type = stmt.type;
         
         parents.pop();
         return clone;

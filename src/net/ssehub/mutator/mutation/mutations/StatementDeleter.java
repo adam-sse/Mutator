@@ -13,6 +13,7 @@ import net.ssehub.mutator.ast.Function;
 import net.ssehub.mutator.ast.FunctionCall;
 import net.ssehub.mutator.ast.Identifier;
 import net.ssehub.mutator.ast.If;
+import net.ssehub.mutator.ast.JumpStmt;
 import net.ssehub.mutator.ast.Literal;
 import net.ssehub.mutator.ast.Loop;
 import net.ssehub.mutator.ast.Return;
@@ -141,6 +142,11 @@ class StatementDeleter implements IAstVisitor<Boolean> {
         return false;
     }
 
+    @Override
+    public Boolean visitJumpStmt(JumpStmt stmt) {
+        return false;
+    }
+    
     @Override
     public Boolean visitLiteral(Literal expr) {
         return false;

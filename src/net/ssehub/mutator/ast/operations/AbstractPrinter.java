@@ -11,6 +11,7 @@ import net.ssehub.mutator.ast.Expression;
 import net.ssehub.mutator.ast.ExpressionStmt;
 import net.ssehub.mutator.ast.FunctionCall;
 import net.ssehub.mutator.ast.Identifier;
+import net.ssehub.mutator.ast.JumpStmt;
 import net.ssehub.mutator.ast.Literal;
 import net.ssehub.mutator.ast.Return;
 import net.ssehub.mutator.ast.Type;
@@ -83,6 +84,11 @@ abstract class AbstractPrinter implements IAstVisitor<String> {
     @Override
     public String visitIdentifier(Identifier expr) {
         return expr.identifier;
+    }
+    
+    @Override
+    public String visitJumpStmt(JumpStmt stmt) {
+        return stmt.type.toString() + ";";
     }
 
     public String visitLiteral(Literal expr) {

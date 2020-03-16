@@ -15,6 +15,7 @@ import net.ssehub.mutator.ast.Function;
 import net.ssehub.mutator.ast.FunctionCall;
 import net.ssehub.mutator.ast.Identifier;
 import net.ssehub.mutator.ast.If;
+import net.ssehub.mutator.ast.JumpStmt;
 import net.ssehub.mutator.ast.Literal;
 import net.ssehub.mutator.ast.Return;
 import net.ssehub.mutator.ast.Statement;
@@ -205,6 +206,11 @@ class ElementReplacer<T extends AstElement> implements IAstVisitor<Boolean> {
             return true;
         }
         
+        return false;
+    }
+    
+    @Override
+    public Boolean visitJumpStmt(JumpStmt stmt) {
         return false;
     }
 

@@ -20,6 +20,7 @@ import net.ssehub.mutator.ast.Function;
 import net.ssehub.mutator.ast.FunctionCall;
 import net.ssehub.mutator.ast.Identifier;
 import net.ssehub.mutator.ast.If;
+import net.ssehub.mutator.ast.JumpStmt;
 import net.ssehub.mutator.ast.Literal;
 import net.ssehub.mutator.ast.Loop;
 import net.ssehub.mutator.ast.Return;
@@ -42,6 +43,7 @@ import net.ssehub.mutator.parsing.grammar.SimpleCParser.StmtDoWhileLoopContext;
 import net.ssehub.mutator.parsing.grammar.SimpleCParser.StmtEmptyContext;
 import net.ssehub.mutator.parsing.grammar.SimpleCParser.StmtExprContext;
 import net.ssehub.mutator.parsing.grammar.SimpleCParser.StmtForLoopContext;
+import net.ssehub.mutator.parsing.grammar.SimpleCParser.StmtJumpContext;
 import net.ssehub.mutator.parsing.grammar.SimpleCParser.StmtLoopContext;
 import net.ssehub.mutator.parsing.grammar.SimpleCParser.StmtReturnContext;
 import net.ssehub.mutator.parsing.grammar.SimpleCParser.StmtWhileLoopContext;
@@ -104,6 +106,8 @@ public class Converter {
             result = convertCompoundStatement(tree.stmtCompound());
         } else if (tree.stmtEmpty() != null) {
             result = convertEmptyStatement(tree.stmtEmpty());
+        } else if (tree.stmtJump() != null) {
+            result = convertJumpStmt(tree.stmtJump());
         } else {
             if (tree.children.size() >= 1) {
                 throw new IllegalArgumentException(tree.getChild(0).getClass().getName());
@@ -246,6 +250,21 @@ public class Converter {
     private EmptyStmt convertEmptyStatement(StmtEmptyContext tree) {
         EmptyStmt stmt = new EmptyStmt(parents.peek());
         stmt.initLocation(tree.start, tree.stop);
+        return stmt;
+    }
+    
+    private JumpStmt convertJumpStmt(StmtJumpContext tree) {
+        JumpStmt stmt = new JumpStmt(parents.peek());
+        stmt.initLocation(tree.start, tree.stop);
+        
+        if (tree.type.getText().equals("break")) {
+            stmt.type = net.ssehub.mutator.ast.JumpStmt.Type.BREAK;
+        } else if (tree.type.getText().equals("continue")) {
+            stmt.type = net.ssehub.mutator.ast.JumpStmt.Type.CONTINUE;
+        } else {
+            throw new IllegalArgumentException();
+        }
+        
         return stmt;
     }
     

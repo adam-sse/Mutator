@@ -1,5 +1,6 @@
 package net.ssehub.mutator.ast.control_flow;
 
+import java.util.Deque;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -19,6 +20,7 @@ import net.ssehub.mutator.ast.Function;
 import net.ssehub.mutator.ast.FunctionCall;
 import net.ssehub.mutator.ast.Identifier;
 import net.ssehub.mutator.ast.If;
+import net.ssehub.mutator.ast.JumpStmt;
 import net.ssehub.mutator.ast.Literal;
 import net.ssehub.mutator.ast.Return;
 import net.ssehub.mutator.ast.Statement;
@@ -86,10 +88,17 @@ public class ControlFlowCreator {
         
         private ControlFlowBlock currentBlock;
         
+        private Deque<ControlFlowBlock> loopNextIter;
+        
+        private Deque<ControlFlowBlock> loopAfter;
+        
         public ControlFlowVisitor(ControlFlowFunction func) {
             this.func = func;
             this.currentBlock = func.createBlock();
             func.getStartBlock().setOutTrue(this.currentBlock);
+            
+            this.loopNextIter = new LinkedList<>();
+            this.loopAfter = new LinkedList<>();
         }
         
         public void finish() {
@@ -148,29 +157,43 @@ public class ControlFlowCreator {
             requireCurrent();
             ControlFlowBlock prev = this.currentBlock;
             
+            ControlFlowBlock cond = func.createBlock();
+            
+            cond.setOutCondition(stmt.condition);
+            this.currentBlock = cond;
+            stmt.condition.accept(this);
             
             ControlFlowBlock bodyStart = func.createBlock();
             this.currentBlock = bodyStart;
             
+            ControlFlowBlock after = func.createBlock();
+            
+            loopNextIter.push(cond);
+            loopAfter.push(after);
+            
             stmt.body.accept(this);
+            
+            loopNextIter.pop();
+            loopAfter.pop();
             
             ControlFlowBlock bodyEnd = this.currentBlock;
             
-            ControlFlowBlock after = null;
-            if (bodyEnd != null) {
-                bodyEnd.setOutCondition(stmt.condition);
-                this.currentBlock = bodyEnd;
-                stmt.condition.accept(this);
-                
-                after = func.createBlock();
-                
-                bodyEnd.setOutTrue(bodyStart);
-                bodyEnd.setOutFalse(after);
-            }
-            
             prev.setOutTrue(bodyStart);
             
-            this.currentBlock = after;
+            if (bodyEnd != null) {
+                bodyEnd.setOutTrue(cond);
+                
+                cond.setOutTrue(bodyStart);
+                cond.setOutFalse(after);
+            } else if (cond.getIncoming().isEmpty()) {
+                func.removeBlock(cond);
+            }
+            
+            if (after.getIncoming().isEmpty()) {
+                this.currentBlock = null;
+            } else {
+                this.currentBlock = after;
+            }
             
             return null;
         }
@@ -217,43 +240,82 @@ public class ControlFlowCreator {
                 stmt.condition.accept(this);
             }
             
+            ControlFlowBlock incrBlock = null;
+            if (stmt.increment != null) {
+                incrBlock = func.createBlock();
+                this.currentBlock = incrBlock;
+                stmt.increment.accept(this);
+                
+                ExpressionStmt incrStmt = new ExpressionStmt(stmt);
+                incrStmt.expr = stmt.increment;
+                incrBlock.addStatement(incrStmt);
+            }
+            
+            ControlFlowBlock after = func.createBlock();
+            loopAfter.push(after);
+            
             ControlFlowBlock bodyStart = func.createBlock();
             this.currentBlock = bodyStart;
+            
+            if (incrBlock != null) {
+                loopNextIter.push(incrBlock);
+            } else if (condBlock != null) {
+                loopNextIter.push(condBlock);
+            } else {
+                loopNextIter.push(bodyStart);
+            }
             
             stmt.body.accept(this);
             
             ControlFlowBlock bodyEnd = this.currentBlock;
             
-            if (bodyEnd != null && stmt.increment != null) {
-                stmt.increment.accept(this);
-                
-                ExpressionStmt incrStmt = new ExpressionStmt(stmt);
-                incrStmt.expr = stmt.increment;
-                bodyEnd.addStatement(incrStmt);
+            if (bodyEnd == null && incrBlock != null && incrBlock.getIncoming().isEmpty()) {
+                func.removeBlock(incrBlock);
             }
             
-            ControlFlowBlock after = null;
+            loopAfter.pop();
+            loopNextIter.pop();
             
             if (condBlock != null) {
-                after = func.createBlock();
                 
                 prev.setOutTrue(condBlock);
                 
                 condBlock.setOutTrue(bodyStart);
                 condBlock.setOutFalse(after);
                 
-                if (bodyEnd != null) {
-                    bodyEnd.setOutTrue(condBlock);
+                if (incrBlock != null) {
+                    incrBlock.setOutTrue(condBlock);
                 }
+                
+                if (bodyEnd != null) {
+                    if (incrBlock != null) {
+                        bodyEnd.setOutTrue(incrBlock);
+                    } else {
+                        bodyEnd.setOutTrue(condBlock);
+                    }
+                }
+                
             } else {
                 prev.setOutTrue(bodyStart);
 
+                if (incrBlock != null) {
+                    incrBlock.setOutTrue(bodyStart);
+                }
+                
                 if (bodyEnd != null) {
-                    bodyEnd.setOutTrue(bodyStart);
+                    if (incrBlock != null) {
+                        bodyEnd.setOutTrue(incrBlock);
+                    } else {
+                        bodyEnd.setOutTrue(bodyStart);
+                    }
                 }
             }
             
-            this.currentBlock = after;
+            if (after.getIncoming().isEmpty()) {
+                this.currentBlock = null;
+            } else {
+                this.currentBlock = after;
+            }
             
             return null;
         }
@@ -331,6 +393,26 @@ public class ControlFlowCreator {
             
             return null;
         }
+        
+        @Override
+        public Void visitJumpStmt(JumpStmt stmt) {
+            requireCurrent();
+            this.currentBlock.addStatement(stmt);
+
+            ControlFlowBlock next;
+            if (stmt.type == net.ssehub.mutator.ast.JumpStmt.Type.CONTINUE) {
+                next = loopNextIter.peek();
+            } else if (stmt.type == net.ssehub.mutator.ast.JumpStmt.Type.BREAK) {
+                next = loopAfter.peek();
+            } else {
+                throw new IllegalArgumentException(stmt.type.toString());
+            }
+            
+            this.currentBlock.setOutTrue(next);
+            this.currentBlock = null;
+            
+            return null;
+        }
 
         @Override
         public Void visitLiteral(Literal expr) {
@@ -377,11 +459,17 @@ public class ControlFlowCreator {
             ControlFlowBlock bodyStart = func.createBlock();
             this.currentBlock = bodyStart;
             
+            ControlFlowBlock after = func.createBlock();
+            
+            loopNextIter.push(cond);
+            loopAfter.push(after);
+            
             stmt.body.accept(this);
             
-            ControlFlowBlock bodyEnd = this.currentBlock;
+            loopNextIter.pop();
+            loopAfter.pop();
             
-            ControlFlowBlock after = func.createBlock();
+            ControlFlowBlock bodyEnd = this.currentBlock;
             
             prev.setOutTrue(cond);
             

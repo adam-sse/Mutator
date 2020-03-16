@@ -12,6 +12,7 @@ import net.ssehub.mutator.ast.File;
 import net.ssehub.mutator.ast.For;
 import net.ssehub.mutator.ast.Function;
 import net.ssehub.mutator.ast.If;
+import net.ssehub.mutator.ast.JumpStmt;
 import net.ssehub.mutator.ast.Return;
 import net.ssehub.mutator.ast.Statement;
 import net.ssehub.mutator.ast.While;
@@ -182,6 +183,11 @@ public class AstPrettyPrinter extends AbstractPrinter {
         }
         
         return sb.toString();
+    }
+    
+    @Override
+    public String visitJumpStmt(JumpStmt stmt) {
+        return indentation(stmt.id) + super.visitJumpStmt(stmt) + "\n";
     }
 
     @Override
