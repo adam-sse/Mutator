@@ -97,6 +97,16 @@ public class ControlFlowCreator {
                 currentBlock.setOutTrue(func.getEndBlock());
             }
         }
+
+        /**
+         * If {@link #currentBlock} is <code>null</code>, this creates a dead block (no incoming) to ensure that
+         * {@link #currentBlock} is not <code>null</code>.
+         */
+        private void requireCurrent() {
+            if (currentBlock == null) {
+                currentBlock = func.createBlock();
+            }
+        }
         
         @Override
         public Void visitBinaryExpr(BinaryExpr expr) {
@@ -125,6 +135,7 @@ public class ControlFlowCreator {
 
         @Override
         public Void visitDeclarationStmt(DeclarationStmt stmt) {
+            requireCurrent();
             currentBlock.addStatement(stmt);
             
             stmt.decl.accept(this);
@@ -134,6 +145,7 @@ public class ControlFlowCreator {
 
         @Override
         public Void visitDoWhileLoop(DoWhileLoop stmt) {
+            requireCurrent();
             ControlFlowBlock prev = this.currentBlock;
             
             
@@ -144,17 +156,19 @@ public class ControlFlowCreator {
             
             ControlFlowBlock bodyEnd = this.currentBlock;
             
-            bodyEnd.setOutCondition(stmt.condition);
-            this.currentBlock = bodyEnd;
-            stmt.condition.accept(this);
-            
-            ControlFlowBlock after = func.createBlock();
+            ControlFlowBlock after = null;
+            if (bodyEnd != null) {
+                bodyEnd.setOutCondition(stmt.condition);
+                this.currentBlock = bodyEnd;
+                stmt.condition.accept(this);
+                
+                after = func.createBlock();
+                
+                bodyEnd.setOutTrue(bodyStart);
+                bodyEnd.setOutFalse(after);
+            }
             
             prev.setOutTrue(bodyStart);
-            
-            bodyStart.setOutTrue(bodyStart);
-            bodyStart.setOutFalse(after);
-            
             
             this.currentBlock = after;
             
@@ -163,12 +177,14 @@ public class ControlFlowCreator {
 
         @Override
         public Void visitEmptyStmt(EmptyStmt stmt) {
+            requireCurrent();
             currentBlock.addStatement(stmt);
             return null;
         }
 
         @Override
         public Void visitExpressionStmt(ExpressionStmt stmt) {
+            requireCurrent();
             currentBlock.addStatement(stmt);
             
             stmt.expr.accept(this);
@@ -182,6 +198,7 @@ public class ControlFlowCreator {
         
         @Override
         public Void visitFor(For stmt) {
+            requireCurrent();
             ControlFlowBlock prev = this.currentBlock;
             if (stmt.init != null) {
                 stmt.init.accept(this);
@@ -207,7 +224,7 @@ public class ControlFlowCreator {
             
             ControlFlowBlock bodyEnd = this.currentBlock;
             
-            if (stmt.increment != null) {
+            if (bodyEnd != null && stmt.increment != null) {
                 stmt.increment.accept(this);
                 
                 ExpressionStmt incrStmt = new ExpressionStmt(stmt);
@@ -215,19 +232,25 @@ public class ControlFlowCreator {
                 bodyEnd.addStatement(incrStmt);
             }
             
-            ControlFlowBlock after = func.createBlock();
+            ControlFlowBlock after = null;
             
             if (condBlock != null) {
+                after = func.createBlock();
+                
                 prev.setOutTrue(condBlock);
                 
                 condBlock.setOutTrue(bodyStart);
                 condBlock.setOutFalse(after);
                 
-                bodyEnd.setOutTrue(condBlock);
+                if (bodyEnd != null) {
+                    bodyEnd.setOutTrue(condBlock);
+                }
             } else {
                 prev.setOutTrue(bodyStart);
-                
-                bodyEnd.setOutTrue(bodyStart);
+
+                if (bodyEnd != null) {
+                    bodyEnd.setOutTrue(bodyStart);
+                }
             }
             
             this.currentBlock = after;
@@ -242,6 +265,7 @@ public class ControlFlowCreator {
 
         @Override
         public Void visitFunctionCall(FunctionCall expr) {
+            requireCurrent();
             this.currentBlock.addCalledFunction(expr.function);
             
             for (Expression param : expr.params) {
@@ -258,6 +282,7 @@ public class ControlFlowCreator {
 
         @Override
         public Void visitIf(If stmt) {
+            requireCurrent();
             ControlFlowBlock prev = this.currentBlock;
             
             prev.setOutCondition(stmt.condition);
@@ -284,8 +309,7 @@ public class ControlFlowCreator {
             }
             
             ControlFlowBlock after = null;
-            
-            if (thenEnd != null || elseEnd != null || !hasElse) {
+            if (thenEnd != null || !hasElse || elseEnd != null) {
                 after = func.createBlock();
             }
             
@@ -315,6 +339,7 @@ public class ControlFlowCreator {
 
         @Override
         public Void visitReturn(Return stmt) {
+            requireCurrent();
             currentBlock.addStatement(stmt);
             
             if (stmt.value != null) {
@@ -340,6 +365,7 @@ public class ControlFlowCreator {
 
         @Override
         public Void visitWhile(While stmt) {
+            requireCurrent();
             ControlFlowBlock prev = this.currentBlock;
             
             ControlFlowBlock cond = func.createBlock();
@@ -362,7 +388,9 @@ public class ControlFlowCreator {
             cond.setOutTrue(bodyStart);
             cond.setOutFalse(after);
             
-            bodyEnd.setOutTrue(cond);
+            if (bodyEnd != null) {
+                bodyEnd.setOutTrue(cond);
+            }
             
             this.currentBlock = after;
             
