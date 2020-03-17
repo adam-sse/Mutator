@@ -83,7 +83,7 @@ public class Mutator implements IMutator {
             for (Mutant neighbor : neighbors) {
                 neighbor.apply(originalAst);
                 if (config.getSaveGenerations()) {
-                    java.io.File dir = new java.io.File(String.format(Locale.ROOT, "generation_%3d", generation));
+                    java.io.File dir = new java.io.File(String.format(Locale.ROOT, "generation_%03d", generation));
                     dir.mkdir();
                     java.io.File out = new java.io.File(dir, "mutant_" + neighbor.getId() + ".c");
                     try {
@@ -101,13 +101,13 @@ public class Mutator implements IMutator {
                     System.out.println(neighbor.getId() + ": " + fitness);
                     
                     if (fitness > currentBestFitness) {
-                        System.out.println(neighbor.getId() + " is better than " + currentBest.getId());
+                        System.out.println(" -> " + neighbor.getId() + " is better than " + currentBest.getId());
                         improved = true;
                         currentBest = neighbor;
                         currentBestFitness = fitness;
                     }
                 } else {
-                    System.out.println(neighbor.getId() + " failed tests");
+                    System.out.println(neighbor.getId() + " " + testResult);
                 }
             }
             

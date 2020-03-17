@@ -2,7 +2,7 @@ unsigned int rotleft(unsigned int v, int c) {
     return v << c | v >> (32 - c);
 }
 
-unsigned int *sha1(unsigned char *in_data, unsigned long in_length) {
+unsigned int *sha1(unsigned char *in_data, long in_length) {
 
     unsigned int *hh;
     hh = malloc(4 * 5);
@@ -14,7 +14,7 @@ unsigned int *sha1(unsigned char *in_data, unsigned long in_length) {
     hh[4] = 0xC3D2E1F0;
 
     // copy data with appended stuff
-    unsigned long ml_bytes;
+    long ml_bytes;
     unsigned char *m;
 
     // append 1 byte 0x80, variable 0 padding, 8 byte bits, so that is a multiple of 64 bytes
@@ -34,8 +34,8 @@ unsigned int *sha1(unsigned char *in_data, unsigned long in_length) {
     m[i++] = 0x80;
 
     // append padding
-    while (i < ml_bytes - 8) {
-        m[i++] = 0;
+    for (; i < ml_bytes - 8; i++) {
+        m[i] = 0;
     }
 
     // append length

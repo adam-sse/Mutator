@@ -96,17 +96,23 @@ public class LoopUnrolling implements IOpportunity {
                 // the remainder loop will take care of all remaining elements that don't fit the new increment
                 decreaseBound(loop, newIncrement - 1);
                 
-                // introduce new temporary variable for remainder loop
-                // this keeps track of the main loop var, so the remainder loop can finish the job
-                String newCountVar = "mutator_tmp_" + (int) (Math.random() * Integer.MAX_VALUE);
-                insertCountDeclaration(newCountVar, loop);
-                insertCountAssigment(newCountVar, newBody);
+                String newCountVar = null;
+                if (loop.init != null) {
+                    // introduce new temporary variable for remainder loop
+                    // this keeps track of the main loop var, so the remainder loop can finish the job
+                    newCountVar = "mutator_tmp_" + (int) (Math.random() * Integer.MAX_VALUE);
+                    insertCountDeclaration(newCountVar, loop);
+                    insertCountAssigment(newCountVar, newBody, newIncrement);
+                }
 
                 // set the correct values for the remainder loop
                 // no init, as it uses the newCountVar temporary variable
                 remainderLoop.init = null;
-                // replace main loop var with newCountVar
-                remainderLoop.accept(new FullVisitor(new WithIdentifierReplacer(newCountVar)));
+                
+                if (newCountVar != null) {
+                    // replace main loop var with newCountVar
+                    remainderLoop.accept(new FullVisitor(new WithIdentifierReplacer(newCountVar)));
+                }
                 
                 // insert the remainder loop after the main loop
                 new StatementInserter().insert(loop, false, remainderLoop);
@@ -123,15 +129,7 @@ public class LoopUnrolling implements IOpportunity {
         countDecl.type = countType;
         countDecl.identifier = countVarId;
         
-        Expression initValue;
-        if (loop.init != null) {
-            initValue = (Expression) loop.init.initExpr.accept(new AstCloner(countDecl, false));
-        } else {
-            Identifier lit = new Identifier(countDecl);
-            lit.identifier = var;
-            initValue = lit;
-        }
-        
+        Expression initValue = (Expression) loop.init.initExpr.accept(new AstCloner(countDecl, false));
         countDecl.initExpr = initValue;
 
         stmt.decl = countDecl;
@@ -139,7 +137,7 @@ public class LoopUnrolling implements IOpportunity {
         new StatementInserter().insert(loop, true, stmt);
     }
     
-    private void insertCountAssigment(String countVarId, Block body) {
+    private void insertCountAssigment(String countVarId, Block body, int newIncrement) {
         ExpressionStmt stmt = new ExpressionStmt(body);
         
         BinaryExpr expr = new BinaryExpr(stmt);
@@ -148,8 +146,17 @@ public class LoopUnrolling implements IOpportunity {
         Identifier left = new Identifier(expr);
         left.identifier = countVarId;
         
-        Identifier right = new Identifier(expr);
-        right.identifier = var;
+        BinaryExpr right = new BinaryExpr(expr);
+        right.operator = BinaryOperator.ADDITION;
+        
+        Identifier varId = new Identifier(right);
+        varId.identifier = var;
+        
+        Literal lit = new Literal(right);
+        lit.value = Integer.toString(newIncrement);
+        
+        right.left = varId;
+        right.right = lit;
         
         expr.left = left;
         expr.right = right;
@@ -498,7 +505,7 @@ public class LoopUnrolling implements IOpportunity {
                     
                     if (var != null) {
                         if (!isVariable(op.left, var)) {
-                            var = null;
+                            return null;
                         }
                     } else {
                         var = getVariable(op.left);
@@ -525,7 +532,7 @@ public class LoopUnrolling implements IOpportunity {
                     
                     if (var != null) {
                         if (!isVariable(op.expr, var)) {
-                            var = null;
+                            return null;
                         }
                     } else {
                         var = getVariable(op.expr);
@@ -541,7 +548,7 @@ public class LoopUnrolling implements IOpportunity {
 
                     if (var != null) {
                         if (!isVariable(op.left, var)) {
-                            var = null;
+                            return null;
                         }
                     } else {
                         var = getVariable(op.left);

@@ -87,7 +87,7 @@ public class Main {
                         mutant.getId(),
                         mutator.getFitness(mutant.getId()) / bestFitness * 100);
                 if (originalFitness != null) {
-                    System.out.printf(Locale.ROOT, "| %6.1f%%\n",
+                    System.out.printf(Locale.ROOT, " | %6.1f%%\n",
                         mutator.getFitness(mutant.getId()) / originalFitness * 100);
                 } else {
                     System.out.println();
