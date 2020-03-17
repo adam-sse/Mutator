@@ -66,15 +66,15 @@ public class Mutator implements IMutator {
         
         System.out.println("Original fitness: " + currentBestFitness);
         
-        int generation = 0;
+        int iteration = 0;
         
         boolean improved;
         do {
-            generation++;
+            iteration++;
             
             System.out.println();
-            System.out.println("Next Round");
-            System.out.println("----------");
+            System.out.printf(Locale.ROOT, "Iteration %03d\n", iteration);
+            System.out.println("-------------");
             
             improved = false;
             List<Mutant> neighbors = generateNeighbors(currentBest);
@@ -83,7 +83,7 @@ public class Mutator implements IMutator {
             for (Mutant neighbor : neighbors) {
                 neighbor.apply(originalAst);
                 if (config.getSaveGenerations()) {
-                    java.io.File dir = new java.io.File(String.format(Locale.ROOT, "generation_%03d", generation));
+                    java.io.File dir = new java.io.File(String.format(Locale.ROOT, "iteration_%03d", iteration));
                     dir.mkdir();
                     java.io.File out = new java.io.File(dir, "mutant_" + neighbor.getId() + ".c");
                     try {
