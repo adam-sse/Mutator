@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import net.ssehub.mutator.Configuration;
-import net.ssehub.mutator.mutation.genetic.Mutant;
+import net.ssehub.mutator.mutation.IMutant;
 
 public class LinuxEvaluator extends Evaluator {
     
@@ -21,7 +21,7 @@ public class LinuxEvaluator extends Evaluator {
     }
     
     @Override
-    public TestResult test(Mutant mutant) {
+    public TestResult test(IMutant mutant) {
         TestResult result;
         
         try {
@@ -55,7 +55,7 @@ public class LinuxEvaluator extends Evaluator {
     }
 
     @Override
-    public double measureFitness(Mutant mutant) {
+    public double measureFitness(IMutant mutant) {
         double fitness = RUNTIME_ERROR;
         
         try {

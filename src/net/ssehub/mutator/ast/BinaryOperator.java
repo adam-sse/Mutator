@@ -33,7 +33,7 @@ public enum BinaryOperator {
     
     ASSIGNMENT("=", 0),
     ASSIGNMENT_PLUS("+=", 0),
-    ASSIGNMENT_MINUX("-=", 0),
+    ASSIGNMENT_MINUS("-=", 0),
     ASSIGNMENT_MULT("*=", 0),
     ASSIGNMENT_DIV("/=", 0),
     ASSIGNMENT_MOD("%=", 0),
@@ -87,7 +87,7 @@ public enum BinaryOperator {
         
         case "=": return ASSIGNMENT;
         case "+=": return ASSIGNMENT_PLUS;
-        case "-=": return ASSIGNMENT_MINUX;
+        case "-=": return ASSIGNMENT_MINUS;
         case "*=": return ASSIGNMENT_MULT;
         case "/=": return ASSIGNMENT_DIV;
         case "%=": return ASSIGNMENT_MOD;

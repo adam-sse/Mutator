@@ -51,7 +51,7 @@ unsigned int *sha1(unsigned char *in_data, unsigned long in_length) {
     unsigned int *w;
     w = malloc(4 * 80);
 
-    for (int chunk_start = 0; chunk_start < ml_bytes; chunk_start = chunk_start + 64) {
+    for (int chunk_start = 0; chunk_start < ml_bytes; chunk_start += 64) {
         i = 0;
         for (; i < 16; i++) {
             unsigned int tmp;

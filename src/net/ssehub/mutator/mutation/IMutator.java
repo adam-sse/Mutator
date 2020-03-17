@@ -10,4 +10,6 @@ public interface IMutator extends IFitnessStore {
     
     public void printStatistics();
     
+    public String getUnmodifiedId();
+    
 }

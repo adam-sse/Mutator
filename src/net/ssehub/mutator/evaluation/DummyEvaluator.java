@@ -3,7 +3,7 @@ package net.ssehub.mutator.evaluation;
 import java.util.Random;
 
 import net.ssehub.mutator.Configuration;
-import net.ssehub.mutator.mutation.genetic.Mutant;
+import net.ssehub.mutator.mutation.IMutant;
 
 public class DummyEvaluator extends Evaluator {
     
@@ -13,7 +13,7 @@ public class DummyEvaluator extends Evaluator {
     }
     
     @Override
-    public TestResult test(Mutant mutant) {
+    public TestResult test(IMutant mutant) {
         if (mutant.getId().equals("G001_M001")) {
             return TestResult.PASS;
         }
@@ -22,7 +22,7 @@ public class DummyEvaluator extends Evaluator {
     }
 
     @Override
-    public double measureFitness(Mutant mutant) {
+    public double measureFitness(IMutant mutant) {
         return random.nextDouble() * 10;
     }
 

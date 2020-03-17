@@ -17,7 +17,7 @@ import org.antlr.v4.runtime.Recognizer;
 import net.ssehub.mutator.ast.operations.AstPrettyPrinter;
 import net.ssehub.mutator.mutation.IMutant;
 import net.ssehub.mutator.mutation.IMutator;
-import net.ssehub.mutator.mutation.genetic.Mutator;
+import net.ssehub.mutator.mutation.pattern_based.Mutator;
 import net.ssehub.mutator.parsing.Converter;
 import net.ssehub.mutator.parsing.grammar.SimpleCLexer;
 import net.ssehub.mutator.parsing.grammar.SimpleCParser;
@@ -61,17 +61,37 @@ public class Main {
             System.out.println();
             System.out.println("Writing " + mutants.size() + " mutants...");
             double bestFitness = mutants.size() > 0 ? mutator.getFitness(mutants.get(0).getId()) : 0.0;
-            double originalFitness = mutator.getFitness("G001_M001");
-            System.out.println(" Rank |   Mutant   |  Best  | Original ");
-            System.out.println("------+------------+--------+----------");
+            Double originalFitness = null;
+            if (mutator.getUnmodifiedId() != null) {
+                originalFitness = mutator.getFitness(mutator.getUnmodifiedId());
+            }
+            
+            System.out.print(" Rank |   Mutant   |  Best  ");
+            if (originalFitness != null) {
+                System.out.println("| Original ");
+            } else {
+                System.out.println();
+            }
+            System.out.print("------+------------+--------");
+            if (originalFitness != null) {
+                System.out.println("+----------");
+            } else {
+                System.out.println();
+            }
+            
             for (int i = 0; i < mutants.size(); i++) {
                 IMutant mutant = mutants.get(i);
                 
-                System.out.printf(Locale.ROOT, "  %2d  | %10s | %5.1f%% | %6.1f%%\n",
+                System.out.printf(Locale.ROOT, "  %2d  | %10s | %5.1f%%",
                         i + 1,
                         mutant.getId(),
-                        mutator.getFitness(mutant.getId()) / bestFitness * 100,
+                        mutator.getFitness(mutant.getId()) / bestFitness * 100);
+                if (originalFitness != null) {
+                    System.out.printf(Locale.ROOT, "| %6.1f%%\n",
                         mutator.getFitness(mutant.getId()) / originalFitness * 100);
+                } else {
+                    System.out.println();
+                }
                 
                 int dotIndex = input.getName().lastIndexOf('.');
                 String inputBase = input.getName().substring(0, dotIndex);

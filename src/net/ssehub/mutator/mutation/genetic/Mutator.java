@@ -444,5 +444,10 @@ public class Mutator implements IMutator {
             System.out.printf(Locale.ROOT, "%03d ", gen + 1);
         }
     }
+
+    @Override
+    public String getUnmodifiedId() {
+        return "G001_M001";
+    }
     
 }
