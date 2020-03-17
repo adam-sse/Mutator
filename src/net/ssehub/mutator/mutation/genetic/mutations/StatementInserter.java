@@ -24,7 +24,7 @@ import net.ssehub.mutator.ast.While;
 import net.ssehub.mutator.ast.operations.IAstVisitor;
 import net.ssehub.mutator.util.Util;
 
-class StatementInserter implements IAstVisitor<Boolean> {
+public class StatementInserter implements IAstVisitor<Boolean> {
     
     private Statement reference;
     

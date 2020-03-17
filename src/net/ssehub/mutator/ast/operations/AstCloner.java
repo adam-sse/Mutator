@@ -167,7 +167,7 @@ public class AstCloner implements IAstVisitor<AstElement> {
     }
     
     @Override
-    public AstElement visitFor(For stmt) {
+    public For visitFor(For stmt) {
         For clone = new For(parents.peek());
         initBasics(stmt, clone);
         
@@ -252,7 +252,7 @@ public class AstCloner implements IAstVisitor<AstElement> {
     }
     
     @Override
-    public AstElement visitJumpStmt(JumpStmt stmt) {
+    public JumpStmt visitJumpStmt(JumpStmt stmt) {
         JumpStmt clone = new JumpStmt(parents.peek());
         initBasics(stmt, clone);
         
