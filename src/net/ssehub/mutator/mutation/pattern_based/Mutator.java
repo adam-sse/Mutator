@@ -75,15 +75,23 @@ public class Mutator implements IMutator {
             System.out.println("Generated " + neighbors.size() + " neighbors");
             
             for (Mutant neighbor : neighbors) {
+                neighbor.apply(originalAst);
+                
                 TestResult testResult = this.evaluator.test(neighbor);
                 if (testResult == TestResult.PASS) {
+                    
                     double fitness = this.evaluator.measureFitness(neighbor);
+                    fitnessStore.put(neighbor.getId(), fitness);
+                    System.out.println(neighbor.getId() + ": " + fitness);
+                    
                     if (fitness > currentBestFitness) {
                         System.out.println(neighbor.getId() + " is better than " + currentBest.getId());
                         improved = true;
                         currentBest = neighbor;
                         currentBestFitness = fitness;
                     }
+                } else {
+                    System.out.println(neighbor.getId() + " failed tests");
                 }
             }
             
