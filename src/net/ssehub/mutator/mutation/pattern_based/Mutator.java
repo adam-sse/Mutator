@@ -99,9 +99,16 @@ public class Mutator implements IMutator {
                 TestResult testResult = this.evaluator.test(neighbor);
                 if (testResult == TestResult.PASS) {
                     
-                    double fitness = this.evaluator.measureFitness(neighbor);
-                    fitnessStore.put(neighbor.getId(), fitness);
-                    System.out.println(neighbor.getId() + ": " + fitness);
+                    double fitness;
+                    
+                    if (fitnessStore.containsKey(neighbor.getId())) {
+                        fitness = fitnessStore.get(neighbor.getId());
+                        System.out.println(neighbor.getId() + ": " + fitness + " (cached)");
+                    } else {
+                        fitness = this.evaluator.measureFitness(neighbor);
+                        fitnessStore.put(neighbor.getId(), fitness);
+                        System.out.println(neighbor.getId() + ": " + fitness);
+                    }
                     
                     if (fitness > mutantList.getTopFitness()) {
                         System.out.println(" -> " + neighbor.getId() + " is better than "
