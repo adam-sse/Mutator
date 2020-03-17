@@ -67,24 +67,29 @@ public class ControlFlowRenderer {
         
         epilog();
         
-//        System.out.println(this.dot);
-        
-        java.io.File tmp = java.io.File.createTempFile("mutator_", ".dot");
-        tmp.deleteOnExit();
-        try (FileWriter out = new FileWriter(tmp)) {
-            out.write(this.dot.toString());
-        }
-        
-        ProcessBuilder pb = new ProcessBuilder(dotExe,
-                "-T" + output.getName().substring(output.getName().lastIndexOf('.') + 1),
-                "-o", output.getAbsolutePath(), tmp.getAbsolutePath());
-        pb.inheritIO();
-        pb.redirectErrorStream(true);
-        
-        try {
-            pb.start().waitFor();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+        if (output.getName().endsWith(".dot")) {
+            try (FileWriter out = new FileWriter(output)) {
+                out.write(this.dot.toString());
+            }
+            
+        } else {
+            java.io.File tmp = java.io.File.createTempFile("mutator_", ".dot");
+            tmp.deleteOnExit();
+            try (FileWriter out = new FileWriter(tmp)) {
+                out.write(this.dot.toString());
+            }
+            
+            ProcessBuilder pb = new ProcessBuilder(dotExe,
+                    "-T" + output.getName().substring(output.getName().lastIndexOf('.') + 1),
+                    "-o", output.getAbsolutePath(), tmp.getAbsolutePath());
+            pb.inheritIO();
+            pb.redirectErrorStream(true);
+            
+            try {
+                pb.start().waitFor();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
     }
     

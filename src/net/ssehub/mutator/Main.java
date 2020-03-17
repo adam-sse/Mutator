@@ -117,8 +117,9 @@ public class Main {
     
     private static int render(String dotExe, String inputPath, String outputPath) {
         try {
-            if (!outputPath.endsWith(".png") && !outputPath.endsWith(".svg") && !outputPath.endsWith(".pdf")) {
-                System.out.println("Output must be either .png, .svg or .pdf");
+            if (!outputPath.endsWith(".png") && !outputPath.endsWith(".svg")
+                    && !outputPath.endsWith(".pdf") && !outputPath.endsWith(".dot")) {
+                System.out.println("Output must be either .png, .svg, .pdf, or .dot");
                 return 2;
             }
             
