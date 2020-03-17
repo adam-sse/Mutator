@@ -1,4 +1,4 @@
-package net.ssehub.mutator.mutation.mutations;
+package net.ssehub.mutator.mutation.genetic.mutations;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
@@ -16,7 +16,7 @@ import net.ssehub.mutator.ast.Literal;
 import net.ssehub.mutator.ast.UnaryExpr;
 import net.ssehub.mutator.ast.UnaryOperator;
 import net.ssehub.mutator.ast.operations.AstCloner;
-import net.ssehub.mutator.mutation.MutationIdentifier;
+import net.ssehub.mutator.mutation.genetic.MutationIdentifier;
 
 public class OverrideWithLiteralTest {
 

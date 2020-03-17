@@ -1,4 +1,4 @@
-package net.ssehub.mutator.mutation.mutations;
+package net.ssehub.mutator.mutation.genetic.mutations;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;

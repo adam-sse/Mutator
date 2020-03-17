@@ -1,4 +1,4 @@
-package net.ssehub.mutator.mutation.mutations;
+package net.ssehub.mutator.mutation.genetic.mutations;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -8,7 +8,7 @@ import net.ssehub.mutator.ast.Expression;
 import net.ssehub.mutator.ast.File;
 import net.ssehub.mutator.ast.Function;
 import net.ssehub.mutator.ast.operations.AstCloner;
-import net.ssehub.mutator.mutation.MutationIdentifier;
+import net.ssehub.mutator.mutation.genetic.MutationIdentifier;
 
 public class CopyOverrideExpression extends Mutation {
 

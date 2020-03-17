@@ -1,6 +1,6 @@
 package net.ssehub.mutator.evaluation;
 
-import net.ssehub.mutator.mutation.Mutant;
+import net.ssehub.mutator.mutation.genetic.Mutant;
 
 public abstract class Evaluator {
 

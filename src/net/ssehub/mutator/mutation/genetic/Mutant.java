@@ -1,4 +1,4 @@
-package net.ssehub.mutator.mutation;
+package net.ssehub.mutator.mutation.genetic;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -9,9 +9,10 @@ import java.util.StringJoiner;
 import net.ssehub.mutator.ast.File;
 import net.ssehub.mutator.ast.operations.AstCloner;
 import net.ssehub.mutator.ast.operations.AstPrettyPrinter;
-import net.ssehub.mutator.mutation.mutations.Mutation;
+import net.ssehub.mutator.mutation.IMutant;
+import net.ssehub.mutator.mutation.genetic.mutations.Mutation;
 
-public class Mutant {
+public class Mutant implements IMutant {
     
     private String id;
     
@@ -47,10 +48,12 @@ public class Mutant {
         return mutations;
     }
     
+    @Override
     public String getId() {
         return id;
     }
     
+    @Override
     public void write(java.io.File destination) throws IOException {
         try (FileWriter out = new FileWriter(destination)) {
             out.write("/*\n * Mutant " + id + "\n");

@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import net.ssehub.mutator.Configuration;
-import net.ssehub.mutator.mutation.Mutant;
+import net.ssehub.mutator.mutation.genetic.Mutant;
 
 public class LinuxEvaluator extends Evaluator {
     

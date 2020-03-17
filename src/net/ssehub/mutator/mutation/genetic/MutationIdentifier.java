@@ -1,4 +1,4 @@
-package net.ssehub.mutator.mutation;
+package net.ssehub.mutator.mutation.genetic;
 
 import net.ssehub.mutator.ast.AstElement;
 import net.ssehub.mutator.ast.BinaryExpr;

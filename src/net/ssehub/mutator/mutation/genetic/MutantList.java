@@ -1,8 +1,12 @@
-package net.ssehub.mutator.mutation;
+package net.ssehub.mutator.mutation.genetic;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+
+import net.ssehub.mutator.mutation.IFitnessStore;
+import net.ssehub.mutator.mutation.IMutant;
 
 public class MutantList implements Iterable<Mutant> {
 
@@ -50,6 +54,10 @@ public class MutantList implements Iterable<Mutant> {
             }
             
         } while (changed);
+    }
+    
+    public List<IMutant> convertToList() {
+        return new ArrayList<>(this.mutants);
     }
     
     @Override

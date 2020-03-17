@@ -1,4 +1,4 @@
-package net.ssehub.mutator.mutation.mutations;
+package net.ssehub.mutator.mutation.genetic.mutations;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
@@ -11,7 +11,7 @@ import net.ssehub.mutator.ast.AstElement.Location;
 import net.ssehub.mutator.ast.Block;
 import net.ssehub.mutator.ast.EmptyStmt;
 import net.ssehub.mutator.ast.Statement;
-import net.ssehub.mutator.mutation.MutationIdentifier;
+import net.ssehub.mutator.mutation.genetic.MutationIdentifier;
 
 public class DeleteStatementTest {
 

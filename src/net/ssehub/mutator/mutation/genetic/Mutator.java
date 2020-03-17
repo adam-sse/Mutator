@@ -1,4 +1,4 @@
-package net.ssehub.mutator.mutation;
+package net.ssehub.mutator.mutation.genetic;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -14,10 +14,12 @@ import net.ssehub.mutator.ast.File;
 import net.ssehub.mutator.evaluation.Evaluator;
 import net.ssehub.mutator.evaluation.EvaluatorFactory;
 import net.ssehub.mutator.evaluation.TestResult;
-import net.ssehub.mutator.mutation.mutations.Mutation;
-import net.ssehub.mutator.mutation.mutations.MutationFactory;
+import net.ssehub.mutator.mutation.IMutant;
+import net.ssehub.mutator.mutation.IMutator;
+import net.ssehub.mutator.mutation.genetic.mutations.Mutation;
+import net.ssehub.mutator.mutation.genetic.mutations.MutationFactory;
 
-public class Mutator implements IFitnessStore {
+public class Mutator implements IMutator {
 
     private Configuration config;
     
@@ -48,7 +50,8 @@ public class Mutator implements IFitnessStore {
         random = new Random(config.getSeed());
     }
     
-    public MutantList run(File originalAst) {
+    @Override
+    public List<IMutant> run(File originalAst) {
         this.evaluator = EvaluatorFactory.create(config);
         this.fitnessStore = new HashMap<>(config.getGenerations() * config.getPopulationSize());
         this.originalAst = originalAst;
@@ -202,7 +205,7 @@ public class Mutator implements IFitnessStore {
 
         cleanPopulation();
         
-        return this.population;
+        return this.population.convertToList();
     }
     
     private void cleanPopulation() {
@@ -391,6 +394,7 @@ public class Mutator implements IFitnessStore {
         return fitnessStore.get(mutantId);
     }
     
+    @Override
     public void printStatistics() {
         System.out.println("Evaluated: " + statNumEvaluated);
         System.out.printf(Locale.ROOT, "    failed compilation: %d (%.2f %%)", statNumCompileError,

@@ -1,4 +1,4 @@
-package net.ssehub.mutator.mutation.mutations; 
+package net.ssehub.mutator.mutation.genetic.mutations; 
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;

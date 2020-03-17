@@ -1,4 +1,4 @@
-package net.ssehub.mutator.mutation.mutations;
+package net.ssehub.mutator.mutation.genetic.mutations;
 
 import java.util.List;
 

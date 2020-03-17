@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.List;
 import java.util.Locale;
 import java.util.Properties;
 
@@ -14,9 +15,9 @@ import org.antlr.v4.runtime.RecognitionException;
 import org.antlr.v4.runtime.Recognizer;
 
 import net.ssehub.mutator.ast.operations.AstPrettyPrinter;
-import net.ssehub.mutator.mutation.Mutant;
-import net.ssehub.mutator.mutation.MutantList;
-import net.ssehub.mutator.mutation.Mutator;
+import net.ssehub.mutator.mutation.IMutant;
+import net.ssehub.mutator.mutation.IMutator;
+import net.ssehub.mutator.mutation.genetic.Mutator;
 import net.ssehub.mutator.parsing.Converter;
 import net.ssehub.mutator.parsing.grammar.SimpleCLexer;
 import net.ssehub.mutator.parsing.grammar.SimpleCParser;
@@ -53,18 +54,18 @@ public class Main {
             
             // 2) mutate file
             System.out.println("Mutating...");
-            Mutator mutator = new Mutator(config);
-            MutantList mutants = mutator.run(file);
+            IMutator mutator = new Mutator(config);
+            List<IMutant> mutants = mutator.run(file);
             
             // 3) print out
             System.out.println();
-            System.out.println("Writing " + mutants.getSize() + " mutants...");
-            double bestFitness = mutants.getSize() > 0 ? mutator.getFitness(mutants.getMutant(0).getId()) : 0.0;
+            System.out.println("Writing " + mutants.size() + " mutants...");
+            double bestFitness = mutants.size() > 0 ? mutator.getFitness(mutants.get(0).getId()) : 0.0;
             double originalFitness = mutator.getFitness("G001_M001");
             System.out.println(" Rank |   Mutant   |  Best  | Original ");
             System.out.println("------+------------+--------+----------");
-            for (int i = 0; i < mutants.getSize(); i++) {
-                Mutant mutant = mutants.getMutant(i);
+            for (int i = 0; i < mutants.size(); i++) {
+                IMutant mutant = mutants.get(i);
                 
                 System.out.printf(Locale.ROOT, "  %2d  | %10s | %5.1f%% | %6.1f%%\n",
                         i + 1,

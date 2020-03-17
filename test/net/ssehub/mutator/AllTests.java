@@ -5,7 +5,7 @@ import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
 import net.ssehub.mutator.ast.AllAstTests;
-import net.ssehub.mutator.mutation.mutations.AllMutationTests;
+import net.ssehub.mutator.mutation.genetic.mutations.AllMutationTests;
 
 @RunWith(Suite.class)
 @SuiteClasses({

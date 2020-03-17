@@ -3,7 +3,7 @@ package net.ssehub.mutator.evaluation;
 import java.util.Random;
 
 import net.ssehub.mutator.Configuration;
-import net.ssehub.mutator.mutation.Mutant;
+import net.ssehub.mutator.mutation.genetic.Mutant;
 
 public class DummyEvaluator extends Evaluator {
     
