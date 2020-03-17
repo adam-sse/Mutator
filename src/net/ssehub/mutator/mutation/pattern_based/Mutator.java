@@ -1,10 +1,12 @@
 package net.ssehub.mutator.mutation.pattern_based;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import net.ssehub.mutator.Configuration;
@@ -64,8 +66,12 @@ public class Mutator implements IMutator {
         
         System.out.println("Original fitness: " + currentBestFitness);
         
+        int generation = 0;
+        
         boolean improved;
         do {
+            generation++;
+            
             System.out.println();
             System.out.println("Next Round");
             System.out.println("----------");
@@ -76,6 +82,16 @@ public class Mutator implements IMutator {
             
             for (Mutant neighbor : neighbors) {
                 neighbor.apply(originalAst);
+                if (config.getSaveGenerations()) {
+                    java.io.File dir = new java.io.File(String.format(Locale.ROOT, "generation_%3d", generation));
+                    dir.mkdir();
+                    java.io.File out = new java.io.File(dir, "mutant_" + neighbor.getId() + ".c");
+                    try {
+                        neighbor.write(out);
+                    } catch (IOException e) {
+                        e.printStackTrace(System.out);
+                    }
+                }
                 
                 TestResult testResult = this.evaluator.test(neighbor);
                 if (testResult == TestResult.PASS) {
