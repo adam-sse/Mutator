@@ -103,13 +103,14 @@ public class Mutator implements IMutator {
                     fitnessStore.put(neighbor.getId(), fitness);
                     System.out.println(neighbor.getId() + ": " + fitness);
                     
-                    mutantList.insertMutant(neighbor, fitness);
-                    
                     if (fitness > mutantList.getTopFitness()) {
                         System.out.println(" -> " + neighbor.getId() + " is better than "
                                 + mutantList.getTopMutant().getId());
                         improved = true;
                     }
+                    
+                    mutantList.insertMutant(neighbor, fitness);
+                    
                 } else {
                     System.out.println(neighbor.getId() + " " + testResult);
                 }
