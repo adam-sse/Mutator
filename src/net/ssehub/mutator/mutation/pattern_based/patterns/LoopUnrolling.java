@@ -411,6 +411,10 @@ public class LoopUnrolling implements IOpportunity {
     public static List<LoopUnrolling> findOpportunities(File ast) {
         LoopUnrollingFinder finder = new LoopUnrollingFinder();
         ast.accept(new FullVisitor(finder));
+        
+        // sort higher IDs first -> inner loops come before outer loops
+        finder.opportunities.sort((o1, o2) -> Long.compare(o2.loopId, o1.loopId));
+        
         return finder.opportunities;
     }
     
