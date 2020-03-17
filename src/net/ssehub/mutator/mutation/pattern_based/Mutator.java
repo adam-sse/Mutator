@@ -2,7 +2,6 @@ package net.ssehub.mutator.mutation.pattern_based;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -57,14 +56,18 @@ public class Mutator implements IMutator {
         }
         System.out.println();
         
-        Mutant currentBest = new Mutant(opportunities);
-        this.unmodifiedId = currentBest.getId();
-        currentBest.apply(originalAst);
+        TopXMutants mutantList = new TopXMutants(5);
         
-        double currentBestFitness = evaluator.measureFitness(currentBest);
-        fitnessStore.put(currentBest.getId(), currentBestFitness);
+        Mutant initial = new Mutant(opportunities);
+        this.unmodifiedId = initial.getId();
+        initial.apply(originalAst);
         
-        System.out.println("Original fitness: " + currentBestFitness);
+        double initialFitness = evaluator.measureFitness(initial);
+        fitnessStore.put(initial.getId(), initialFitness);
+        
+        mutantList.insertMutant(initial, initialFitness);
+        
+        System.out.println("Original fitness: " + initialFitness);
         
         int iteration = 0;
         
@@ -77,7 +80,7 @@ public class Mutator implements IMutator {
             System.out.println("-------------");
             
             improved = false;
-            List<Mutant> neighbors = generateNeighbors(currentBest);
+            List<Mutant> neighbors = generateNeighbors(mutantList.getTopMutant());
             System.out.println("Generated " + neighbors.size() + " neighbors");
             
             for (Mutant neighbor : neighbors) {
@@ -100,11 +103,12 @@ public class Mutator implements IMutator {
                     fitnessStore.put(neighbor.getId(), fitness);
                     System.out.println(neighbor.getId() + ": " + fitness);
                     
-                    if (fitness > currentBestFitness) {
-                        System.out.println(" -> " + neighbor.getId() + " is better than " + currentBest.getId());
+                    mutantList.insertMutant(neighbor, fitness);
+                    
+                    if (fitness > mutantList.getTopFitness()) {
+                        System.out.println(" -> " + neighbor.getId() + " is better than "
+                                + mutantList.getTopMutant().getId());
                         improved = true;
-                        currentBest = neighbor;
-                        currentBestFitness = fitness;
                     }
                 } else {
                     System.out.println(neighbor.getId() + " " + testResult);
@@ -113,7 +117,7 @@ public class Mutator implements IMutator {
             
         } while (improved);
         
-        return new LinkedList<>(Arrays.asList(currentBest));
+        return mutantList.toList();
     }
     
     private List<Mutant> generateNeighbors(Mutant base) {
