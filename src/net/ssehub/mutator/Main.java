@@ -17,7 +17,10 @@ import org.antlr.v4.runtime.Recognizer;
 import net.ssehub.mutator.ast.operations.AstPrettyPrinter;
 import net.ssehub.mutator.mutation.IMutant;
 import net.ssehub.mutator.mutation.IMutator;
-import net.ssehub.mutator.mutation.pattern_based.Mutator;
+import net.ssehub.mutator.mutation.genetic.GeneticConfiguration;
+import net.ssehub.mutator.mutation.genetic.GeneticMutator;
+import net.ssehub.mutator.mutation.pattern_based.PatternBasedConfiguration;
+import net.ssehub.mutator.mutation.pattern_based.PatternBasedMutator;
 import net.ssehub.mutator.parsing.Converter;
 import net.ssehub.mutator.parsing.grammar.SimpleCLexer;
 import net.ssehub.mutator.parsing.grammar.SimpleCParser;
@@ -44,7 +47,22 @@ public class Main {
             File configFile = new File(configPath);
             Properties props = new Properties();
             props.load(new FileReader(configFile));
-            Configuration config = new Configuration(props);
+            
+            IMutator mutator;
+            BaseConfiguration config;
+            switch (props.getProperty("mutator").toLowerCase()) {
+            case "genetic":
+                config = new GeneticConfiguration(props);
+                mutator = new GeneticMutator((GeneticConfiguration) config);
+                break;
+            case "patternbased":
+                config = new PatternBasedConfiguration(props);
+                mutator = new PatternBasedMutator((PatternBasedConfiguration) config);
+                break;
+            default:
+                System.out.println("Invalid mutator setting: " + props.getProperty("mutator"));
+                return 2;
+            }
             
             File input = new File(inputPath);
             
@@ -54,7 +72,6 @@ public class Main {
             
             // 2) mutate file
             System.out.println("Mutating...");
-            IMutator mutator = new Mutator(config);
             List<IMutant> mutants = mutator.run(file);
             
             // 3) print out

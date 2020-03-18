@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Random;
 
-import net.ssehub.mutator.Configuration;
 import net.ssehub.mutator.ast.File;
 import net.ssehub.mutator.evaluation.Evaluator;
 import net.ssehub.mutator.evaluation.EvaluatorFactory;
@@ -16,9 +15,9 @@ import net.ssehub.mutator.mutation.IMutant;
 import net.ssehub.mutator.mutation.genetic.mutations.Mutation;
 import net.ssehub.mutator.mutation.genetic.mutations.MutationFactory;
 
-public class Mutator extends AbstractMutator {
+public class GeneticMutator extends AbstractMutator {
 
-    private Configuration config;
+    private GeneticConfiguration config;
     
     private File originalAst;
     
@@ -32,7 +31,7 @@ public class Mutator extends AbstractMutator {
     
     private int nextMutantId;
     
-    public Mutator(Configuration config) {
+    public GeneticMutator(GeneticConfiguration config) {
         this.config = config;
         random = new Random(config.getSeed());
     }
@@ -61,7 +60,7 @@ public class Mutator extends AbstractMutator {
         }
         
         while (generation <= config.getGenerations()) {
-            if (config.getSaveGenerations()) {
+            if (config.getSaveIterations()) {
                 saveGeneration();
             }
             

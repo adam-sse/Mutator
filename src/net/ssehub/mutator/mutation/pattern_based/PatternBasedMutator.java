@@ -6,7 +6,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 
-import net.ssehub.mutator.Configuration;
 import net.ssehub.mutator.ast.File;
 import net.ssehub.mutator.evaluation.Evaluator;
 import net.ssehub.mutator.evaluation.EvaluatorFactory;
@@ -15,9 +14,9 @@ import net.ssehub.mutator.mutation.IMutant;
 import net.ssehub.mutator.mutation.pattern_based.patterns.IOpportunity;
 import net.ssehub.mutator.mutation.pattern_based.patterns.LoopUnrolling;
 
-public class Mutator extends AbstractMutator {
+public class PatternBasedMutator extends AbstractMutator {
 
-    private Configuration config;
+    private PatternBasedConfiguration config;
     
     private Evaluator evaluator;
     
@@ -25,7 +24,7 @@ public class Mutator extends AbstractMutator {
     
     private List<IOpportunity> opportunities;
     
-    public Mutator(Configuration config) {
+    public PatternBasedMutator(PatternBasedConfiguration config) {
         this.config = config;
     }
     
@@ -79,7 +78,7 @@ public class Mutator extends AbstractMutator {
             
             for (Mutant neighbor : neighbors) {
                 neighbor.apply(originalAst);
-                if (config.getSaveGenerations()) {
+                if (config.getSaveIterations()) {
                     java.io.File dir = new java.io.File(String.format(Locale.ROOT, "iteration_%03d", iteration));
                     dir.mkdir();
                     java.io.File out = new java.io.File(dir, "mutant_" + neighbor.getId() + ".c");
