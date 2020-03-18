@@ -25,7 +25,7 @@ public class LinuxEvaluator extends Evaluator {
         TestResult result;
         
         try {
-            mutant.write(config.getDropin());
+            mutant.write(new File(config.getEvalDir(), config.getDropin()));
             boolean compilationSuccess = compile(config.getTestSrc(), getExe(config.getTestSrc()));
             if (compilationSuccess) {
                 String stdout = run(getExe(config.getTestSrc()));
@@ -59,7 +59,7 @@ public class LinuxEvaluator extends Evaluator {
         double fitness = RUNTIME_ERROR;
         
         try {
-            mutant.write(config.getDropin());
+            mutant.write(new File(config.getEvalDir(), config.getDropin()));
             boolean compilationSuccess = compile(config.getFitnessSrc(), getExe(config.getFitnessSrc()));
             if (compilationSuccess) {
                 

@@ -72,7 +72,8 @@ public class PatternBasedMutator extends AbstractMutator {
             for (Mutant neighbor : neighbors) {
                 neighbor.apply(originalAst);
                 if (config.getSaveIterations()) {
-                    java.io.File dir = new java.io.File(String.format(Locale.ROOT, "iteration_%03d", iteration));
+                    java.io.File dir = new java.io.File(config.getExecDir(),
+                            String.format(Locale.ROOT, "iteration_%03d", iteration));
                     dir.mkdir();
                     java.io.File out = new java.io.File(dir, "mutant_" + neighbor.getId() + ".c");
                     try {

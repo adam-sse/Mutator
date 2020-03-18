@@ -1,3 +1,7 @@
 * don't mutate declaration statements?
 
 * AbstractMutator: iteration tracking?
+
+* Pattern ideas:
+    * common-sub-expression elimination
+    * rewrite array accesses to same index with temporary local variable

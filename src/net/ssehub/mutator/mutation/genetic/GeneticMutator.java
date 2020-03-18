@@ -219,7 +219,8 @@ public class GeneticMutator extends AbstractMutator {
     }
     
     private void saveGeneration() {
-        java.io.File folder = new java.io.File(String.format(Locale.ROOT, "generation_%03d", generation));
+        java.io.File folder = new java.io.File(config.getExecDir(),
+                String.format(Locale.ROOT, "generation_%03d", generation));
         folder.mkdir();
         
         for (Mutant mutant : population) {

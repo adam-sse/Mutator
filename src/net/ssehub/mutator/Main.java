@@ -4,6 +4,9 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Locale;
 import java.util.Properties;
@@ -44,31 +47,64 @@ public class Main {
     
     private static int run(String configPath, String inputPath) {
         try {
+            File input = new File(inputPath);
+            
             File configFile = new File(configPath);
             Properties props = new Properties();
             props.load(new FileReader(configFile));
             
+            String mutatorType = props.getProperty("mutator").toLowerCase();
+            
+            int inputDotIndex = input.getName().lastIndexOf('.');
+            String inputBase = input.getName().substring(0,
+                    inputDotIndex > 0 ? inputDotIndex : input.getName().length());
+            String inputSuffix = inputDotIndex > 0 ? input.getName().substring(inputDotIndex + 1) : "";
+            
+            // create an execution directory
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss", Locale.ROOT);
+            File execDir = new File(inputBase + '_' + formatter.format(LocalDateTime.now()) + '_' + mutatorType);
+            if (execDir.exists()) {
+                System.out.println(execDir + " already exists");
+                return 2;
+            }
+            execDir.mkdir();
+            
             IMutator mutator;
             BaseConfiguration config;
-            switch (props.getProperty("mutator").toLowerCase()) {
+            switch (mutatorType) {
             case "genetic":
                 config = new GeneticConfiguration(props);
+                config.setExecDir(execDir);
                 mutator = new GeneticMutator((GeneticConfiguration) config);
                 break;
             case "patternbased":
                 config = new PatternBasedConfiguration(props);
+                config.setExecDir(execDir);
                 mutator = new PatternBasedMutator((PatternBasedConfiguration) config);
                 break;
             default:
-                System.out.println("Invalid mutator setting: " + props.getProperty("mutator"));
+                System.out.println("Invalid mutator setting: " + mutatorType);
                 return 2;
             }
             
-            File input = new File(inputPath);
+            // copy the evaluation resources to the exec directory
+            config.getEvalDir().mkdir();
+            File newTestSrc = new File(config.getEvalDir(), config.getTestSrc().getName());
+            Files.copy(config.getTestSrc().toPath(), newTestSrc.toPath());
+            config.setTestSrc(newTestSrc);
+            File newFitnessSrc = new File(config.getEvalDir(), config.getFitnessSrc().getName());
+            Files.copy(config.getFitnessSrc().toPath(), newFitnessSrc.toPath());
+            config.setFitnessSrc(newFitnessSrc);
             
             // 1) parse file to mutate
             System.out.println("Parsing...");
             net.ssehub.mutator.ast.File file = parse(input);
+            
+            // write to execDir
+            File inputOut = new File(execDir, input.getName());
+            try (FileWriter out = new FileWriter(inputOut)) {
+                out.write(file.accept(new AstPrettyPrinter(true)));
+            }
             
             // 2) mutate file
             System.out.println("Mutating...");
@@ -112,11 +148,8 @@ public class Main {
                     System.out.println();
                 }
                 
-                int dotIndex = input.getName().lastIndexOf('.');
-                String inputBase = input.getName().substring(0, dotIndex);
-                String suffix = input.getName().substring(dotIndex + 1);
-                File output = new File(input.getParentFile(), inputBase + "_" + (i + 1) + "_"
-                        + mutant.getId() + "." + suffix);
+                File output = new File(execDir, inputBase + "_" + (i + 1) + "_"
+                        + mutant.getId() + "." + inputSuffix);
                 mutant.write(output);
             }
             

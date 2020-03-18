@@ -8,11 +8,13 @@ import java.util.Properties;
 
 public class BaseConfiguration {
     
+    private File execDir;
+    
     private boolean saveIterations;
     
     private int timeout;
     
-    private File dropin;
+    private String dropin;
     
     private List<String> compilerArgs;
     
@@ -28,7 +30,7 @@ public class BaseConfiguration {
         this.saveIterations = Boolean.parseBoolean(props.getProperty("mutator.saveIterations"));
         
         this.timeout = Integer.parseInt(props.getProperty("evaluator.timeout"));
-        this.dropin = new File(props.getProperty("evaluator.dropin"));
+        this.dropin = props.getProperty("evaluator.dropin");
         
         compilerArgs = new LinkedList<>();
         for (String arg : props.getProperty("evaluator.compiler").split(" ")) {
@@ -43,6 +45,18 @@ public class BaseConfiguration {
         this.sleepBeforeFitness = Long.parseLong(props.getProperty("evaluator.fitness.sleepBefore"));
     }
     
+    public File getExecDir() {
+        return execDir;
+    }
+    
+    void setExecDir(File execDir) {
+        this.execDir = execDir;
+    }
+    
+    public File getEvalDir() {
+        return new File(this.execDir, "evaluation");
+    }
+    
     public boolean getSaveIterations() {
         return saveIterations;
     }
@@ -51,7 +65,7 @@ public class BaseConfiguration {
         return timeout;
     }
 
-    public File getDropin() {
+    public String getDropin() {
         return dropin;
     }
     
@@ -63,8 +77,16 @@ public class BaseConfiguration {
         return testSrc;
     }
     
+    void setTestSrc(File testSrc) {
+        this.testSrc = testSrc;
+    }
+    
     public File getFitnessSrc() {
         return fitnessSrc;
+    }
+    
+    void setFitnessSrc(File fitnessSrc) {
+        this.fitnessSrc = fitnessSrc;
     }
     
     public int getFitnessMeasures() {
