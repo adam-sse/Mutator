@@ -55,15 +55,16 @@ public class PatternBasedMutator extends AbstractMutator {
         this.unmodifiedId = initial.getId();
         initial.apply(originalAst);
         
-        double initialFitness = evaluator.measureFitness(initial);
-        setFitness(initial.getId(), initialFitness);
-        
-        mutantList.insertMutant(initial, initialFitness);
+        Double initialFitness = evaluate(initial, evaluator, false);
+        if (initialFitness == null) {
+            System.out.println("ERROR: Initial mutant doesn't pass");
+            return new LinkedList<>();
+        }
         
         System.out.println("Original fitness: " + initialFitness);
+        mutantList.insertMutant(initial, initialFitness);
         
         int iteration = 0;
-        
         boolean improved;
         do {
             iteration++;
