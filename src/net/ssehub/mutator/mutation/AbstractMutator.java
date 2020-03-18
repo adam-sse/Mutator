@@ -150,6 +150,7 @@ public abstract class AbstractMutator implements IMutator {
             for (int iteration = 0; iteration < statBestInIteration.size(); iteration++) {
                 System.out.printf(Locale.ROOT, "%03d ", iteration + 1);
             }
+            System.out.println();
         }
     }
     
