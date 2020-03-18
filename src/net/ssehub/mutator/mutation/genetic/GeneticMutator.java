@@ -70,7 +70,7 @@ public class GeneticMutator extends AbstractMutator {
             for (int i = 0; i < population.getSize(); i++) {
                 Mutant mutant = population.getMutant(i);
                 
-                Double fitness = evaluate(mutant, evaluator, true);
+                Double fitness = evaluate(mutant, evaluator, true, true);
                 
                 if (fitness == null) {
                     population.removeMutant(i);
@@ -298,7 +298,7 @@ public class GeneticMutator extends AbstractMutator {
                 }
                 
                 // evaluate
-                Double tempFitness = evaluate(temp, evaluator, false);
+                Double tempFitness = evaluate(temp, evaluator, false, false);
                 if (tempFitness != null) {
                     if ((originalFitness - tempFitness) / originalFitness < config.getCleanThreshold()) {
                         System.out.println(" * Mutation " + mutations.get(i) + " is not required");

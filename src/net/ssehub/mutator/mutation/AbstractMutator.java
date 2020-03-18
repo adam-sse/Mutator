@@ -40,46 +40,56 @@ public abstract class AbstractMutator implements IMutator {
         return getFitness(mutantId) != null;
     }
     
-    protected Double evaluate(IMutant mutant, Evaluator evaluator, boolean useCache) {
+    protected Double evaluate(IMutant mutant, Evaluator evaluator, boolean useCache, boolean printAndStats) {
         Double fitness = null;
         
         if (useCache && hasFitness(mutant.getId())) {
             fitness = getFitness(mutant.getId());
-            System.out.println(mutant.getId() + ": " + fitness + " (cached)");
+            if (printAndStats) {
+                System.out.println(mutant.getId() + ": " + fitness + " (cached)");
+            }
             return fitness;
         }
-        
-        statNumEvaluated++;
+
+        if (printAndStats) {
+            statNumEvaluated++;
+        }
         
         TestResult testResult = evaluator.test(mutant);
         if (testResult != TestResult.PASS) {
-            System.out.println(mutant.getId() + " " + testResult);
+            if (printAndStats) {
+                System.out.println(mutant.getId() + " " + testResult);
             
-            switch (testResult) {
-            case COMPILATION_FAILED:
-                statNumCompileError++;
-                break;
-            case ERROR:
-                statNumError++;
-                break;
-            case TEST_FAILED:
-                statNumFailed++;
-                break;
-            case TIMEOUT:
-                statNumTimeout++;
-                break;
-            default:
+                switch (testResult) {
+                case COMPILATION_FAILED:
+                    statNumCompileError++;
+                    break;
+                case ERROR:
+                    statNumError++;
+                    break;
+                case TEST_FAILED:
+                    statNumFailed++;
+                    break;
+                case TIMEOUT:
+                    statNumTimeout++;
+                    break;
+                default:
+                }
             }
             
         } else {
             fitness = evaluator.measureFitness(mutant);
             if (fitness == Evaluator.RUNTIME_ERROR) {
-                System.out.println(mutant.getId() + " had a runtime error during fitness evaluation");
-                statNumRuntimeError++;
+                if (printAndStats) {
+                    System.out.println(mutant.getId() + " had a runtime error during fitness evaluation");
+                    statNumRuntimeError++;
+                }
                 fitness = null;
                 
             } else {
-                System.out.println(mutant.getId() + ": " + fitness);
+                if (printAndStats) {
+                    System.out.println(mutant.getId() + ": " + fitness);
+                }
                 setFitness(mutant.getId(), fitness);
             }
         }
