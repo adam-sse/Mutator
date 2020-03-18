@@ -9,7 +9,6 @@ import java.util.Random;
 import net.ssehub.mutator.ast.File;
 import net.ssehub.mutator.evaluation.Evaluator;
 import net.ssehub.mutator.evaluation.EvaluatorFactory;
-import net.ssehub.mutator.evaluation.TestResult;
 import net.ssehub.mutator.mutation.AbstractMutator;
 import net.ssehub.mutator.mutation.IMutant;
 import net.ssehub.mutator.mutation.genetic.mutations.Mutation;
@@ -71,7 +70,7 @@ public class GeneticMutator extends AbstractMutator {
             for (int i = 0; i < population.getSize(); i++) {
                 Mutant mutant = population.getMutant(i);
                 
-                Double fitness = evaluate(mutant, evaluator, false);
+                Double fitness = evaluate(mutant, evaluator, true);
                 
                 if (fitness == null) {
                     population.removeMutant(i);
@@ -299,9 +298,8 @@ public class GeneticMutator extends AbstractMutator {
                 }
                 
                 // evaluate
-                TestResult testResult = this.evaluator.test(temp);
-                if (testResult == TestResult.PASS) {
-                    double tempFitness = evaluator.measureFitness(temp);
+                Double tempFitness = evaluate(temp, evaluator, false);
+                if (tempFitness != null) {
                     if ((originalFitness - tempFitness) / originalFitness < config.getCleanThreshold()) {
                         System.out.println(" * Mutation " + mutations.get(i) + " is not required");
                         System.out.println("   (original fitness: " + originalFitness
@@ -317,7 +315,6 @@ public class GeneticMutator extends AbstractMutator {
                         i--;
                     }
                 }
-                
             }
             
         } while (changed);
