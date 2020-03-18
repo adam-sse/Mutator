@@ -1,9 +1,7 @@
 package net.ssehub.mutator.mutation.pattern_based.patterns;
 
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
 import net.ssehub.mutator.ast.BasicType;
 import net.ssehub.mutator.ast.BinaryExpr;
@@ -82,15 +80,18 @@ public class LoopUnrolling implements IOpportunity {
                 
                 for (int i = 1; i < param; i++) {
                     // for each duplication, increase var by one (e.g. i + 1, i + 2, etc.)
-                    Statement clone = cloneBody(oldBody, i * increment);
+                    insertIncrement(loop, newBody);
+                    Statement clone = (Statement) oldBody.accept(new AstCloner(newBody, false));
                     newBody.statements.add(clone);
                 }
+                insertIncrement(loop, newBody);
                 
                 loop.body = newBody;
                 
-                // update the increment of the main loop
+                // remove the increment, as we inserted the increment statements
+                loop.increment = null;
+                
                 int newIncrement = increment * param;
-                setNewIncrement(loop, newIncrement);
                 
                 // decrease the bound
                 // the remainder loop will take care of all remaining elements that don't fit the new increment
@@ -102,7 +103,7 @@ public class LoopUnrolling implements IOpportunity {
                     // this keeps track of the main loop var, so the remainder loop can finish the job
                     newCountVar = "mutator_tmp_" + (int) (Math.random() * Integer.MAX_VALUE);
                     insertCountDeclaration(newCountVar, loop);
-                    insertCountAssigment(newCountVar, newBody, newIncrement);
+                    insertCountAssigment(newCountVar, newBody);
                 }
 
                 // set the correct values for the remainder loop
@@ -118,6 +119,15 @@ public class LoopUnrolling implements IOpportunity {
                 new StatementInserter().insert(loop, false, remainderLoop);
             }
         }
+    }
+    
+    private void insertIncrement(For loop, Block block) {
+        ExpressionStmt incStmt = new ExpressionStmt(block);
+        
+        Expression inc = (Expression) loop.increment.accept(new AstCloner(block, false));
+        incStmt.expr = inc;
+        
+        block.statements.add(incStmt);
     }
     
     private void insertCountDeclaration(String countVarId, For loop) {
@@ -137,7 +147,7 @@ public class LoopUnrolling implements IOpportunity {
         new StatementInserter().insert(loop, true, stmt);
     }
     
-    private void insertCountAssigment(String countVarId, Block body, int newIncrement) {
+    private void insertCountAssigment(String countVarId, Block body) {
         ExpressionStmt stmt = new ExpressionStmt(body);
         
         BinaryExpr expr = new BinaryExpr(stmt);
@@ -146,17 +156,8 @@ public class LoopUnrolling implements IOpportunity {
         Identifier left = new Identifier(expr);
         left.identifier = countVarId;
         
-        BinaryExpr right = new BinaryExpr(expr);
-        right.operator = BinaryOperator.ADDITION;
-        
-        Identifier varId = new Identifier(right);
-        varId.identifier = var;
-        
-        Literal lit = new Literal(right);
-        lit.value = Integer.toString(newIncrement);
-        
-        right.left = varId;
-        right.right = lit;
+        Identifier right = new Identifier(expr);
+        right.identifier = var;
         
         expr.left = left;
         expr.right = right;
@@ -183,31 +184,25 @@ public class LoopUnrolling implements IOpportunity {
         cond.right = subtract;
     }
     
-    private void setNewIncrement(For loop, int increment) {
-        BinaryExpr newIncrementOp = new BinaryExpr(loop);
-        
-        Literal newIncrementStep = new Literal(newIncrementOp);
-        newIncrementStep.value = Integer.toString(Math.abs(increment));
-        
-        Identifier newIncrementVar = new Identifier(newIncrementOp);
-        newIncrementVar.identifier = var;
-        
-        if (increment >= 0) {
-            newIncrementOp.operator = BinaryOperator.ASSIGNMENT_PLUS;
-        } else {
-            newIncrementOp.operator = BinaryOperator.ASSIGNMENT_MINUS;
-        }
-        newIncrementOp.left = newIncrementVar;
-        newIncrementOp.right = newIncrementStep;
-        
-        loop.increment = newIncrementOp;
-    }
-    
-    private Statement cloneBody(Statement body, int varAddition) {
-        Statement clone = (Statement) body.accept(new AstCloner(body.parent, false));
-        clone.accept(new FullVisitor(new WithLiteralReplacer(varAddition)));
-        return clone;
-    }
+//    private void setNewIncrement(For loop, int increment) {
+//        BinaryExpr newIncrementOp = new BinaryExpr(loop);
+//        
+//        Literal newIncrementStep = new Literal(newIncrementOp);
+//        newIncrementStep.value = Integer.toString(Math.abs(increment));
+//        
+//        Identifier newIncrementVar = new Identifier(newIncrementOp);
+//        newIncrementVar.identifier = var;
+//        
+//        if (increment >= 0) {
+//            newIncrementOp.operator = BinaryOperator.ASSIGNMENT_PLUS;
+//        } else {
+//            newIncrementOp.operator = BinaryOperator.ASSIGNMENT_MINUS;
+//        }
+//        newIncrementOp.left = newIncrementVar;
+//        newIncrementOp.right = newIncrementStep;
+//        
+//        loop.increment = newIncrementOp;
+//    }
     
     private static abstract class AbstractIdentifierReplacer implements IAstVisitor<Void> {
 
@@ -347,43 +342,43 @@ public class LoopUnrolling implements IOpportunity {
         
     }
     
-    private class WithLiteralReplacer extends AbstractIdentifierReplacer {
-
-        private int varAddition;
-        
-        private Set<Long> converted;
-        
-        public WithLiteralReplacer(int varAddition) {
-            super(LoopUnrolling.this.var);
-            this.varAddition = varAddition;
-            this.converted = new HashSet<>();
-        }
-        
-        @Override
-        protected Expression convert(Identifier identifier) {
-            if (!converted.contains(identifier.id)) {
-                BinaryExpr addition = new BinaryExpr(identifier.parent);
-                
-                Literal lit = new Literal(addition);
-                lit.value = Integer.toString(Math.abs(varAddition));
-                if (varAddition >= 0) {
-                    addition.operator = BinaryOperator.ADDITION;
-                } else {
-                    addition.operator = BinaryOperator.SUBTRACTION;
-                }
-                
-                addition.left = identifier;
-                addition.right = lit;
-                
-                identifier.parent = addition;
-                
-                converted.add(identifier.id);
-                
-                return addition;
-            }
-            return null;
-        }
-    }
+//    private class WithLiteralReplacer extends AbstractIdentifierReplacer {
+//
+//        private int varAddition;
+//        
+//        private Set<Long> converted;
+//        
+//        public WithLiteralReplacer(int varAddition) {
+//            super(LoopUnrolling.this.var);
+//            this.varAddition = varAddition;
+//            this.converted = new HashSet<>();
+//        }
+//        
+//        @Override
+//        protected Expression convert(Identifier identifier) {
+//            if (!converted.contains(identifier.id)) {
+//                BinaryExpr addition = new BinaryExpr(identifier.parent);
+//                
+//                Literal lit = new Literal(addition);
+//                lit.value = Integer.toString(Math.abs(varAddition));
+//                if (varAddition >= 0) {
+//                    addition.operator = BinaryOperator.ADDITION;
+//                } else {
+//                    addition.operator = BinaryOperator.SUBTRACTION;
+//                }
+//                
+//                addition.left = identifier;
+//                addition.right = lit;
+//                
+//                identifier.parent = addition;
+//                
+//                converted.add(identifier.id);
+//                
+//                return addition;
+//            }
+//            return null;
+//        }
+//    }
     
     private class WithIdentifierReplacer extends AbstractIdentifierReplacer {
 
