@@ -23,7 +23,7 @@ public class MutationFactory {
     
     private Mutation createMutation(String name, File ast, Random random) {
         try {
-            Class<?> cls = Class.forName("net.ssehub.mutator.mutation.mutations." + name);
+            Class<?> cls = Class.forName("net.ssehub.mutator.mutation.genetic.mutations." + name);
             return (Mutation) cls.getMethod("find", File.class, Random.class).invoke(null, ast, random);
             
         } catch (ReflectiveOperationException e) {
