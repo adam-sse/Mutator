@@ -1,7 +1,7 @@
 package net.ssehub.mutator.mutation.genetic.mutations;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.util.Arrays;
 

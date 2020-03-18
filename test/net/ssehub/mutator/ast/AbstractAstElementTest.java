@@ -1,7 +1,7 @@
 package net.ssehub.mutator.ast;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import org.junit.Test;
 
@@ -37,6 +37,7 @@ public abstract class AbstractAstElementTest {
         for (int i = 0; i < elements.length; i++) {
             for (int j = 0; j < elements.length; j++) {
                 boolean expected = equal(i, j);
+                
                 assertThat(i + " should" + (expected ? "" : " not") + " equal "  + j,
                         elements[i].hashCode() == elements[j].hashCode(), is(expected));
             }
