@@ -83,13 +83,13 @@ public class Main {
                 originalFitness = mutator.getFitness(mutator.getUnmodifiedId());
             }
             
-            System.out.print(" Rank |   Mutant   |  Best  ");
+            System.out.print(" Rank |   Mutant   | Fitness |  Best  ");
             if (originalFitness != null) {
                 System.out.println("| Original ");
             } else {
                 System.out.println();
             }
-            System.out.print("------+------------+--------");
+            System.out.print("------+------------+---------+--------");
             if (originalFitness != null) {
                 System.out.println("+----------");
             } else {
@@ -99,13 +99,15 @@ public class Main {
             for (int i = 0; i < mutants.size(); i++) {
                 IMutant mutant = mutants.get(i);
                 
-                System.out.printf(Locale.ROOT, "  %2d  | %10s | %5.1f%%",
+                double fitness = mutator.getFitness(mutant.getId());
+                System.out.printf(Locale.ROOT, "  %2d  | %10s | %7.3f | %5.1f%%",
                         i + 1,
                         mutant.getId(),
-                        mutator.getFitness(mutant.getId()) / bestFitness * 100);
+                        fitness,
+                        fitness / bestFitness * 100);
                 if (originalFitness != null) {
                     System.out.printf(Locale.ROOT, " | %6.1f%%\n",
-                        mutator.getFitness(mutant.getId()) / originalFitness * 100);
+                            fitness / originalFitness * 100);
                 } else {
                     System.out.println();
                 }
