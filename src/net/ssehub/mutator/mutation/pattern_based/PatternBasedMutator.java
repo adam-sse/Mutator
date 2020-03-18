@@ -91,10 +91,14 @@ public class PatternBasedMutator extends AbstractMutator {
                 }
                 
                 Double fitness = evaluate(neighbor, evaluator, true);
-                if (fitness != null && fitness > mutantList.getTopFitness()) {
-                    System.out.println(" -> " + neighbor.getId() + " is better than "
-                            + mutantList.getTopMutant().getId());
-                    improved = true;
+                if (fitness != null) {
+                    if (fitness > mutantList.getTopFitness()) {
+                        System.out.println(" -> " + neighbor.getId() + " is better than "
+                                + mutantList.getTopMutant().getId());
+                        improved = true;
+                    }
+                    
+                    mutantList.insertMutant(neighbor, fitness);
                 }
             }
             
