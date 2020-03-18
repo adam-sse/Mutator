@@ -2,29 +2,24 @@ package net.ssehub.mutator.mutation.pattern_based;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 
 import net.ssehub.mutator.Configuration;
 import net.ssehub.mutator.ast.File;
 import net.ssehub.mutator.evaluation.Evaluator;
 import net.ssehub.mutator.evaluation.EvaluatorFactory;
-import net.ssehub.mutator.evaluation.TestResult;
+import net.ssehub.mutator.mutation.AbstractMutator;
 import net.ssehub.mutator.mutation.IMutant;
-import net.ssehub.mutator.mutation.IMutator;
 import net.ssehub.mutator.mutation.pattern_based.patterns.IOpportunity;
 import net.ssehub.mutator.mutation.pattern_based.patterns.LoopUnrolling;
 
-public class Mutator implements IMutator {
+public class Mutator extends AbstractMutator {
 
     private Configuration config;
     
     private Evaluator evaluator;
-    
-    private Map<String, Double> fitnessStore;
     
     private String unmodifiedId;
     
@@ -35,7 +30,6 @@ public class Mutator implements IMutator {
     }
     
     private void init() {
-        this.fitnessStore = new HashMap<>();
         this.evaluator = EvaluatorFactory.create(config);
     }
 
@@ -63,7 +57,7 @@ public class Mutator implements IMutator {
         initial.apply(originalAst);
         
         double initialFitness = evaluator.measureFitness(initial);
-        fitnessStore.put(initial.getId(), initialFitness);
+        setFitness(initial.getId(), initialFitness);
         
         mutantList.insertMutant(initial, initialFitness);
         
@@ -96,32 +90,15 @@ public class Mutator implements IMutator {
                     }
                 }
                 
-                TestResult testResult = this.evaluator.test(neighbor);
-                if (testResult == TestResult.PASS) {
-                    
-                    double fitness;
-                    
-                    if (fitnessStore.containsKey(neighbor.getId())) {
-                        fitness = fitnessStore.get(neighbor.getId());
-                        System.out.println(neighbor.getId() + ": " + fitness + " (cached)");
-                    } else {
-                        fitness = this.evaluator.measureFitness(neighbor);
-                        fitnessStore.put(neighbor.getId(), fitness);
-                        System.out.println(neighbor.getId() + ": " + fitness);
-                    }
-                    
-                    if (fitness > mutantList.getTopFitness()) {
-                        System.out.println(" -> " + neighbor.getId() + " is better than "
-                                + mutantList.getTopMutant().getId());
-                        improved = true;
-                    }
-                    
-                    mutantList.insertMutant(neighbor, fitness);
-                    
-                } else {
-                    System.out.println(neighbor.getId() + " " + testResult);
+                Double fitness = evaluate(neighbor, evaluator, true);
+                if (fitness != null && fitness > mutantList.getTopFitness()) {
+                    System.out.println(" -> " + neighbor.getId() + " is better than "
+                            + mutantList.getTopMutant().getId());
+                    improved = true;
                 }
             }
+            
+            setBestInIteration(iteration, mutantList.getTopMutant());
             
         } while (improved);
         
@@ -151,16 +128,6 @@ public class Mutator implements IMutator {
         return result;
     }
     
-    @Override
-    public Double getFitness(String mutantId) {
-        return fitnessStore.get(mutantId);
-    }
-
-    @Override
-    public void printStatistics() {
-        System.out.println("TODO"); // TODO
-    }
-
     @Override
     public String getUnmodifiedId() {
         return unmodifiedId;

@@ -2,11 +2,8 @@ package net.ssehub.mutator.mutation.genetic;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Random;
 
 import net.ssehub.mutator.Configuration;
@@ -14,18 +11,16 @@ import net.ssehub.mutator.ast.File;
 import net.ssehub.mutator.evaluation.Evaluator;
 import net.ssehub.mutator.evaluation.EvaluatorFactory;
 import net.ssehub.mutator.evaluation.TestResult;
+import net.ssehub.mutator.mutation.AbstractMutator;
 import net.ssehub.mutator.mutation.IMutant;
-import net.ssehub.mutator.mutation.IMutator;
 import net.ssehub.mutator.mutation.genetic.mutations.Mutation;
 import net.ssehub.mutator.mutation.genetic.mutations.MutationFactory;
 
-public class Mutator implements IMutator {
+public class Mutator extends AbstractMutator {
 
     private Configuration config;
     
     private File originalAst;
-    
-    private Map<String, Double> fitnessStore;
     
     private Evaluator evaluator;
     
@@ -37,14 +32,6 @@ public class Mutator implements IMutator {
     
     private int nextMutantId;
     
-    private int statNumEvaluated;
-    private int statNumCompileError;
-    private int statNumTimeout;
-    private int statNumFailed;
-    private int statNumRuntimeError;
-    private int statNumError;
-    private List<Double> statBestGenFitness;
-    
     public Mutator(Configuration config) {
         this.config = config;
         random = new Random(config.getSeed());
@@ -53,10 +40,7 @@ public class Mutator implements IMutator {
     @Override
     public List<IMutant> run(File originalAst) {
         this.evaluator = EvaluatorFactory.create(config);
-        this.fitnessStore = new HashMap<>(config.getGenerations() * config.getPopulationSize());
         this.originalAst = originalAst;
-        
-        this.statBestGenFitness = new ArrayList<>(config.getGenerations());
         
         this.population = new MutantList();
         this.generation = 0;
@@ -88,44 +72,12 @@ public class Mutator implements IMutator {
             for (int i = 0; i < population.getSize(); i++) {
                 Mutant mutant = population.getMutant(i);
                 
-                statNumEvaluated++;
-            
-                TestResult testResult = this.evaluator.test(mutant);
-                if (testResult != TestResult.PASS) {
+                Double fitness = evaluate(mutant, evaluator, false);
+                
+                if (fitness == null) {
                     population.removeMutant(i);
                     i--;
-                    System.out.println(mutant.getId() + " " + testResult);
-                    
-                    switch (testResult) {
-                    case COMPILATION_FAILED:
-                        statNumCompileError++;
-                        break;
-                    case ERROR:
-                        statNumError++;
-                        break;
-                    case TEST_FAILED:
-                        statNumFailed++;
-                        break;
-                    case TIMEOUT:
-                        statNumTimeout++;
-                        break;
-                    default:
-                    }
-                    
-                } else {
-                    double fitness = this.evaluator.measureFitness(mutant);
-                    if (fitness == Evaluator.RUNTIME_ERROR) {
-                        System.out.println(mutant.getId() + " had a runtime error during fitness evaluation");
-                        population.removeMutant(i);
-                        i--;
-                        statNumRuntimeError++;
-                        
-                    } else {
-                        System.out.println(mutant.getId() + ": " + fitness);
-                        fitnessStore.put(mutant.getId(), fitness);
-                    }
                 }
-                
             }
             
             population.sort(this);
@@ -135,9 +87,9 @@ public class Mutator implements IMutator {
             }
             
             if (population.getSize() > 0) {
-                this.statBestGenFitness.add(fitnessStore.get(population.getMutant(0).getId()));
+                setBestInIteration(generation, population.getMutant(0));
             } else {
-                this.statBestGenFitness.add(0.0);
+                setBestInIteration(generation, 0.0);
             }
             
             nextGeneration();
@@ -330,7 +282,7 @@ public class Mutator implements IMutator {
         }
         
         String cleanedId = original.getId() + "c";
-        double originalFitness = fitnessStore.get(original.getId());
+        double originalFitness = getFitness(original.getId());
         List<Mutation> mutations = new ArrayList<>(original.getMutations());
         
         System.out.println("Cleaning " + original.getId());
@@ -356,7 +308,7 @@ public class Mutator implements IMutator {
                         System.out.println("   (original fitness: " + originalFitness
                                 + "; w/o this mutation: " + tempFitness + ")");
                         
-                        this.fitnessStore.put(cleanedId, tempFitness);
+                        setFitness(cleanedId, tempFitness);
                         if (tempFitness > originalFitness) {
                             originalFitness = tempFitness;
                         }
@@ -387,62 +339,6 @@ public class Mutator implements IMutator {
     
     private String generateMutantId() {
         return String.format(Locale.ROOT, "G%03d_M%03d", generation, nextMutantId++);
-    }
-
-    @Override
-    public Double getFitness(String mutantId) {
-        return fitnessStore.get(mutantId);
-    }
-    
-    @Override
-    public void printStatistics() {
-        System.out.println("Evaluated: " + statNumEvaluated);
-        System.out.printf(Locale.ROOT, "    failed compilation: %d (%.2f %%)", statNumCompileError,
-                (double) statNumCompileError / statNumEvaluated * 100.0);
-        System.out.println();
-        System.out.printf(Locale.ROOT, "    timed-out: %d (%.2f %%)", statNumTimeout,
-                (double) statNumTimeout / statNumEvaluated * 100.0);
-        System.out.println();
-        System.out.printf(Locale.ROOT, "    failed tests: %d (%.2f %%)", statNumFailed,
-                (double) statNumFailed / statNumEvaluated * 100.0);
-        System.out.println();
-        System.out.printf(Locale.ROOT, "    runtime error: %d (%.2f %%)", statNumRuntimeError,
-                (double) statNumRuntimeError / statNumEvaluated * 100.0);
-        System.out.println();
-        System.out.printf(Locale.ROOT, "    error: %d (%.2f %%)", statNumError,
-                (double) statNumError / statNumEvaluated * 100.0);
-        System.out.println();
-        
-        System.out.println();
-        System.out.println("Best Fitness per Generation:");
-        
-        double max = Collections.max(statBestGenFitness);
-        double min = Collections.min(statBestGenFitness);
-        
-        final int NUM_LINES = 20;
-        double range = (max - min) / NUM_LINES;
-        for (int line = 0; line < NUM_LINES; line++) {
-            double upper = max - (line * range);
-            double lower = upper - range;
-            
-            System.out.printf(Locale.ROOT, "%10.2f |", (upper + lower) / 2);
-            
-            for (int gen = 0; gen < statBestGenFitness.size(); gen++) {
-                double fitness = statBestGenFitness.get(gen);
-                if (fitness <= upper  && fitness >= lower) {
-                    System.out.print(" *  ");
-                } else {
-                    System.out.print("    ");
-                }
-            }
-            
-            System.out.println();
-        }
-        System.out.println("-----------+" + "----".repeat(statBestGenFitness.size()));
-        System.out.print("           |");
-        for (int gen = 0; gen < statBestGenFitness.size(); gen++) {
-            System.out.printf(Locale.ROOT, "%03d ", gen + 1);
-        }
     }
 
     @Override

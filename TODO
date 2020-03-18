@@ -1,1 +1,4 @@
 * don't mutate declaration statements?
+
+* LoopUnrolling: insert increment statements instead of replacing all iterVar usages
+* Add AbstractMutator -> iteration tracking?
