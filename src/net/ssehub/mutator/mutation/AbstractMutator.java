@@ -117,36 +117,39 @@ public abstract class AbstractMutator implements IMutator {
         System.out.printf(Locale.ROOT, "    error: %d (%.2f %%)", statNumError,
                 (double) statNumError / statNumEvaluated * 100.0);
         System.out.println();
+
         
-        System.out.println();
-        System.out.println("Best Fitness per Iteration:");
-        
-        double max = Collections.max(statBestInIteration);
-        double min = Collections.min(statBestInIteration);
-        
-        final int NUM_LINES = 20;
-        double range = (max - min) / NUM_LINES;
-        for (int line = 0; line < NUM_LINES; line++) {
-            double upper = max - (line * range);
-            double lower = upper - range;
-            
-            System.out.printf(Locale.ROOT, "%10.2f |", (upper + lower) / 2);
-            
-            for (int iteration = 0; iteration < statBestInIteration.size(); iteration++) {
-                double fitness = statBestInIteration.get(iteration);
-                if (fitness <= upper  && fitness >= lower) {
-                    System.out.print(" *  ");
-                } else {
-                    System.out.print("    ");
-                }
-            }
-            
+        if (statBestInIteration.size() >= 2) {
             System.out.println();
-        }
-        System.out.println("-----------+" + "----".repeat(statBestInIteration.size()));
-        System.out.print("           |");
-        for (int iteration = 0; iteration < statBestInIteration.size(); iteration++) {
-            System.out.printf(Locale.ROOT, "%03d ", iteration + 1);
+            System.out.println("Best Fitness per Iteration:");
+            
+            double max = Collections.max(statBestInIteration);
+            double min = Collections.min(statBestInIteration);
+            
+            final int NUM_LINES = 20;
+            double range = (max - min) / NUM_LINES;
+            for (int line = 0; line < NUM_LINES; line++) {
+                double upper = max - (line * range);
+                double lower = upper - range;
+                
+                System.out.printf(Locale.ROOT, "%10.2f |", (upper + lower) / 2);
+                
+                for (int iteration = 0; iteration < statBestInIteration.size(); iteration++) {
+                    double fitness = statBestInIteration.get(iteration);
+                    if (fitness <= upper  && fitness >= lower) {
+                        System.out.print(" *  ");
+                    } else {
+                        System.out.print("    ");
+                    }
+                }
+                
+                System.out.println();
+            }
+            System.out.println("-----------+" + "----".repeat(statBestInIteration.size()));
+            System.out.print("           |");
+            for (int iteration = 0; iteration < statBestInIteration.size(); iteration++) {
+                System.out.printf(Locale.ROOT, "%03d ", iteration + 1);
+            }
         }
     }
     
