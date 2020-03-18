@@ -5,3 +5,7 @@
 * Pattern ideas:
     * common-sub-expression elimination
     * rewrite array accesses to same index with temporary local variable
+
+* Logger
+    * Log to console and to file in execDir
+    * If execDir is not yet set up, cache the log lines until notified about it
