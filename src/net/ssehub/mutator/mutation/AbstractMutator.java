@@ -92,10 +92,10 @@ public abstract class AbstractMutator implements IMutator {
     }
     
     protected void setBestInIteration(int iteration, double bestFitness) {
-        if (iteration < this.statBestInIteration.size()) {
-            this.statBestInIteration.set(iteration, bestFitness);
+        if (iteration - 1 < this.statBestInIteration.size()) {
+            this.statBestInIteration.set(iteration - 1, bestFitness);
         } else {
-            this.statBestInIteration.add(iteration, bestFitness);
+            this.statBestInIteration.add(iteration - 1, bestFitness);
         }
     }
     
