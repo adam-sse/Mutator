@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Locale;
 
 import net.ssehub.mutator.ast.File;
-import net.ssehub.mutator.evaluation.Evaluator;
 import net.ssehub.mutator.evaluation.EvaluatorFactory;
 import net.ssehub.mutator.mutation.AbstractMutator;
 import net.ssehub.mutator.mutation.IMutant;
@@ -18,24 +17,17 @@ public class PatternBasedMutator extends AbstractMutator {
 
     private PatternBasedConfiguration config;
     
-    private Evaluator evaluator;
-    
     private String unmodifiedId;
     
     private List<IOpportunity> opportunities;
     
     public PatternBasedMutator(PatternBasedConfiguration config) {
+        super(EvaluatorFactory.create(config));
         this.config = config;
     }
     
-    private void init() {
-        this.evaluator = EvaluatorFactory.create(config);
-    }
-
     @Override
     public List<IMutant> run(File originalAst) {
-        init();
-        
         System.out.println();
         System.out.println("Initialization");
         System.out.println("--------------");
@@ -56,7 +48,7 @@ public class PatternBasedMutator extends AbstractMutator {
         initial.apply(originalAst);
         
         System.out.println("Original fitness:");
-        Double initialFitness = evaluate(initial, evaluator, false, true);
+        Double initialFitness = evaluate(initial, false, true);
         if (initialFitness == null) {
             System.out.println("ERROR: Initial mutant doesn't pass");
             return new LinkedList<>();
@@ -90,7 +82,7 @@ public class PatternBasedMutator extends AbstractMutator {
                     }
                 }
                 
-                Double fitness = evaluate(neighbor, evaluator, true, true);
+                Double fitness = evaluate(neighbor, true, true);
                 if (fitness != null) {
                     if (fitness > mutantList.getTopFitness()) {
                         System.out.println(" -> " + neighbor.getId() + " is better than "

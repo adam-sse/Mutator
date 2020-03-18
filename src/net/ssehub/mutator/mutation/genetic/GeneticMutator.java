@@ -7,7 +7,6 @@ import java.util.Locale;
 import java.util.Random;
 
 import net.ssehub.mutator.ast.File;
-import net.ssehub.mutator.evaluation.Evaluator;
 import net.ssehub.mutator.evaluation.EvaluatorFactory;
 import net.ssehub.mutator.mutation.AbstractMutator;
 import net.ssehub.mutator.mutation.IMutant;
@@ -20,8 +19,6 @@ public class GeneticMutator extends AbstractMutator {
     
     private File originalAst;
     
-    private Evaluator evaluator;
-    
     private Random random;
     
     private MutantList population;
@@ -31,13 +28,13 @@ public class GeneticMutator extends AbstractMutator {
     private int nextMutantId;
     
     public GeneticMutator(GeneticConfiguration config) {
+        super(EvaluatorFactory.create(config));
         this.config = config;
         random = new Random(config.getSeed());
     }
     
     @Override
     public List<IMutant> run(File originalAst) {
-        this.evaluator = EvaluatorFactory.create(config);
         this.originalAst = originalAst;
         
         this.population = new MutantList();
@@ -70,7 +67,7 @@ public class GeneticMutator extends AbstractMutator {
             for (int i = 0; i < population.getSize(); i++) {
                 Mutant mutant = population.getMutant(i);
                 
-                Double fitness = evaluate(mutant, evaluator, true, true);
+                Double fitness = evaluate(mutant, true, true);
                 
                 if (fitness == null) {
                     population.removeMutant(i);
@@ -298,7 +295,7 @@ public class GeneticMutator extends AbstractMutator {
                 }
                 
                 // evaluate
-                Double tempFitness = evaluate(temp, evaluator, false, false);
+                Double tempFitness = evaluate(temp, false, false);
                 if (tempFitness != null) {
                     if ((originalFitness - tempFitness) / originalFitness < config.getCleanThreshold()) {
                         System.out.println(" * Mutation " + mutations.get(i) + " is not required");

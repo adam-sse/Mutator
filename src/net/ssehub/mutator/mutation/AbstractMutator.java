@@ -14,6 +14,8 @@ public abstract class AbstractMutator implements IMutator {
 
     private Map<String, Double> fitnessStore;
     
+    private Evaluator evaluator;
+    
     private int statNumEvaluated;
     private int statNumCompileError;
     private int statNumTimeout;
@@ -22,7 +24,8 @@ public abstract class AbstractMutator implements IMutator {
     private int statNumError;
     private List<Double> statBestInIteration;
     
-    public AbstractMutator() {
+    public AbstractMutator(Evaluator evaluator) {
+        this.evaluator = evaluator;
         this.fitnessStore = new HashMap<>();
         this.statBestInIteration = new ArrayList<>();
     }
@@ -40,7 +43,7 @@ public abstract class AbstractMutator implements IMutator {
         return getFitness(mutantId) != null;
     }
     
-    protected Double evaluate(IMutant mutant, Evaluator evaluator, boolean useCache, boolean printAndStats) {
+    protected Double evaluate(IMutant mutant, boolean useCache, boolean printAndStats) {
         Double fitness = null;
         
         if (useCache && hasFitness(mutant.getId())) {
@@ -55,7 +58,7 @@ public abstract class AbstractMutator implements IMutator {
             statNumEvaluated++;
         }
         
-        TestResult testResult = evaluator.test(mutant);
+        TestResult testResult = this.evaluator.test(mutant);
         if (testResult != TestResult.PASS) {
             if (printAndStats) {
                 System.out.println(mutant.getId() + " " + testResult);
@@ -78,7 +81,7 @@ public abstract class AbstractMutator implements IMutator {
             }
             
         } else {
-            fitness = evaluator.measureFitness(mutant);
+            fitness = this.evaluator.measureFitness(mutant);
             if (fitness == Evaluator.RUNTIME_ERROR) {
                 if (printAndStats) {
                     System.out.println(mutant.getId() + " had a runtime error during fitness evaluation");
