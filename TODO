@@ -3,7 +3,11 @@
 * AbstractMutator: iteration tracking?
 
 * Pattern ideas:
-    * common-sub-expression elimination -> test
+    * common-sub-expression elimination
+        -> test
+        - improve
+            -> type detection?
+            -> re-search for expressions? (may be needed due to previous modifications)
     * rewrite array accesses to same index with temporary local variable
 
 * LoopUnrolling

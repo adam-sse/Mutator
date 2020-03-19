@@ -79,8 +79,15 @@ public class CommonSubExpressionElimination implements IOpportunity {
             List<Statement> statements = new ArrayList<>(expressionIds.size());
             for (long id : expressionIds) {
                 Expression expr = (Expression) ast.accept(new IdFinder(id));
-                expressions.add(expr);
-                statements.add(findParentStatement(expr));
+                if (expr != null) {
+                    expressions.add(expr);
+                    statements.add(findParentStatement(expr));
+                }
+            }
+            
+            if (expressions.size() < 2) {
+                // due to previous modifications, a few expressions may be lost
+                return;
             }
             
             // 2) find the statement with the lowest id (~= first statement)
