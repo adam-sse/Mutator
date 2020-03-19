@@ -10,6 +10,7 @@ import net.ssehub.mutator.ast.File;
 import net.ssehub.mutator.evaluation.EvaluatorFactory;
 import net.ssehub.mutator.mutation.AbstractMutator;
 import net.ssehub.mutator.mutation.IMutant;
+import net.ssehub.mutator.mutation.pattern_based.patterns.CommonSubExpressionElimination;
 import net.ssehub.mutator.mutation.pattern_based.patterns.IOpportunity;
 import net.ssehub.mutator.mutation.pattern_based.patterns.LoopUnrolling;
 import net.ssehub.mutator.util.Logger;
@@ -36,6 +37,9 @@ public class PatternBasedMutator extends AbstractMutator {
         LOGGER.println("--------------");
         
         this.opportunities = new ArrayList<>();
+        // the order here matters, as mutations are applied in this order
+        // thus: loop unrolling last (from inner to outer loops), as they duplicate the nested body
+        opportunities.addAll(CommonSubExpressionElimination.findOpportunities(originalAst));
         opportunities.addAll(LoopUnrolling.findOpportunities(originalAst));
         
         LOGGER.println("Opportunities:");

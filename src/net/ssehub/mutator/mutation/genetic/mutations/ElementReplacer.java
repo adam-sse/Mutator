@@ -25,7 +25,7 @@ import net.ssehub.mutator.ast.While;
 import net.ssehub.mutator.ast.operations.IAstVisitor;
 import net.ssehub.mutator.util.Util;
 
-class ElementReplacer<T extends AstElement> implements IAstVisitor<Boolean> {
+public class ElementReplacer<T extends AstElement> implements IAstVisitor<Boolean> {
     
     private T toReplace;
     
