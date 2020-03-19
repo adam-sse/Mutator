@@ -96,9 +96,24 @@ public class Logger {
         checkWrite();
     }
     
-    public void logException(Throwable e) {
-        // TODO
-        e.printStackTrace(System.out);
+    public void logException(Throwable exc) {
+        synchronized (Logger.class) {
+            println(exc.toString());
+            for (StackTraceElement element : exc.getStackTrace()) {
+                println("    at " + element.toString());
+            }
+            
+            for (Throwable supressed : exc.getSuppressed()) {
+                print("Suppressed: ");
+                logException(supressed);
+            }
+            
+            if (exc.getCause() != null) {
+                print("Caused by: ");
+                logException(exc.getCause());
+            }
+            
+        }
     }
     
 }
