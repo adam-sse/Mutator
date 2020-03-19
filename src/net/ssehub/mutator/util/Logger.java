@@ -4,6 +4,8 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
@@ -11,6 +13,10 @@ import java.util.Locale;
 public class Logger {
 
     private static final Logger LOGGER = Logger.get("Logger");
+    
+    private static final int COMPONENT_WIDTH = 21;
+    
+    private static final DateTimeFormatter TIME_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     
     private static BufferedWriter fileOut;
     
@@ -21,7 +27,12 @@ public class Logger {
     private StringBuilder buffer;
     
     private Logger(String component) {
-        this.component = component;
+        int numSpaces = COMPONENT_WIDTH - component.length();
+        if (numSpaces > 0) {
+            this.component = " ".repeat(numSpaces / 2) + component + " ".repeat((numSpaces + 1) / 2);
+        } else {
+            this.component = component;
+        }
         this.buffer = new StringBuilder(2048);
     }
     
@@ -40,7 +51,7 @@ public class Logger {
     }
     
     private static synchronized void printlnImpl(String component, String line) {
-        String message = "[" + component + "] " + line;
+        String message = "[" + TIME_FORMAT.format(LocalDateTime.now()) + "] [" + component + "]  " + line;
         System.out.println(message);
         
         if (fileOut != null) {

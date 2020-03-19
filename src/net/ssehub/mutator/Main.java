@@ -66,6 +66,7 @@ public class Main {
             // create an execution directory
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss", Locale.ROOT);
             File execDir = new File(inputBase + '_' + formatter.format(LocalDateTime.now()) + '_' + mutatorType);
+            LOGGER.println("Execution directory is at " + execDir.getAbsolutePath());
             if (execDir.exists()) {
                 LOGGER.println(execDir + " already exists");
                 return 2;
