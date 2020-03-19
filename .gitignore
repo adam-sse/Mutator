@@ -1,3 +1,5 @@
 bin/
+test-classes/
+
 jar/*.jar
 testdata/tmp*
