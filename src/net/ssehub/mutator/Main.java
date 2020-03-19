@@ -72,7 +72,12 @@ public class Main {
                 return 2;
             }
             execDir.mkdir();
+            
+            // create log file in execDir
             Logger.setFileOut(new File(execDir, "mutator.log"));
+            
+            // copy config to execDir
+            Files.copy(configFile.toPath(), new File(execDir, "config.properties").toPath());
             
             IMutator mutator;
             BaseConfiguration config;
@@ -106,7 +111,7 @@ public class Main {
             net.ssehub.mutator.ast.File file = parse(input);
             
             // write to execDir
-            File inputOut = new File(execDir, input.getName());
+            File inputOut = new File(execDir, "input." + inputSuffix);
             try (FileWriter out = new FileWriter(inputOut)) {
                 out.write(file.accept(new AstPrettyPrinter(true)));
             }
@@ -152,7 +157,7 @@ public class Main {
                     LOGGER.println();
                 }
                 
-                File output = new File(execDir, inputBase + "_" + (i + 1) + "_"
+                File output = new File(execDir, "result_" + (i + 1) + "_"
                         + mutant.getId() + "." + inputSuffix);
                 mutant.write(output);
             }
