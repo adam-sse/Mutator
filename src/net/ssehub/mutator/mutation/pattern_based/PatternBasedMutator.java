@@ -12,9 +12,12 @@ import net.ssehub.mutator.mutation.AbstractMutator;
 import net.ssehub.mutator.mutation.IMutant;
 import net.ssehub.mutator.mutation.pattern_based.patterns.IOpportunity;
 import net.ssehub.mutator.mutation.pattern_based.patterns.LoopUnrolling;
+import net.ssehub.mutator.util.Logger;
 
 public class PatternBasedMutator extends AbstractMutator {
 
+    private static final Logger LOGGER = Logger.get(PatternBasedMutator.class.getSimpleName());
+    
     private PatternBasedConfiguration config;
     
     private String unmodifiedId;
@@ -28,18 +31,18 @@ public class PatternBasedMutator extends AbstractMutator {
     
     @Override
     public List<IMutant> run(File originalAst) {
-        System.out.println();
-        System.out.println("Initialization");
-        System.out.println("--------------");
+        LOGGER.println();
+        LOGGER.println("Initialization");
+        LOGGER.println("--------------");
         
         this.opportunities = new ArrayList<>();
         opportunities.addAll(LoopUnrolling.findOpportunities(originalAst));
         
-        System.out.println("Opportunities:");
+        LOGGER.println("Opportunities:");
         for (IOpportunity oppo : opportunities) {
-            System.out.println(" * " + oppo);
+            LOGGER.println(" * " + oppo);
         }
-        System.out.println();
+        LOGGER.println();
         
         TopXMutants mutantList = new TopXMutants(5);
         
@@ -47,10 +50,10 @@ public class PatternBasedMutator extends AbstractMutator {
         this.unmodifiedId = initial.getId();
         initial.apply(originalAst);
         
-        System.out.println("Original fitness:");
+        LOGGER.println("Original fitness:");
         Double initialFitness = evaluate(initial, false, true);
         if (initialFitness == null) {
-            System.out.println("ERROR: Initial mutant doesn't pass");
+            LOGGER.println("ERROR: Initial mutant doesn't pass");
             return new LinkedList<>();
         }
         
@@ -61,13 +64,13 @@ public class PatternBasedMutator extends AbstractMutator {
         do {
             iteration++;
             
-            System.out.println();
-            System.out.printf(Locale.ROOT, "Iteration %03d\n", iteration);
-            System.out.println("-------------");
+            LOGGER.println();
+            LOGGER.printf("Iteration %03d\n", iteration);
+            LOGGER.println("-------------");
             
             improved = false;
             List<Mutant> neighbors = generateNeighbors(mutantList.getTopMutant());
-            System.out.println("Generated " + neighbors.size() + " neighbors");
+            LOGGER.println("Generated " + neighbors.size() + " neighbors");
             
             for (Mutant neighbor : neighbors) {
                 neighbor.apply(originalAst);
@@ -79,14 +82,14 @@ public class PatternBasedMutator extends AbstractMutator {
                     try {
                         neighbor.write(out);
                     } catch (IOException e) {
-                        e.printStackTrace(System.out);
+                        LOGGER.logException(e);
                     }
                 }
                 
                 Double fitness = evaluate(neighbor, true, true);
                 if (fitness != null) {
                     if (fitness > mutantList.getTopFitness()) {
-                        System.out.println(" -> " + neighbor.getId() + " is better than "
+                        LOGGER.println(" -> " + neighbor.getId() + " is better than "
                                 + mutantList.getTopMutant().getId());
                         improved = true;
                     }

@@ -11,8 +11,11 @@ import net.ssehub.mutator.ast.operations.AstCloner;
 import net.ssehub.mutator.ast.operations.AstPrettyPrinter;
 import net.ssehub.mutator.mutation.IMutant;
 import net.ssehub.mutator.mutation.pattern_based.patterns.IOpportunity;
+import net.ssehub.mutator.util.Logger;
 
 public class Mutant implements IMutant {
+    
+    private static final Logger LOGGER = Logger.get(Mutant.class.getSimpleName());
 
     private List<IOpportunity> opportunities;
     
@@ -64,12 +67,12 @@ public class Mutant implements IMutant {
     }
 
     public void printToConsole() {
-        System.out.print("/*\n * Mutant " + getId() + "\n");
+        LOGGER.print("/*\n * Mutant " + getId() + "\n");
         for (int i = 0; i < this.opportunities.size(); i++) {
-            System.out.print(" *   " + this.opportunities.get(i).toString() + " param=" + this.params.get(i) + "\n");
+            LOGGER.print(" *   " + this.opportunities.get(i).toString() + " param=" + this.params.get(i) + "\n");
         }
-        System.out.print(" */\n\n");
-        System.out.print(ast.accept(new AstPrettyPrinter(true)));
+        LOGGER.print(" */\n\n");
+        LOGGER.print(ast.accept(new AstPrettyPrinter(true)));
     }
     
     @Override

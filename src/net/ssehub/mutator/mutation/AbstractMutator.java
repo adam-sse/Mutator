@@ -4,14 +4,16 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 import net.ssehub.mutator.evaluation.Evaluator;
 import net.ssehub.mutator.evaluation.TestResult;
+import net.ssehub.mutator.util.Logger;
 
 public abstract class AbstractMutator implements IMutator {
 
+    private static final Logger LOGGER = Logger.get(AbstractMutator.class.getSimpleName());
+    
     private Map<String, Double> fitnessStore;
     
     private Evaluator evaluator;
@@ -49,7 +51,7 @@ public abstract class AbstractMutator implements IMutator {
         if (useCache && hasFitness(mutant.getId())) {
             fitness = getFitness(mutant.getId());
             if (printAndStats) {
-                System.out.println(mutant.getId() + ": " + fitness + " (cached)");
+                LOGGER.println(mutant.getId() + ": " + fitness + " (cached)");
             }
             return fitness;
         }
@@ -61,7 +63,7 @@ public abstract class AbstractMutator implements IMutator {
         TestResult testResult = this.evaluator.test(mutant);
         if (testResult != TestResult.PASS) {
             if (printAndStats) {
-                System.out.println(mutant.getId() + " " + testResult);
+                LOGGER.println(mutant.getId() + " " + testResult);
             
                 switch (testResult) {
                 case COMPILATION_FAILED:
@@ -84,14 +86,14 @@ public abstract class AbstractMutator implements IMutator {
             fitness = this.evaluator.measureFitness(mutant);
             if (fitness == Evaluator.RUNTIME_ERROR) {
                 if (printAndStats) {
-                    System.out.println(mutant.getId() + " had a runtime error during fitness evaluation");
+                    LOGGER.println(mutant.getId() + " had a runtime error during fitness evaluation");
                     statNumRuntimeError++;
                 }
                 fitness = null;
                 
             } else {
                 if (printAndStats) {
-                    System.out.println(mutant.getId() + ": " + fitness);
+                    LOGGER.println(mutant.getId() + ": " + fitness);
                 }
                 setFitness(mutant.getId(), fitness);
             }
@@ -114,27 +116,27 @@ public abstract class AbstractMutator implements IMutator {
     
     @Override
     public void printStatistics() {
-        System.out.println("Evaluated: " + statNumEvaluated);
-        System.out.printf(Locale.ROOT, "    failed compilation: %d (%.2f %%)", statNumCompileError,
+        LOGGER.println("Evaluated: " + statNumEvaluated);
+        LOGGER.printf("    failed compilation: %d (%.2f %%)", statNumCompileError,
                 (double) statNumCompileError / statNumEvaluated * 100.0);
-        System.out.println();
-        System.out.printf(Locale.ROOT, "    timed-out: %d (%.2f %%)", statNumTimeout,
+        LOGGER.println();
+        LOGGER.printf("    timed-out: %d (%.2f %%)", statNumTimeout,
                 (double) statNumTimeout / statNumEvaluated * 100.0);
-        System.out.println();
-        System.out.printf(Locale.ROOT, "    failed tests: %d (%.2f %%)", statNumFailed,
+        LOGGER.println();
+        LOGGER.printf("    failed tests: %d (%.2f %%)", statNumFailed,
                 (double) statNumFailed / statNumEvaluated * 100.0);
-        System.out.println();
-        System.out.printf(Locale.ROOT, "    runtime error: %d (%.2f %%)", statNumRuntimeError,
+        LOGGER.println();
+        LOGGER.printf("    runtime error: %d (%.2f %%)", statNumRuntimeError,
                 (double) statNumRuntimeError / statNumEvaluated * 100.0);
-        System.out.println();
-        System.out.printf(Locale.ROOT, "    error: %d (%.2f %%)", statNumError,
+        LOGGER.println();
+        LOGGER.printf("    error: %d (%.2f %%)", statNumError,
                 (double) statNumError / statNumEvaluated * 100.0);
-        System.out.println();
+        LOGGER.println();
 
         
         if (statBestInIteration.size() >= 2) {
-            System.out.println();
-            System.out.println("Best Fitness per Iteration:");
+            LOGGER.println();
+            LOGGER.println("Best Fitness per Iteration:");
             
             double max = Collections.max(statBestInIteration);
             double min = Collections.min(statBestInIteration);
@@ -145,25 +147,25 @@ public abstract class AbstractMutator implements IMutator {
                 double upper = max - (line * range);
                 double lower = upper - range;
                 
-                System.out.printf(Locale.ROOT, "%10.2f |", (upper + lower) / 2);
+                LOGGER.printf("%10.2f |", (upper + lower) / 2);
                 
                 for (int iteration = 0; iteration < statBestInIteration.size(); iteration++) {
                     double fitness = statBestInIteration.get(iteration);
                     if (fitness <= upper  && fitness >= lower) {
-                        System.out.print(" *  ");
+                        LOGGER.print(" *  ");
                     } else {
-                        System.out.print("    ");
+                        LOGGER.print("    ");
                     }
                 }
                 
-                System.out.println();
+                LOGGER.println();
             }
-            System.out.println("-----------+" + "----".repeat(statBestInIteration.size()));
-            System.out.print("           |");
+            LOGGER.println("-----------+" + "----".repeat(statBestInIteration.size()));
+            LOGGER.print("           |");
             for (int iteration = 0; iteration < statBestInIteration.size(); iteration++) {
-                System.out.printf(Locale.ROOT, "%03d ", iteration + 1);
+                LOGGER.printf("%03d ", iteration + 1);
             }
-            System.out.println();
+            LOGGER.println();
         }
     }
     

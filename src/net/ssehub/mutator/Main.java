@@ -27,20 +27,23 @@ import net.ssehub.mutator.mutation.pattern_based.PatternBasedMutator;
 import net.ssehub.mutator.parsing.Converter;
 import net.ssehub.mutator.parsing.grammar.SimpleCLexer;
 import net.ssehub.mutator.parsing.grammar.SimpleCParser;
+import net.ssehub.mutator.util.Logger;
 import net.ssehub.mutator.visualization.ControlFlowRenderer;
 
 public class Main {
     
+    private static final Logger LOGGER = Logger.get(Main.class.getSimpleName());
+    
     private static int help() {
-        System.out.println("Usage: <command> <command-specific arguments>*");
-        System.out.println("Available commands:");
-        System.out.println("  help                             : "
+        LOGGER.println("Usage: <command> <command-specific arguments>*");
+        LOGGER.println("Available commands:");
+        LOGGER.println("  help                             : "
                 + "Display this help message");
-        System.out.println("  run <configuration> <input file> : "
+        LOGGER.println("  run <configuration> <input file> : "
                 + "Run the main Mutator program with the given configuration");
-        System.out.println("  clean <input file> <output file> : "
+        LOGGER.println("  clean <input file> <output file> : "
                 + "Pretty-print the given file");
-        System.out.println("  render <dot exe> <input file> <output file> : "
+        LOGGER.println("  render <dot exe> <input file> <output file> : "
                 + "Renders the control-flow graph of the given source code file");
         return 0;
     }
@@ -64,10 +67,11 @@ public class Main {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss", Locale.ROOT);
             File execDir = new File(inputBase + '_' + formatter.format(LocalDateTime.now()) + '_' + mutatorType);
             if (execDir.exists()) {
-                System.out.println(execDir + " already exists");
+                LOGGER.println(execDir + " already exists");
                 return 2;
             }
             execDir.mkdir();
+            Logger.setFileOut(new File(execDir, "mutator.log"));
             
             IMutator mutator;
             BaseConfiguration config;
@@ -83,7 +87,7 @@ public class Main {
                 mutator = new PatternBasedMutator((PatternBasedConfiguration) config);
                 break;
             default:
-                System.out.println("Invalid mutator setting: " + mutatorType);
+                LOGGER.println("Invalid mutator setting: " + mutatorType);
                 return 2;
             }
             
@@ -97,7 +101,7 @@ public class Main {
             config.setFitnessSrc(newFitnessSrc);
             
             // 1) parse file to mutate
-            System.out.println("Parsing...");
+            LOGGER.println("Parsing...");
             net.ssehub.mutator.ast.File file = parse(input);
             
             // write to execDir
@@ -107,45 +111,44 @@ public class Main {
             }
             
             // 2) mutate file
-            System.out.println("Mutating...");
+            LOGGER.println("Mutating...");
             List<IMutant> mutants = mutator.run(file);
             
             // 3) print out
-            System.out.println();
-            System.out.println("Writing " + mutants.size() + " mutants...");
+            LOGGER.println();
+            LOGGER.println("Writing " + mutants.size() + " mutants...");
             double bestFitness = mutants.size() > 0 ? mutator.getFitness(mutants.get(0).getId()) : 0.0;
             Double originalFitness = null;
             if (mutator.getUnmodifiedId() != null) {
                 originalFitness = mutator.getFitness(mutator.getUnmodifiedId());
             }
             
-            System.out.print(" Rank |   Mutant   | Fitness |  Best  ");
+            LOGGER.print(" Rank |   Mutant   | Fitness |  Best  ");
             if (originalFitness != null) {
-                System.out.println("| Original ");
+                LOGGER.println("| Original ");
             } else {
-                System.out.println();
+                LOGGER.println();
             }
-            System.out.print("------+------------+---------+--------");
+            LOGGER.print("------+------------+---------+--------");
             if (originalFitness != null) {
-                System.out.println("+----------");
+                LOGGER.println("+----------");
             } else {
-                System.out.println();
+                LOGGER.println();
             }
             
             for (int i = 0; i < mutants.size(); i++) {
                 IMutant mutant = mutants.get(i);
                 
                 double fitness = mutator.getFitness(mutant.getId());
-                System.out.printf(Locale.ROOT, "  %2d  | %10s | %7.3f | %5.1f%%",
+                LOGGER.printf("  %2d  | %10s | %7.3f | %5.1f%%",
                         i + 1,
                         mutant.getId(),
                         fitness,
                         fitness / bestFitness * 100);
                 if (originalFitness != null) {
-                    System.out.printf(Locale.ROOT, " | %6.1f%%\n",
-                            fitness / originalFitness * 100);
+                    LOGGER.printf(" | %6.1f%%\n", fitness / originalFitness * 100);
                 } else {
-                    System.out.println();
+                    LOGGER.println();
                 }
                 
                 File output = new File(execDir, inputBase + "_" + (i + 1) + "_"
@@ -153,12 +156,12 @@ public class Main {
                 mutant.write(output);
             }
             
-            System.out.println();
-            System.out.println("Statistics:");
+            LOGGER.println();
+            LOGGER.println("Statistics:");
             mutator.printStatistics();
             
         } catch (IOException | IllegalArgumentException e) {
-            e.printStackTrace(System.out);
+            LOGGER.logException(e);
             return 2;
         }
         
@@ -170,18 +173,18 @@ public class Main {
             File input = new File(inputPath);
             
             // 1) parse file
-            System.out.println("Parsing...");
+            LOGGER.println("Parsing...");
             net.ssehub.mutator.ast.File file = parse(input);
             
             // 2) print out
-            System.out.println("Writing...");
+            LOGGER.println("Writing...");
             
             try (FileWriter out = new FileWriter(outpuPath)) {
                 out.write(file.accept(new AstPrettyPrinter(false)));
             }
             
         } catch (IOException | IllegalArgumentException e) {
-            e.printStackTrace(System.out);
+            LOGGER.logException(e);
             return 2;
         }
         
@@ -192,7 +195,7 @@ public class Main {
         try {
             if (!outputPath.endsWith(".png") && !outputPath.endsWith(".svg")
                     && !outputPath.endsWith(".pdf") && !outputPath.endsWith(".dot")) {
-                System.out.println("Output must be either .png, .svg, .pdf, or .dot");
+                LOGGER.println("Output must be either .png, .svg, .pdf, or .dot");
                 return 2;
             }
             
@@ -200,16 +203,16 @@ public class Main {
             File ouput = new File(outputPath);
             
             // 1) parse file
-            System.out.println("Parsing...");
+            LOGGER.println("Parsing...");
             net.ssehub.mutator.ast.File file = parse(input);
             
             // 2) print out
-            System.out.println("Rendering...");
+            LOGGER.println("Rendering...");
             ControlFlowRenderer renderer = new ControlFlowRenderer(dotExe);
             renderer.render(file, ouput);
             
         } catch (IOException | IllegalArgumentException e) {
-            e.printStackTrace(System.out);
+            LOGGER.logException(e);
             return 2;
         }
         
