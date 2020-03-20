@@ -14,6 +14,8 @@ public class PatternBasedConfiguration extends BaseConfiguration {
     
     private double initialTemperature;
     
+    private Double coolingFactor;
+    
     public PatternBasedConfiguration(Properties props) {
         super(props);
         
@@ -23,9 +25,13 @@ public class PatternBasedConfiguration extends BaseConfiguration {
             this.patterns.add(mutation.trim());
         }
         
-        if (props.containsKey("mutator.annealingIterations")) {
-            this.maxAnnealingIterations = Integer.parseInt(props.getProperty("mutator.annealingIterations"));
+        if (props.containsKey("mutator.initialTemperature")) {
             this.initialTemperature = Double.parseDouble(props.getProperty("mutator.initialTemperature"));
+            this.maxAnnealingIterations = Integer.parseInt(props.getProperty("mutator.annealingIterations"));
+            
+            if (props.containsKey("mutator.coolingFactor")) {
+                this.coolingFactor = Double.parseDouble(props.getProperty("mutator.coolingFactor"));
+            }
         }
     }
     
@@ -33,12 +39,16 @@ public class PatternBasedConfiguration extends BaseConfiguration {
         return patterns;
     }
     
+    public double getInitialTemperature() {
+        return initialTemperature;
+    }
+    
     public int getMaxAnnealingIterations() {
         return maxAnnealingIterations;
     }
     
-    public double getInitialTemperature() {
-        return initialTemperature;
+    public Double getCoolingFactor() {
+        return coolingFactor;
     }
     
 }

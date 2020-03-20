@@ -142,8 +142,14 @@ public class PatternBasedMutator extends AbstractMutator {
             LOGGER.printf("Iteration %03d\n", iteration);
             LOGGER.println("-------------");
             
-            double temperature = initTemp * (maxIter - iteration + 1) / maxIter;
+            double temperature;
+            if (config.getCoolingFactor() == null) {
+                temperature = initTemp * (maxIter - iteration + 1) / maxIter;
+            } else {
+                temperature = initTemp * Math.pow(config.getCoolingFactor(), iteration - 1);
+            }
             LOGGER.println("Temperature: " + temperature);
+            
             
             List<Mutant> neighbors = generateNeighbors(currentMutant);
             LOGGER.println("Generated " + neighbors.size() + " neighbors");
