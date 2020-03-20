@@ -10,6 +10,10 @@ public class PatternBasedConfiguration extends BaseConfiguration {
 
     private List<String> patterns;
     
+    private int maxAnnealingIterations;
+    
+    private double initialTemperature;
+    
     public PatternBasedConfiguration(Properties props) {
         super(props);
         
@@ -18,10 +22,23 @@ public class PatternBasedConfiguration extends BaseConfiguration {
         for (String mutation : tmp) {
             this.patterns.add(mutation.trim());
         }
+        
+        if (props.containsKey("mutator.annealingIterations")) {
+            this.maxAnnealingIterations = Integer.parseInt(props.getProperty("mutator.annealingIterations"));
+            this.initialTemperature = Double.parseDouble(props.getProperty("mutator.initialTemperature"));
+        }
     }
     
     public List<String> getPatterns() {
         return patterns;
     }
-
+    
+    public int getMaxAnnealingIterations() {
+        return maxAnnealingIterations;
+    }
+    
+    public double getInitialTemperature() {
+        return initialTemperature;
+    }
+    
 }
