@@ -2,7 +2,6 @@ package net.ssehub.mutator.mutation.pattern_based.patterns;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -82,13 +81,20 @@ public class CommonSubExpressionElimination implements IOpportunity {
         if (param == 1) {
             
             // 1) find all expressions & corresponding statements
+            Block parent = (Block) ast.accept(new IdFinder(parentId));
+            
             List<Expression> expressions = new ArrayList<>(expressionIds.size());
             List<Statement> statements = new ArrayList<>(expressionIds.size());
             for (long id : expressionIds) {
                 Expression expr = (Expression) ast.accept(new IdFinder(id));
                 if (expr != null) {
                     expressions.add(expr);
-                    statements.add(findParentStatement(expr));
+                    
+                    Statement parentStatement = findParentStatement(expr);
+                    while (parentStatement.parent.id != parentId) {
+                        parentStatement = (Statement) parentStatement.parent;
+                    }
+                    statements.add(parentStatement);
                 }
             }
             
@@ -97,17 +103,16 @@ public class CommonSubExpressionElimination implements IOpportunity {
                 return;
             }
             
-            // 2) find the statement with the lowest id (~= first statement)
-            Statement firstStatement = Collections.min(statements, (s1, s2) -> Long.compare(s1.id, s2.id));
-            
-            // 3) create a declaration and insert before first statement
-            AstElement reference = firstStatement;
-            if (reference.id != parentId) {
-                while (reference.parent.id != parentId) {
-                    reference = reference.parent;
+            // 2) find the first statement that uses the expression
+            Statement reference = statements.get(0);
+            for (Statement st : parent.statements) {
+                if (statements.contains(st)) {
+                    reference = st;
+                    break;
                 }
             }
             
+            // 3) create a declaration and insert before first statement
             String tempVar = "mutator_tmp_" + (int) (Math.random() * Integer.MAX_VALUE);
             
             DeclarationStmt declStmt = new DeclarationStmt(reference.parent);
@@ -121,7 +126,7 @@ public class CommonSubExpressionElimination implements IOpportunity {
             declStmt.decl = decl;
             
             StatementInserter inserter = new StatementInserter();
-            inserter.insert((Statement) reference, true, declStmt);
+            inserter.insert(reference, true, declStmt);
             
             // 4) replace all expression occurrences with the temporary variable 
             for (Expression expr : expressions) {
