@@ -52,10 +52,13 @@ public class CommonSubExpressionElimination implements IOpportunity {
     
     private String exprTxt;
     
-    private CommonSubExpressionElimination(long parentId, List<Long> expressionIds, String exprTxt) {
+    private BasicType type;
+    
+    private CommonSubExpressionElimination(long parentId, List<Long> expressionIds, String exprTxt, BasicType type) {
         this.parentId = parentId;
         this.expressionIds = expressionIds;
         this.exprTxt = exprTxt;
+        this.type = type;
     }
     
     @Override
@@ -103,8 +106,7 @@ public class CommonSubExpressionElimination implements IOpportunity {
             DeclarationStmt declStmt = new DeclarationStmt(firstStatement.parent);
             Declaration decl = new Declaration(declStmt);
             Type type = new Type(decl);
-            // TODO: find out correct type
-            type.type = BasicType.DOUBLE;
+            type.type = this.type;
             
             decl.type = type;
             decl.identifier = tempVar;
@@ -140,7 +142,8 @@ public class CommonSubExpressionElimination implements IOpportunity {
         for (Long id : expressionIds) {
             sj.add(Long.toString(id));
         }
-        return "CommonSubExpressionElimination(parent=#" + parentId + ", expr=\'" + exprTxt + "\', exprIds=" + sj + ")";
+        return "CommonSubExpressionElimination(parent=#" + parentId + ", expr=\'" + exprTxt
+                + "\', type=" + type + " exprIds=" + sj + ")";
     }
     
     public static List<CommonSubExpressionElimination> findOpportunities(File ast) {
@@ -171,7 +174,9 @@ public class CommonSubExpressionElimination implements IOpportunity {
                 exprIds.add(expr.id);
             }
             
-            result.add(new CommonSubExpressionElimination(commonParent.id, exprIds, key.getText()));
+            BasicType type = new TypeGuesser().guessType(key);
+            
+            result.add(new CommonSubExpressionElimination(commonParent.id, exprIds, key.getText(), type));
         }
         
         return result;
