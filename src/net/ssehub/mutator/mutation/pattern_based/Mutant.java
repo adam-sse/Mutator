@@ -11,12 +11,9 @@ import net.ssehub.mutator.ast.operations.AstCloner;
 import net.ssehub.mutator.ast.operations.AstPrettyPrinter;
 import net.ssehub.mutator.mutation.IMutant;
 import net.ssehub.mutator.mutation.pattern_based.patterns.IOpportunity;
-import net.ssehub.mutator.util.Logger;
 
 public class Mutant implements IMutant {
     
-    private static final Logger LOGGER = Logger.get(Mutant.class.getSimpleName());
-
     private List<IOpportunity> opportunities;
     
     private List<Integer> params;
@@ -66,21 +63,16 @@ public class Mutant implements IMutant {
         return "Mutant " + getId();
     }
 
-    public void printToConsole() {
-        LOGGER.print("/*\n * Mutant " + getId() + "\n");
-        for (int i = 0; i < this.opportunities.size(); i++) {
-            LOGGER.print(" *   " + this.opportunities.get(i).toString() + " param=" + this.params.get(i) + "\n");
-        }
-        LOGGER.print(" */\n\n");
-        LOGGER.print(ast.accept(new AstPrettyPrinter(true)));
-    }
-    
     @Override
     public void write(java.io.File destination) throws IOException {
         try (FileWriter out = new FileWriter(destination)) {
             out.write("/*\n * Mutant " + getId() + "\n");
             for (int i = 0; i < this.opportunities.size(); i++) {
-                out.write(" *   " + this.opportunities.get(i).toString() + " param=" + this.params.get(i) + "\n");
+                IOpportunity oppo = this.opportunities.get(i);
+                int param = this.params.get(i);
+                if (param != oppo.getDefaultParam()) {
+                    out.write(" *   " + oppo.toString() + " param=" + param + "\n");
+                }
             }
             out.write(" */\n\n");
             out.write(ast.accept(new AstPrettyPrinter(true)));
