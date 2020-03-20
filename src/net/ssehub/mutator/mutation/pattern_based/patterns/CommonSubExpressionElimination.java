@@ -1,17 +1,21 @@
 package net.ssehub.mutator.mutation.pattern_based.patterns;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.StringJoiner;
 import java.util.stream.Collectors;
 
 import net.ssehub.mutator.ast.AstElement;
 import net.ssehub.mutator.ast.BasicType;
 import net.ssehub.mutator.ast.BinaryExpr;
+import net.ssehub.mutator.ast.BinaryOperator;
 import net.ssehub.mutator.ast.Block;
 import net.ssehub.mutator.ast.Declaration;
 import net.ssehub.mutator.ast.DeclarationStmt;
@@ -218,11 +222,26 @@ public class CommonSubExpressionElimination implements IOpportunity {
     
     private static class ExpressionCounter implements IAstVisitor<Void> {
 
+        private static final Set<BinaryOperator> ASSIGNMENTS = new HashSet<>(Arrays.asList(
+                BinaryOperator.ASSIGNMENT, BinaryOperator.ASSIGNMENT_AND, BinaryOperator.ASSIGNMENT_DIV,
+                BinaryOperator.ASSIGNMENT_MINUS, BinaryOperator.ASSIGNMENT_MOD, BinaryOperator.ASSIGNMENT_MULT,
+                BinaryOperator.ASSIGNMENT_OR, BinaryOperator.ASSIGNMENT_PLUS, BinaryOperator.ASSIGNMENT_SHL,
+                BinaryOperator.ASSIGNMENT_SHR, BinaryOperator.ASSIGNMENT_XOR));
+        
+        private static final Set<UnaryOperator> INC_OR_DEC = new HashSet<>(Arrays.asList(
+                UnaryOperator.POST_DEC, UnaryOperator.POST_INC, UnaryOperator.PRE_DEC, UnaryOperator.PRE_INC));
+        
         private Map<Expression, Integer> count = new HashMap<>(1024);
         
         private Map<Expression, List<Expression>> elements = new HashMap<>(1024);
         
         private void addAndIncrement(Expression expr) {
+            // don't consider top-level expressions in for loops
+            // (this commonly breaks loop-unrolling)
+            if (expr.parent instanceof For) {
+                return;
+            }
+            
             Integer count = this.count.get(expr);
             if (count != null) {
                 this.count.put(expr, count + 1);
@@ -237,9 +256,15 @@ public class CommonSubExpressionElimination implements IOpportunity {
             }
         }
         
+        
+        
         @Override
         public Void visitBinaryExpr(BinaryExpr expr) {
-            addAndIncrement(expr);
+            // don't count assignments
+            if (!ASSIGNMENTS.contains(expr.operator)) {
+                addAndIncrement(expr);
+            }
+            
             return null;
         }
 
@@ -328,8 +353,9 @@ public class CommonSubExpressionElimination implements IOpportunity {
 
         @Override
         public Void visitUnaryExpr(UnaryExpr expr) {
-            // ignore -literal
-            if (expr.operator != UnaryOperator.MINUS || !(expr.expr instanceof Literal)) {
+            // ignore -literal, don't allow ++ or --
+            if ((expr.operator != UnaryOperator.MINUS || !(expr.expr instanceof Literal))
+                    && !INC_OR_DEC.contains(expr.operator)) {
                 addAndIncrement(expr);
             }
             
