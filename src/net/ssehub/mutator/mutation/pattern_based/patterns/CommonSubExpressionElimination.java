@@ -101,9 +101,16 @@ public class CommonSubExpressionElimination implements IOpportunity {
             Statement firstStatement = Collections.min(statements, (s1, s2) -> Long.compare(s1.id, s2.id));
             
             // 3) create a declaration and insert before first statement
+            AstElement reference = firstStatement;
+            if (reference.id != parentId) {
+                while (reference.parent.id != parentId) {
+                    reference = reference.parent;
+                }
+            }
+            
             String tempVar = "mutator_tmp_" + (int) (Math.random() * Integer.MAX_VALUE);
             
-            DeclarationStmt declStmt = new DeclarationStmt(firstStatement.parent);
+            DeclarationStmt declStmt = new DeclarationStmt(reference.parent);
             Declaration decl = new Declaration(declStmt);
             Type type = new Type(decl);
             type.type = this.type;
@@ -114,7 +121,7 @@ public class CommonSubExpressionElimination implements IOpportunity {
             declStmt.decl = decl;
             
             StatementInserter inserter = new StatementInserter();
-            inserter.insert(firstStatement, true, declStmt);
+            inserter.insert((Statement) reference, true, declStmt);
             
             // 4) replace all expression occurrences with the temporary variable 
             for (Expression expr : expressions) {
@@ -168,6 +175,10 @@ public class CommonSubExpressionElimination implements IOpportunity {
             List<Expression> expressions = counter.elements.get(key);
             
             AstElement commonParent = findCommonParent(expressions.toArray(new AstElement[0]));
+            // we want a Block as the common parent, so that we can properly insert statements before the first expr
+            while (!(commonParent instanceof Block)) {
+                commonParent = commonParent.parent;
+            }
             
             List<Long> exprIds = new ArrayList<>(expressions.size());
             for (Expression expr : expressions) {

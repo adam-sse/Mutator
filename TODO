@@ -6,7 +6,7 @@
     * common-sub-expression elimination
         -> test
         - improve
-            -> type detection?
+            -> type detection: more than BasicType
             -> re-search for expressions? (may be needed due to previous modifications)
     * rewrite array accesses to same index with temporary local variable
 
