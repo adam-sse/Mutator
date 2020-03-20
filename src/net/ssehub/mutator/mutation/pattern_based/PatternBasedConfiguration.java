@@ -16,6 +16,8 @@ public class PatternBasedConfiguration extends BaseConfiguration {
     
     private Double coolingFactor;
     
+    private int randomSearchIterations;
+    
     public PatternBasedConfiguration(Properties props) {
         super(props);
         
@@ -33,6 +35,10 @@ public class PatternBasedConfiguration extends BaseConfiguration {
                 this.coolingFactor = Double.parseDouble(props.getProperty("mutator.coolingFactor"));
             }
         }
+        
+        if (props.containsKey("mutator.randomSearchIterations")) {
+            this.randomSearchIterations = Integer.parseInt(props.getProperty("mutator.randomSearchIterations"));
+        }
     }
     
     public List<String> getPatterns() {
@@ -49,6 +55,10 @@ public class PatternBasedConfiguration extends BaseConfiguration {
     
     public Double getCoolingFactor() {
         return coolingFactor;
+    }
+    
+    public int getRandomSearchIterations() {
+        return randomSearchIterations;
     }
     
 }

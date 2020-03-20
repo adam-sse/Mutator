@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Random;
 
 import net.ssehub.mutator.ast.File;
 import net.ssehub.mutator.evaluation.EvaluatorFactory;
@@ -79,6 +80,8 @@ public class PatternBasedMutator extends AbstractMutator {
         
         if (config.getMaxAnnealingIterations() > 0) {
             simulatedAnnealing(originalAst, mutantList);
+        } else if (config.getRandomSearchIterations() > 0) {
+            randomSearch(originalAst, mutantList);
         } else {
             hillClimbing(originalAst, mutantList);
         }
@@ -204,6 +207,22 @@ public class PatternBasedMutator extends AbstractMutator {
         hillClimbing(originalAst, mutantList);
     }
     
+    private void randomSearch(File originalAst, TopXMutants mutantList) {
+        LOGGER.println();
+        LOGGER.println("Random Search");
+        LOGGER.println("-------------");
+        LOGGER.println("Number to generate: " + config.getRandomSearchIterations());
+        
+        for (iteration = 1; iteration <= config.getRandomSearchIterations(); iteration++) {
+            Mutant random = generateRandom();
+            random.apply(originalAst);
+            Double fitness = evaluate(random, true, true);
+            if (fitness != null) {
+                mutantList.insertMutant(random, fitness);
+            }
+        }
+    }
+    
     private List<Mutant> generateNeighbors(Mutant base) {
         List<Mutant> result = new LinkedList<>();
         
@@ -225,6 +244,19 @@ public class PatternBasedMutator extends AbstractMutator {
         }
         
         return result;
+    }
+    
+    private Mutant generateRandom() {
+        Random random = new Random();
+        Mutant mutant = new Mutant(this.opportunities);
+        
+        for (int i = 0; i < this.opportunities.size(); i++) {
+            IOpportunity oppo = this.opportunities.get(i);
+            
+            mutant.setParam(i, random.nextInt(oppo.getMaxParam() - oppo.getMinParam() + 1) + oppo.getMinParam());
+        }
+        
+        return mutant;
     }
     
     @Override
