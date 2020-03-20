@@ -2,6 +2,7 @@ package net.ssehub.mutator.mutation.pattern_based;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
@@ -10,9 +11,7 @@ import net.ssehub.mutator.ast.File;
 import net.ssehub.mutator.evaluation.EvaluatorFactory;
 import net.ssehub.mutator.mutation.AbstractMutator;
 import net.ssehub.mutator.mutation.IMutant;
-import net.ssehub.mutator.mutation.pattern_based.patterns.CommonSubExpressionElimination;
 import net.ssehub.mutator.mutation.pattern_based.patterns.IOpportunity;
-import net.ssehub.mutator.mutation.pattern_based.patterns.LoopUnrolling;
 import net.ssehub.mutator.util.Logger;
 
 public class PatternBasedMutator extends AbstractMutator {
@@ -38,9 +37,20 @@ public class PatternBasedMutator extends AbstractMutator {
         
         this.opportunities = new ArrayList<>();
         // the order here matters, as mutations are applied in this order
-        // thus: loop unrolling last (from inner to outer loops), as they duplicate the nested body
-        opportunities.addAll(CommonSubExpressionElimination.findOpportunities(originalAst));
-        opportunities.addAll(LoopUnrolling.findOpportunities(originalAst));
+        for (String pattern : config.getPatterns()) {
+            try {
+                Class<?> patternClass = Class.forName("net.ssehub.mutator.mutation.pattern_based.patterns." + pattern);
+                
+                
+                @SuppressWarnings("unchecked")
+                Collection<IOpportunity> oppos = (Collection<IOpportunity>)
+                        patternClass.getMethod("findOpportunities", File.class).invoke(null, originalAst);
+                this.opportunities.addAll(oppos);
+                
+            } catch (ReflectiveOperationException e) {
+                LOGGER.logException(e);
+            }
+        }
         
         LOGGER.println("Opportunities:");
         for (IOpportunity oppo : opportunities) {
