@@ -197,6 +197,9 @@ public class PatternBasedMutator extends AbstractMutator {
         
         LOGGER.println();
         LOGGER.println("Temperature exceeded, falling back to hill climbing");
+        LOGGER.println("Best seen during simulated annealing:");
+        LOGGER.println(mutantList.getTopMutant().getId() + ": " + mutantList.getTopFitness());
+        
         iteration--; // hillClimbing starts by increase iteration
         hillClimbing(originalAst, mutantList);
     }
