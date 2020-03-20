@@ -36,10 +36,17 @@ public class TypeGuesser {
     public BasicType guessType(Expression expression) {
         Function func = getParentFunction(expression);
         
+        File file = getParentFile(func);
+        
+        Map<String, BasicType> typeFunctions = new HashMap<>(file.functions.size());
+        for (Function f : file.functions) {
+            typeFunctions.put(f.name, f.type.type);
+        }
+        
         DeclTypeBuilder typeBuilder = new DeclTypeBuilder();
         func.accept(new FullVisitor(typeBuilder));
         
-        return expression.accept(new TypeEvaluator(typeBuilder.types));
+        return expression.accept(new TypeEvaluator(typeBuilder.types, typeFunctions));
     }
     
     private Function getParentFunction(AstElement element) {
@@ -50,12 +57,23 @@ public class TypeGuesser {
         }
     }
     
+    private File getParentFile(AstElement element) {
+        if (element instanceof File) {
+            return (File) element;
+        } else {
+            return getParentFile(element.parent);
+        }
+    }
+    
     private static class TypeEvaluator implements IAstVisitor<BasicType> {
         
         private Map<String, BasicType> varTypes;
         
-        public TypeEvaluator(Map<String, BasicType> varTypes) {
+        private Map<String, BasicType> funcTypes;
+        
+        public TypeEvaluator(Map<String, BasicType> varTypes, Map<String, BasicType> funcTypes) {
             this.varTypes = varTypes;
+            this.funcTypes = funcTypes;
         }
 
         @Override
@@ -93,7 +111,6 @@ public class TypeGuesser {
 
         @Override
         public BasicType visitExpressionStmt(ExpressionStmt stmt) {
-            // TODO Auto-generated method stub
             return null;
         }
 
@@ -114,16 +131,19 @@ public class TypeGuesser {
 
         @Override
         public BasicType visitFunctionCall(FunctionCall expr) {
-            LOGGER.println("Warning: TODO: handle functions");
-            // TODO: handle functions
-            return BasicType.DOUBLE;
+            BasicType type = funcTypes.get(expr.function);
+            if (type == null) {
+                LOGGER.println("Warning: found function with unknown type: " + expr.function + "; assuming double");
+                type = BasicType.DOUBLE;
+            }
+            return type;
         }
 
         @Override
         public BasicType visitIdentifier(Identifier expr) {
             BasicType type = varTypes.get(expr.identifier);
             if (type == null) {
-                LOGGER.println("Warning: found variable with unknown type: " + expr.identifier);
+                LOGGER.println("Warning: found variable with unknown type: " + expr.identifier + "; assuming int");
                 type = BasicType.INT;
             }
             return type;
