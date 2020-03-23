@@ -42,6 +42,11 @@ public class TopXMutants {
         }
     }
     
+    public void clear() {
+        this.mutants.clear();
+        this.fitness.clear();
+    }
+    
     public Mutant getTopMutant() {
         return mutants.get(0);
     }

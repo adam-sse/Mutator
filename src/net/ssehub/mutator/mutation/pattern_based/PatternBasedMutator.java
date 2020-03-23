@@ -163,6 +163,8 @@ public class PatternBasedMutator extends AbstractMutator {
         Mutant currentMutant = mutantList.getTopMutant();
         double currentFitness = mutantList.getTopFitness();
         
+        mutantList.clear();
+        
         for (iteration = 1; iteration <= maxIter; iteration++) {
             LOGGER.println();
             LOGGER.printf("Iteration %03d\n", iteration);
@@ -206,12 +208,10 @@ public class PatternBasedMutator extends AbstractMutator {
             
             if (delta < 0) {
                 LOGGER.println(" -> " + neighbor.getId() + " is better than " + currentMutant.getId());
-                mutantList.insertMutant(neighbor, nFitness);
                 currentMutant = neighbor;
                 currentFitness = nFitness;
             } else if (Math.random() < Math.pow(Math.E, -delta / temperature)) {
                 LOGGER.println(" -> " + neighbor.getId() + " selected because of temperature");
-                mutantList.insertMutant(neighbor, nFitness);
                 currentMutant = neighbor;
                 currentFitness = nFitness;
             } else {
@@ -223,10 +223,12 @@ public class PatternBasedMutator extends AbstractMutator {
         
         LOGGER.println();
         LOGGER.println("Temperature exceeded, falling back to hill climbing");
-        LOGGER.println("Best seen during simulated annealing:");
-        LOGGER.println(mutantList.getTopMutant().getId() + ": " + mutantList.getTopFitness());
+        LOGGER.println("Current mutant:");
+        LOGGER.println(currentMutant.getId() + ": " + currentFitness);
         
-        iteration--; // hillClimbing starts by increase iteration
+        mutantList.insertMutant(currentMutant, currentFitness);
+        
+        iteration--; // hillClimbing starts by increasing the iteration
         hillClimbing(originalAst, mutantList);
     }
     
