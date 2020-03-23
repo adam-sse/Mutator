@@ -4,7 +4,6 @@
 
 * Pattern ideas:
     * common-sub-expression elimination
-        -> test
         - improve
             -> type detection: more than BasicType
             -> re-search for expressions? (may be needed due to previous modifications)
