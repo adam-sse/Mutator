@@ -9,14 +9,14 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import net.ssehub.mutator.BaseConfiguration;
+import net.ssehub.mutator.BaseConfig;
 import net.ssehub.mutator.mutation.IMutant;
 
 public class LinuxEvaluator extends Evaluator {
     
-    private BaseConfiguration config;
+    private BaseConfig config;
     
-    public LinuxEvaluator(BaseConfiguration config) {
+    public LinuxEvaluator(BaseConfig config) {
         this.config = config;
     }
     

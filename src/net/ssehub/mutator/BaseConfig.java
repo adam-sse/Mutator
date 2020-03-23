@@ -6,7 +6,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
 
-public class BaseConfiguration {
+public class BaseConfig {
     
     private File execDir;
     
@@ -26,7 +26,7 @@ public class BaseConfiguration {
     
     private long sleepBeforeFitness;
     
-    public BaseConfiguration(Properties props) {
+    public BaseConfig(Properties props) {
         this.saveIterations = Boolean.parseBoolean(props.getProperty("mutator.saveIterations"));
         
         this.timeout = Integer.parseInt(props.getProperty("evaluator.timeout"));

@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
-import net.ssehub.mutator.BaseConfiguration;
+import net.ssehub.mutator.BaseConfig;
 
-public class GeneticConfiguration extends BaseConfiguration {
+public class GeneticConfig extends BaseConfig {
 
     private long seed;
     
@@ -24,7 +24,7 @@ public class GeneticConfiguration extends BaseConfiguration {
     
     private double cleanThreshold;
     
-    public GeneticConfiguration(Properties props) {
+    public GeneticConfig(Properties props) {
         super(props);
         
         this.seed = Long.parseLong(props.getProperty("mutator.seed"));

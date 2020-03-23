@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
-import net.ssehub.mutator.BaseConfiguration;
+import net.ssehub.mutator.BaseConfig;
 
-public class PatternBasedConfiguration extends BaseConfiguration {
+public class PatternBasedConfig extends BaseConfig {
 
     private List<String> patterns;
     
@@ -18,7 +18,7 @@ public class PatternBasedConfiguration extends BaseConfiguration {
     
     private int randomSearchIterations;
     
-    public PatternBasedConfiguration(Properties props) {
+    public PatternBasedConfig(Properties props) {
         super(props);
         
         String[] tmp = props.getProperty("mutator.patterns").split(",");

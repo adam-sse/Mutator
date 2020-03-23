@@ -19,7 +19,7 @@ public class PatternBasedMutator extends AbstractMutator {
 
     private static final Logger LOGGER = Logger.get(PatternBasedMutator.class.getSimpleName());
     
-    private PatternBasedConfiguration config;
+    private PatternBasedConfig config;
     
     private String unmodifiedId;
     
@@ -27,7 +27,7 @@ public class PatternBasedMutator extends AbstractMutator {
     
     private int iteration;
     
-    public PatternBasedMutator(PatternBasedConfiguration config) {
+    public PatternBasedMutator(PatternBasedConfig config) {
         super(EvaluatorFactory.create(config));
         this.config = config;
     }

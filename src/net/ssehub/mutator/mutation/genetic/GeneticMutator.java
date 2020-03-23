@@ -18,7 +18,7 @@ public class GeneticMutator extends AbstractMutator {
 
     private static final Logger LOGGER = Logger.get(GeneticMutator.class.getSimpleName());
     
-    private GeneticConfiguration config;
+    private GeneticConfig config;
     
     private File originalAst;
     
@@ -30,7 +30,7 @@ public class GeneticMutator extends AbstractMutator {
     
     private int nextMutantId;
     
-    public GeneticMutator(GeneticConfiguration config) {
+    public GeneticMutator(GeneticConfig config) {
         super(EvaluatorFactory.create(config));
         this.config = config;
         random = new Random(config.getSeed());

@@ -2,14 +2,14 @@ package net.ssehub.mutator.evaluation;
 
 import java.util.Random;
 
-import net.ssehub.mutator.BaseConfiguration;
+import net.ssehub.mutator.BaseConfig;
 import net.ssehub.mutator.mutation.IMutant;
 
 public class DummyEvaluator extends Evaluator {
     
     private Random random = new Random(123);
 
-    public DummyEvaluator(BaseConfiguration config) {
+    public DummyEvaluator(BaseConfig config) {
     }
     
     @Override

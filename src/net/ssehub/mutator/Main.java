@@ -20,9 +20,9 @@ import org.antlr.v4.runtime.Recognizer;
 import net.ssehub.mutator.ast.operations.AstPrettyPrinter;
 import net.ssehub.mutator.mutation.IMutant;
 import net.ssehub.mutator.mutation.IMutator;
-import net.ssehub.mutator.mutation.genetic.GeneticConfiguration;
+import net.ssehub.mutator.mutation.genetic.GeneticConfig;
 import net.ssehub.mutator.mutation.genetic.GeneticMutator;
-import net.ssehub.mutator.mutation.pattern_based.PatternBasedConfiguration;
+import net.ssehub.mutator.mutation.pattern_based.PatternBasedConfig;
 import net.ssehub.mutator.mutation.pattern_based.PatternBasedMutator;
 import net.ssehub.mutator.parsing.Converter;
 import net.ssehub.mutator.parsing.grammar.SimpleCLexer;
@@ -80,17 +80,17 @@ public class Main {
             Files.copy(configFile.toPath(), new File(execDir, "config.properties").toPath());
             
             IMutator mutator;
-            BaseConfiguration config;
+            BaseConfig config;
             switch (mutatorType) {
             case "genetic":
-                config = new GeneticConfiguration(props);
+                config = new GeneticConfig(props);
                 config.setExecDir(execDir);
-                mutator = new GeneticMutator((GeneticConfiguration) config);
+                mutator = new GeneticMutator((GeneticConfig) config);
                 break;
             case "patternbased":
-                config = new PatternBasedConfiguration(props);
+                config = new PatternBasedConfig(props);
                 config.setExecDir(execDir);
-                mutator = new PatternBasedMutator((PatternBasedConfiguration) config);
+                mutator = new PatternBasedMutator((PatternBasedConfig) config);
                 break;
             default:
                 LOGGER.println("Invalid mutator setting: " + mutatorType);
