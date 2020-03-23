@@ -10,9 +10,11 @@ public class PatternBasedConfig extends BaseConfig {
 
     private List<String> patterns;
     
-    private int maxAnnealingIterations;
+    private int[] startParams;
     
     private double initialTemperature;
+    
+    private int maxAnnealingIterations;
     
     private Double coolingFactor;
     
@@ -25,6 +27,15 @@ public class PatternBasedConfig extends BaseConfig {
         this.patterns = new ArrayList<>(tmp.length);
         for (String mutation : tmp) {
             this.patterns.add(mutation.trim());
+        }
+        
+        if (props.containsKey("mutator.startParams")) {
+            tmp = props.getProperty("mutator.startParams").split("\\.");
+            this.startParams = new int[tmp.length];
+            int i = 0;
+            for (String param : tmp) {
+                this.startParams[i++] = Integer.parseInt(param);
+            }
         }
         
         if (props.containsKey("mutator.initialTemperature")) {
@@ -43,6 +54,10 @@ public class PatternBasedConfig extends BaseConfig {
     
     public List<String> getPatterns() {
         return patterns;
+    }
+    
+    public int[] getStartParams() {
+        return startParams;
     }
     
     public double getInitialTemperature() {

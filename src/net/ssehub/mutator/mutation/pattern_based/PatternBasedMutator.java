@@ -66,6 +66,29 @@ public class PatternBasedMutator extends AbstractMutator {
         TopXMutants mutantList = new TopXMutants(5);
         
         Mutant initial = new Mutant(opportunities);
+        
+        // get initial starting parameters from config, if set
+        if (config.getStartParams() != null) {
+            if (opportunities.size() != config.getStartParams().length) {
+                LOGGER.println("Warning: got " + config.getStartParams().length + " start parameters from config, "
+                        + "but got " + opportunities.size() + " opportunities");
+            }
+            
+            for (int i = 0; i < Math.min(opportunities.size(), config.getStartParams().length); i++) {
+                IOpportunity oppo = opportunities.get(i);
+                int param = config.getStartParams()[i];
+                if (param < oppo.getMinParam()) {
+                    LOGGER.println("startParams[" + i + "] is too small; setting to " + oppo.getMinParam());
+                    param = oppo.getMinParam();
+                }
+                if (param > oppo.getMaxParam()) {
+                    LOGGER.println("startParams[" + i + "] is too large; setting to " + oppo.getMaxParam());
+                    param = oppo.getMaxParam();
+                }
+                initial.setParam(i, param);
+            }
+        }
+        
         this.unmodifiedId = initial.getId();
         initial.apply(originalAst);
         
