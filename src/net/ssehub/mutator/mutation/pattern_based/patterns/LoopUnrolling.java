@@ -59,7 +59,7 @@ public class LoopUnrolling implements IOpportunity {
     
     @Override
     public int getMaxParam() {
-        return 8;
+        return 16;
     }
     
     @Override
