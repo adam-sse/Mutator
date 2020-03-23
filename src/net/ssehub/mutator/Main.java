@@ -4,7 +4,11 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -18,8 +22,12 @@ import org.antlr.v4.runtime.RecognitionException;
 import org.antlr.v4.runtime.Recognizer;
 
 import net.ssehub.mutator.ast.operations.AstPrettyPrinter;
+import net.ssehub.mutator.evaluation.Evaluator;
+import net.ssehub.mutator.evaluation.EvaluatorFactory;
+import net.ssehub.mutator.evaluation.TestResult;
 import net.ssehub.mutator.mutation.IMutant;
 import net.ssehub.mutator.mutation.IMutator;
+import net.ssehub.mutator.mutation.PseudoMutant;
 import net.ssehub.mutator.mutation.genetic.GeneticConfig;
 import net.ssehub.mutator.mutation.genetic.GeneticMutator;
 import net.ssehub.mutator.mutation.pattern_based.PatternBasedConfig;
@@ -45,6 +53,8 @@ public class Main {
                 + "Pretty-print the given file");
         LOGGER.println("  render <dot exe> <input file> <output file> : "
                 + "Renders the control-flow graph of the given source code file");
+        LOGGER.println("  evaluate <configuration> <input file> : "
+                + "Evaluates the given input file according to the configuration");
         return 0;
     }
     
@@ -224,7 +234,67 @@ public class Main {
         
         return 0;
     }
-    
+
+    private static int evaluate(String configPath, String inputPath) throws IOException {
+        File input = new File(inputPath);
+        
+        File configFile = new File(configPath);
+        Properties props = new Properties();
+        props.load(new FileReader(configFile));
+        
+        BaseConfig config = new BaseConfig(props);
+        
+        // 1) parse file
+        LOGGER.println("Parsing...");
+        net.ssehub.mutator.ast.File file = parse(input);
+        PseudoMutant mutant = new PseudoMutant(file);
+        
+        // 2) set up temporary evaluation directory
+        File tmp = File.createTempFile("mutator_evaluation", null);
+        tmp.delete();
+        tmp.mkdir();
+        config.setExecDir(tmp);
+        tmp.deleteOnExit();
+        
+        config.getEvalDir().mkdir();
+        File newTestSrc = new File(config.getEvalDir(), config.getTestSrc().getName());
+        Files.copy(config.getTestSrc().toPath(), newTestSrc.toPath());
+        config.setTestSrc(newTestSrc);
+        File newFitnessSrc = new File(config.getEvalDir(), config.getFitnessSrc().getName());
+        Files.copy(config.getFitnessSrc().toPath(), newFitnessSrc.toPath());
+        config.setFitnessSrc(newFitnessSrc);
+        
+        // 3) evaluate
+        LOGGER.println("Evaluating...");
+        Evaluator evaluator = EvaluatorFactory.create(config);
+        TestResult result = evaluator.test(mutant);
+        LOGGER.println("Test result: " + result);
+        if (result == TestResult.PASS) {
+            Double fitness = evaluator.measureFitness(mutant);
+            LOGGER.println("Fitness: " + fitness);
+            
+        }
+        
+        // 4) clean up
+        Files.walkFileTree(tmp.toPath(), new SimpleFileVisitor<Path>() {
+            
+            @Override
+            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                Files.delete(file);
+                return FileVisitResult.CONTINUE;
+            }
+            
+            @Override
+            public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+                Files.delete(dir);
+                return FileVisitResult.CONTINUE;
+            }
+            
+        });
+        
+        return 0;
+    }
+
     public static void main(String[] args) throws IOException {
         if (args.length < 1) {
             help();
@@ -257,6 +327,14 @@ public class Main {
                 help();
             } else {
                 result = render(args[1], args[2], args[3]);
+            }
+            break;
+            
+        case "evaluate":
+            if (args.length != 3) {
+                help();
+            } else {
+                result = evaluate(args[1], args[2]);
             }
             break;
             
