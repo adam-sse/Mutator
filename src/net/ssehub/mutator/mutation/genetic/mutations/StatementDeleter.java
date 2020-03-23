@@ -11,6 +11,7 @@ import net.ssehub.mutator.ast.File;
 import net.ssehub.mutator.ast.For;
 import net.ssehub.mutator.ast.Function;
 import net.ssehub.mutator.ast.FunctionCall;
+import net.ssehub.mutator.ast.FunctionDecl;
 import net.ssehub.mutator.ast.Identifier;
 import net.ssehub.mutator.ast.If;
 import net.ssehub.mutator.ast.JumpStmt;
@@ -114,6 +115,11 @@ class StatementDeleter implements IAstVisitor<Boolean> {
     @Override
     public Boolean visitFunctionCall(FunctionCall expr) {
         return false;
+    }
+    
+    @Override
+    public Boolean visitFunctionDecl(FunctionDecl decl) {
+        return null;
     }
 
     @Override

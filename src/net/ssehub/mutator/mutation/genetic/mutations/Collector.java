@@ -15,6 +15,7 @@ import net.ssehub.mutator.ast.File;
 import net.ssehub.mutator.ast.For;
 import net.ssehub.mutator.ast.Function;
 import net.ssehub.mutator.ast.FunctionCall;
+import net.ssehub.mutator.ast.FunctionDecl;
 import net.ssehub.mutator.ast.Identifier;
 import net.ssehub.mutator.ast.If;
 import net.ssehub.mutator.ast.JumpStmt;
@@ -115,6 +116,12 @@ class Collector<T> implements IAstVisitor<Void> {
     @Override
     public Void visitFunctionCall(FunctionCall expr) {
         check(expr);
+        return null;
+    }
+    
+    @Override
+    public Void visitFunctionDecl(FunctionDecl decl) {
+        check(decl);
         return null;
     }
 

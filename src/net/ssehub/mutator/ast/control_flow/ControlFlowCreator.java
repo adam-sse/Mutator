@@ -4,8 +4,8 @@ import java.util.Deque;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.StringJoiner;
 
+import net.ssehub.mutator.ast.AstElement;
 import net.ssehub.mutator.ast.BinaryExpr;
 import net.ssehub.mutator.ast.Block;
 import net.ssehub.mutator.ast.Declaration;
@@ -18,6 +18,7 @@ import net.ssehub.mutator.ast.File;
 import net.ssehub.mutator.ast.For;
 import net.ssehub.mutator.ast.Function;
 import net.ssehub.mutator.ast.FunctionCall;
+import net.ssehub.mutator.ast.FunctionDecl;
 import net.ssehub.mutator.ast.Identifier;
 import net.ssehub.mutator.ast.If;
 import net.ssehub.mutator.ast.JumpStmt;
@@ -27,6 +28,7 @@ import net.ssehub.mutator.ast.Statement;
 import net.ssehub.mutator.ast.Type;
 import net.ssehub.mutator.ast.UnaryExpr;
 import net.ssehub.mutator.ast.While;
+import net.ssehub.mutator.ast.operations.AstLinePrinter;
 import net.ssehub.mutator.ast.operations.IAstVisitor;
 
 public class ControlFlowCreator {
@@ -34,22 +36,19 @@ public class ControlFlowCreator {
     public List<ControlFlowFunction> createControlFlow(File ast) {
         List<ControlFlowFunction> result = new LinkedList<>();
         
-        for (Function func : ast.functions) {
-            result.add(createControlFlow(func));
+        for (AstElement func : ast.functions) {
+            if (func instanceof Function) {
+                result.add(createControlFlow((Function) func));
+            }
         }
         
         return result;
     }
     
     public ControlFlowFunction createControlFlow(Function ast) {
-        String header = ast.type.getText() + " " + ast.name;
-        StringJoiner sj = new StringJoiner(", ", "(", ")");
-        for (Declaration param : ast.parameters) {
-            sj.add(param.getText());
-        }
-        header += sj.toString();
+        String header = ast.header.accept(new AstLinePrinter());
         
-        ControlFlowFunction result = new ControlFlowFunction(ast.name, header);
+        ControlFlowFunction result = new ControlFlowFunction(ast.header.name, header);
         
         ControlFlowVisitor visitor = new ControlFlowVisitor(result);
         ast.body.accept(visitor);
@@ -335,6 +334,11 @@ public class ControlFlowCreator {
             }
             
             return null;
+        }
+        
+        @Override
+        public Void visitFunctionDecl(FunctionDecl decl) {
+            throw new IllegalArgumentException();
         }
 
         @Override

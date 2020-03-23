@@ -73,8 +73,10 @@ public class CopyOverrideExpression extends Mutation {
     
     public static CopyOverrideExpression find(File file, Random random) {
         Collector<Expression> collector = new Collector<>(Expression.class);
-        for (Function func : file.functions) {
-            collector.collect(func.body);
+        for (AstElement func : file.functions) {
+            if (func instanceof Function) {
+                collector.collect(((Function) func).body);
+            }
         }
         
         Expression mutationSource;

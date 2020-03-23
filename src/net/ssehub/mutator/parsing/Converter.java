@@ -3,6 +3,8 @@ package net.ssehub.mutator.parsing;
 import java.util.Deque;
 import java.util.LinkedList;
 
+import org.antlr.v4.runtime.tree.ParseTree;
+
 import net.ssehub.mutator.ast.AstElement;
 import net.ssehub.mutator.ast.BasicType;
 import net.ssehub.mutator.ast.BinaryExpr;
@@ -18,6 +20,7 @@ import net.ssehub.mutator.ast.File;
 import net.ssehub.mutator.ast.For;
 import net.ssehub.mutator.ast.Function;
 import net.ssehub.mutator.ast.FunctionCall;
+import net.ssehub.mutator.ast.FunctionDecl;
 import net.ssehub.mutator.ast.Identifier;
 import net.ssehub.mutator.ast.If;
 import net.ssehub.mutator.ast.JumpStmt;
@@ -30,23 +33,25 @@ import net.ssehub.mutator.ast.Type.Modifier;
 import net.ssehub.mutator.ast.UnaryExpr;
 import net.ssehub.mutator.ast.UnaryOperator;
 import net.ssehub.mutator.ast.While;
-import net.ssehub.mutator.parsing.grammar.SimpleCParser.DeclTypeContext;
-import net.ssehub.mutator.parsing.grammar.SimpleCParser.DeclarationContext;
-import net.ssehub.mutator.parsing.grammar.SimpleCParser.ExprContext;
-import net.ssehub.mutator.parsing.grammar.SimpleCParser.FileContext;
-import net.ssehub.mutator.parsing.grammar.SimpleCParser.FunctionContext;
-import net.ssehub.mutator.parsing.grammar.SimpleCParser.StmtBranchContext;
-import net.ssehub.mutator.parsing.grammar.SimpleCParser.StmtCompoundContext;
-import net.ssehub.mutator.parsing.grammar.SimpleCParser.StmtContext;
-import net.ssehub.mutator.parsing.grammar.SimpleCParser.StmtDeclarationContext;
-import net.ssehub.mutator.parsing.grammar.SimpleCParser.StmtDoWhileLoopContext;
-import net.ssehub.mutator.parsing.grammar.SimpleCParser.StmtEmptyContext;
-import net.ssehub.mutator.parsing.grammar.SimpleCParser.StmtExprContext;
-import net.ssehub.mutator.parsing.grammar.SimpleCParser.StmtForLoopContext;
-import net.ssehub.mutator.parsing.grammar.SimpleCParser.StmtJumpContext;
-import net.ssehub.mutator.parsing.grammar.SimpleCParser.StmtLoopContext;
-import net.ssehub.mutator.parsing.grammar.SimpleCParser.StmtReturnContext;
-import net.ssehub.mutator.parsing.grammar.SimpleCParser.StmtWhileLoopContext;
+import net.ssehub.mutator.parsing.SimpleCParser.DeclTypeContext;
+import net.ssehub.mutator.parsing.SimpleCParser.DeclarationContext;
+import net.ssehub.mutator.parsing.SimpleCParser.ExprContext;
+import net.ssehub.mutator.parsing.SimpleCParser.FileContext;
+import net.ssehub.mutator.parsing.SimpleCParser.FunctionContext;
+import net.ssehub.mutator.parsing.SimpleCParser.FunctionDeclContext;
+import net.ssehub.mutator.parsing.SimpleCParser.FunctionDeclStmtContext;
+import net.ssehub.mutator.parsing.SimpleCParser.StmtBranchContext;
+import net.ssehub.mutator.parsing.SimpleCParser.StmtCompoundContext;
+import net.ssehub.mutator.parsing.SimpleCParser.StmtContext;
+import net.ssehub.mutator.parsing.SimpleCParser.StmtDeclarationContext;
+import net.ssehub.mutator.parsing.SimpleCParser.StmtDoWhileLoopContext;
+import net.ssehub.mutator.parsing.SimpleCParser.StmtEmptyContext;
+import net.ssehub.mutator.parsing.SimpleCParser.StmtExprContext;
+import net.ssehub.mutator.parsing.SimpleCParser.StmtForLoopContext;
+import net.ssehub.mutator.parsing.SimpleCParser.StmtJumpContext;
+import net.ssehub.mutator.parsing.SimpleCParser.StmtLoopContext;
+import net.ssehub.mutator.parsing.SimpleCParser.StmtReturnContext;
+import net.ssehub.mutator.parsing.SimpleCParser.StmtWhileLoopContext;
 
 public class Converter {
 
@@ -63,8 +68,30 @@ public class Converter {
         f.initLocation(tree.start, tree.stop);
         parents.push(f);
 
-        for (FunctionContext child : tree.function()) {
-            f.functions.add(convertFunction(child));
+        for (ParseTree child : tree.children) {
+            if (child instanceof FunctionDeclStmtContext) {
+                f.functions.add(convertFunctionDecl(((FunctionDeclStmtContext) child).functionDecl()));
+            } else if (child instanceof FunctionContext) {
+                f.functions.add(convertFunction((FunctionContext) child));
+            } else {
+                throw new IllegalArgumentException();
+            }
+        }
+        
+        parents.pop();
+        return f;
+    }
+    
+    private FunctionDecl convertFunctionDecl(FunctionDeclContext tree) {
+        FunctionDecl f = new FunctionDecl(parents.peek());
+        f.initLocation(tree.start, tree.stop);
+        parents.push(f);
+        
+        f.name = tree.name.getText();
+        f.type = convertType(tree.type);
+        
+        for (DeclarationContext declTree : tree.declList().declaration()) {
+            f.parameters.add(convertDeclaration(declTree));
         }
         
         parents.pop();
@@ -76,13 +103,7 @@ public class Converter {
         f.initLocation(tree.start, tree.stop);
         parents.push(f);
         
-        f.name = tree.name.getText();
-        f.type = convertType(tree.type);
-        
-        for (DeclarationContext declTree : tree.declList().declaration()) {
-            f.parameters.add(convertDeclaration(declTree));
-        }
-        
+        f.header = convertFunctionDecl(tree.functionDecl());
         f.body = convertCompoundStatement(tree.body);
 
         parents.pop();

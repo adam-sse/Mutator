@@ -1,11 +1,19 @@
 grammar SimpleC;
 
 file
-    : function*
+    : (function|functionDeclStmt)*
 ;
 
+functionDecl
+    : type=declType name=IDENTIFIER '(' params=declList ')'
+    ;
+    
+functionDeclStmt
+    : functionDecl ';'
+    ;
+
 function
-    : type=declType name=IDENTIFIER '(' params=declList ')' body=stmtCompound
+    : functionDecl body=stmtCompound
     ;
 
 declList

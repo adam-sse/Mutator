@@ -71,8 +71,10 @@ public class CopyOverrideStatement extends Mutation {
     
     public static CopyOverrideStatement find(File file, Random random) {
         Collector<Statement> collector = new Collector<>(Statement.class);
-        for (Function func : file.functions) {
-            collector.collect(func.body);
+        for (AstElement func : file.functions) {
+            if (func instanceof Function) {
+                collector.collect(((Function) func).body);
+            }
         }
         
         Statement mutationSource;

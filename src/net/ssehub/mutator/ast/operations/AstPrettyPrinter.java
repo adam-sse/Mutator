@@ -2,8 +2,8 @@ package net.ssehub.mutator.ast.operations;
 
 import java.util.StringJoiner;
 
+import net.ssehub.mutator.ast.AstElement;
 import net.ssehub.mutator.ast.Block;
-import net.ssehub.mutator.ast.Declaration;
 import net.ssehub.mutator.ast.DeclarationStmt;
 import net.ssehub.mutator.ast.DoWhileLoop;
 import net.ssehub.mutator.ast.EmptyStmt;
@@ -11,6 +11,7 @@ import net.ssehub.mutator.ast.ExpressionStmt;
 import net.ssehub.mutator.ast.File;
 import net.ssehub.mutator.ast.For;
 import net.ssehub.mutator.ast.Function;
+import net.ssehub.mutator.ast.FunctionDecl;
 import net.ssehub.mutator.ast.If;
 import net.ssehub.mutator.ast.JumpStmt;
 import net.ssehub.mutator.ast.Return;
@@ -103,7 +104,7 @@ public class AstPrettyPrinter extends AbstractPrinter {
     public String visitFile(File file) {
         StringJoiner sj = new StringJoiner("\n"); // extra spacing around functions
         
-        for (Function func : file.functions) {
+        for (AstElement func : file.functions) {
             sj.add(func.accept(this));
         }
         
@@ -144,16 +145,17 @@ public class AstPrettyPrinter extends AbstractPrinter {
     
     @Override
     public String visitFunction(Function func) {
-        StringBuilder sb = new StringBuilder();
-        sb.append(indentation(func.id)).append(func.type.accept(this)).append(" ").append(func.name).append("(");
-        
-        StringJoiner sj = new StringJoiner(", ");
-        for (Declaration decl : func.parameters) {
-            sj.add(decl.accept(this));
+        return indentation(func.id) + func.header.accept(this) + "\n" + func.body.accept(this);
+    }
+    
+    @Override
+    public String visitFunctionDecl(FunctionDecl decl) {
+        String line = super.visitFunctionDecl(decl);
+        if (decl.parent instanceof Function) {
+            return line;
+        } else {
+            return indentation(decl.id) + line + "\n";
         }
-        sb.append(sj.toString()).append(")\n").append(func.body.accept(this));
-        
-        return sb.toString();
     }
 
     @Override

@@ -13,6 +13,7 @@ import net.ssehub.mutator.ast.File;
 import net.ssehub.mutator.ast.For;
 import net.ssehub.mutator.ast.Function;
 import net.ssehub.mutator.ast.FunctionCall;
+import net.ssehub.mutator.ast.FunctionDecl;
 import net.ssehub.mutator.ast.Identifier;
 import net.ssehub.mutator.ast.If;
 import net.ssehub.mutator.ast.JumpStmt;
@@ -110,7 +111,7 @@ public class IdFinder implements IAstVisitor<AstElement> {
             return file;
         }
         
-        for (Function func : file.functions) {
+        for (AstElement func : file.functions) {
             AstElement found = func.accept(this);
             if (found != null) {
                 return found;
@@ -139,14 +140,7 @@ public class IdFinder implements IAstVisitor<AstElement> {
             return func;
         }
         
-        for (Declaration param : func.parameters) {
-            AstElement found = param.accept(this);
-            if (found != null) {
-                return found;
-            }
-        }
-        
-        return getNonNull(func.type.accept(this), func.body.accept(this));
+        return getNonNull(func.header.accept(this), func.body.accept(this));
     }
 
     @Override
@@ -163,6 +157,22 @@ public class IdFinder implements IAstVisitor<AstElement> {
         }
         
         return null;
+    }
+    
+    @Override
+    public AstElement visitFunctionDecl(FunctionDecl decl) {
+        if (decl.id == this.id) {
+            return decl;
+        }
+        
+        for (Declaration param : decl.parameters) {
+            AstElement found = param.accept(this);
+            if (found != null) {
+                return found;
+            }
+        }
+        
+        return decl.type.accept(this);
     }
 
     @Override

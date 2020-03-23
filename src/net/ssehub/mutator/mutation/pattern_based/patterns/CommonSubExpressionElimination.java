@@ -26,6 +26,7 @@ import net.ssehub.mutator.ast.File;
 import net.ssehub.mutator.ast.For;
 import net.ssehub.mutator.ast.Function;
 import net.ssehub.mutator.ast.FunctionCall;
+import net.ssehub.mutator.ast.FunctionDecl;
 import net.ssehub.mutator.ast.Identifier;
 import net.ssehub.mutator.ast.If;
 import net.ssehub.mutator.ast.JumpStmt;
@@ -341,6 +342,11 @@ public class CommonSubExpressionElimination implements IOpportunity {
         }
 
         @Override
+        public Void visitFunctionDecl(FunctionDecl decl) {
+            return null;
+        }
+        
+        @Override
         public Void visitIdentifier(Identifier expr) {
             // don't add single identifiers
             return null;
@@ -451,6 +457,11 @@ public class CommonSubExpressionElimination implements IOpportunity {
             return complexity;
         }
 
+        @Override
+        public Integer visitFunctionDecl(FunctionDecl decl) {
+            return null;
+        }
+        
         @Override
         public Integer visitIdentifier(Identifier expr) {
             return 1;

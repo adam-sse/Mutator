@@ -1,5 +1,6 @@
 package net.ssehub.mutator.ast.operations;
 
+import net.ssehub.mutator.ast.AstElement;
 import net.ssehub.mutator.ast.BinaryExpr;
 import net.ssehub.mutator.ast.Block;
 import net.ssehub.mutator.ast.Declaration;
@@ -12,6 +13,7 @@ import net.ssehub.mutator.ast.File;
 import net.ssehub.mutator.ast.For;
 import net.ssehub.mutator.ast.Function;
 import net.ssehub.mutator.ast.FunctionCall;
+import net.ssehub.mutator.ast.FunctionDecl;
 import net.ssehub.mutator.ast.Identifier;
 import net.ssehub.mutator.ast.If;
 import net.ssehub.mutator.ast.JumpStmt;
@@ -102,7 +104,7 @@ public class FullVisitor implements IAstVisitor<Void> {
     public Void visitFile(File file) {
         other.visitFile(file);
         
-        for (Function f : file.functions) {
+        for (AstElement f : file.functions) {
             f.accept(this);
         }
         
@@ -132,10 +134,7 @@ public class FullVisitor implements IAstVisitor<Void> {
     public Void visitFunction(Function func) {
         other.visitFunction(func);
         
-        func.type.accept(this);
-        for (Declaration decl : func.parameters) {
-            decl.accept(this);
-        }
+        func.header.accept(this);
         func.body.accept(this);
         
         return null;
@@ -146,6 +145,18 @@ public class FullVisitor implements IAstVisitor<Void> {
         other.visitFunctionCall(expr);
         
         for (Expression param : expr.params) {
+            param.accept(this);
+        }
+        
+        return null;
+    }
+    
+    @Override
+    public Void visitFunctionDecl(FunctionDecl decl) {
+        other.visitFunctionDecl(decl);
+        
+        decl.type.accept(this);
+        for (Declaration param : decl.parameters) {
             param.accept(this);
         }
         

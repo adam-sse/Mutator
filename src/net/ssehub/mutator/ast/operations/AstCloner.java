@@ -16,6 +16,7 @@ import net.ssehub.mutator.ast.File;
 import net.ssehub.mutator.ast.For;
 import net.ssehub.mutator.ast.Function;
 import net.ssehub.mutator.ast.FunctionCall;
+import net.ssehub.mutator.ast.FunctionDecl;
 import net.ssehub.mutator.ast.Identifier;
 import net.ssehub.mutator.ast.If;
 import net.ssehub.mutator.ast.JumpStmt;
@@ -158,8 +159,8 @@ public class AstCloner implements IAstVisitor<AstElement> {
         
         parents.push(clone);
         
-        for (Function func : file.functions) {
-            clone.functions.add(visitFunction(func));
+        for (AstElement func : file.functions) {
+            clone.functions.add(func.accept(this));
         }
         
         parents.pop();
@@ -196,11 +197,7 @@ public class AstCloner implements IAstVisitor<AstElement> {
         
         parents.push(clone);
         
-        clone.type = visitType(func.type);
-        clone.name = func.name;
-        for (Declaration param : func.parameters) {
-            clone.parameters.add(visitDeclaration(param));
-        }
+        clone.header = visitFunctionDecl(func.header);
         clone.body = visitBlock(func.body);
         
         parents.pop();
@@ -218,6 +215,23 @@ public class AstCloner implements IAstVisitor<AstElement> {
         
         for (Expression param : expr.params) {
             clone.params.add(cloneExpression(param));
+        }
+        
+        parents.pop();
+        return clone;
+    }
+    
+    @Override
+    public FunctionDecl visitFunctionDecl(FunctionDecl decl) {
+        FunctionDecl clone = new FunctionDecl(parents.peek());
+        initBasics(decl, clone);
+        
+        parents.push(clone);
+        
+        clone.type = visitType(decl.type);
+        clone.name = decl.name;
+        for (Declaration param : decl.parameters) {
+            clone.parameters.add(visitDeclaration(param));
         }
         
         parents.pop();

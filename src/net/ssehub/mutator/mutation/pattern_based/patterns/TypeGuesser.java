@@ -17,6 +17,7 @@ import net.ssehub.mutator.ast.File;
 import net.ssehub.mutator.ast.For;
 import net.ssehub.mutator.ast.Function;
 import net.ssehub.mutator.ast.FunctionCall;
+import net.ssehub.mutator.ast.FunctionDecl;
 import net.ssehub.mutator.ast.Identifier;
 import net.ssehub.mutator.ast.If;
 import net.ssehub.mutator.ast.JumpStmt;
@@ -39,9 +40,16 @@ public class TypeGuesser {
         File file = getParentFile(func);
         
         Map<String, BasicType> typeFunctions = new HashMap<>(file.functions.size());
-        for (Function f : file.functions) {
-            typeFunctions.put(f.name, f.type.type);
+        for (AstElement f : file.functions) {
+            FunctionDecl decl;
+            if (f instanceof Function) {
+                decl = ((Function) f).header;
+            } else {
+                decl = (FunctionDecl) f;
+            }
+            typeFunctions.put(decl.name, decl.type.type);
         }
+        // TODO: handle FunctionDecls
         
         DeclTypeBuilder typeBuilder = new DeclTypeBuilder();
         func.accept(new FullVisitor(typeBuilder));
@@ -139,6 +147,11 @@ public class TypeGuesser {
             return type;
         }
 
+        @Override
+        public BasicType visitFunctionDecl(FunctionDecl decl) {
+            return null;
+        }
+        
         @Override
         public BasicType visitIdentifier(Identifier expr) {
             BasicType type = varTypes.get(expr.identifier);
@@ -253,6 +266,11 @@ public class TypeGuesser {
 
         @Override
         public Void visitFunctionCall(FunctionCall expr) {
+            return null;
+        }
+        
+        @Override
+        public Void visitFunctionDecl(FunctionDecl decl) {
             return null;
         }
 

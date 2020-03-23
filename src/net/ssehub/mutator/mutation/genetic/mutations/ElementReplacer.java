@@ -13,6 +13,7 @@ import net.ssehub.mutator.ast.File;
 import net.ssehub.mutator.ast.For;
 import net.ssehub.mutator.ast.Function;
 import net.ssehub.mutator.ast.FunctionCall;
+import net.ssehub.mutator.ast.FunctionDecl;
 import net.ssehub.mutator.ast.Identifier;
 import net.ssehub.mutator.ast.If;
 import net.ssehub.mutator.ast.JumpStmt;
@@ -120,7 +121,7 @@ public class ElementReplacer<T extends AstElement> implements IAstVisitor<Boolea
     public Boolean visitFile(File file) {
         int i = Util.findIndex(file.functions, (Function) toReplace);
         if (i != -1) {
-            file.functions.set(i, (Function) replacement);
+            file.functions.set(i, replacement);
             return true;
         }
         
@@ -154,19 +155,13 @@ public class ElementReplacer<T extends AstElement> implements IAstVisitor<Boolea
 
     @Override
     public Boolean visitFunction(Function func) {
-        if (toReplace == func.type) {
-            func.type = (Type) replacement;
+        if (toReplace == func.header) {
+            func.header = (FunctionDecl) replacement;
             return true;
         }
         
         if (toReplace == func.body) {
             func.body = (Block) replacement;
-            return true;
-        }
-        
-        int i = Util.findIndex(func.parameters, (Declaration) toReplace);
-        if (i != -1) {
-            func.parameters.set(i, (Declaration) replacement);
             return true;
         }
         
@@ -182,6 +177,22 @@ public class ElementReplacer<T extends AstElement> implements IAstVisitor<Boolea
         }
         
         return false;
+    }
+    
+    @Override
+    public Boolean visitFunctionDecl(FunctionDecl decl) {
+        if (toReplace == decl.type) {
+            decl.type = (Type) replacement;
+            return true;
+        }
+        
+        int i = Util.findIndex(decl.parameters, (Declaration) toReplace);
+        if (i != -1) {
+            decl.parameters.set(i, (Declaration) replacement);
+            return true;
+        }
+        
+        return null;
     }
 
     @Override

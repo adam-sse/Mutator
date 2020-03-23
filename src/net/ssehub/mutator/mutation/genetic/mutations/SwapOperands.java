@@ -75,8 +75,10 @@ public class SwapOperands extends Mutation {
 
     public static SwapOperands find(File file, Random random) {
         Collector<BinaryExpr> collector = new Collector<>(BinaryExpr.class);
-        for (Function func : file.functions) {
-            collector.collect(func.body);
+        for (AstElement func : file.functions) {
+            if (func instanceof Function) {
+                collector.collect(((Function) func).body);
+            }
         }
 
         SwapOperands result = null;

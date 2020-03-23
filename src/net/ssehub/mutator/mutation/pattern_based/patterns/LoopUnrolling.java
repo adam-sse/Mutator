@@ -17,6 +17,7 @@ import net.ssehub.mutator.ast.File;
 import net.ssehub.mutator.ast.For;
 import net.ssehub.mutator.ast.Function;
 import net.ssehub.mutator.ast.FunctionCall;
+import net.ssehub.mutator.ast.FunctionDecl;
 import net.ssehub.mutator.ast.Identifier;
 import net.ssehub.mutator.ast.If;
 import net.ssehub.mutator.ast.JumpStmt;
@@ -291,6 +292,11 @@ public class LoopUnrolling implements IOpportunity {
             for (int i = 0; i < expr.params.size(); i++) {
                 expr.params.set(i, checkAndConvert(expr.params.get(i)));
             }
+            return null;
+        }
+        
+        @Override
+        public Void visitFunctionDecl(FunctionDecl decl) {
             return null;
         }
 
@@ -569,6 +575,11 @@ public class LoopUnrolling implements IOpportunity {
 
         @Override
         public Void visitFunctionCall(FunctionCall expr) {
+            return null;
+        }
+        
+        @Override
+        public Void visitFunctionDecl(FunctionDecl decl) {
             return null;
         }
 

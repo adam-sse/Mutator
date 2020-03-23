@@ -11,6 +11,7 @@ import net.ssehub.mutator.ast.File;
 import net.ssehub.mutator.ast.For;
 import net.ssehub.mutator.ast.Function;
 import net.ssehub.mutator.ast.FunctionCall;
+import net.ssehub.mutator.ast.FunctionDecl;
 import net.ssehub.mutator.ast.Identifier;
 import net.ssehub.mutator.ast.If;
 import net.ssehub.mutator.ast.JumpStmt;
@@ -43,6 +44,8 @@ public interface IAstVisitor<T> {
     public T visitFunction(Function func);
     
     public T visitFunctionCall(FunctionCall expr);
+    
+    public T visitFunctionDecl(FunctionDecl decl);
     
     public T visitIdentifier(Identifier expr);
     

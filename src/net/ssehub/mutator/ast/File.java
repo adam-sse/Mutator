@@ -7,7 +7,7 @@ import net.ssehub.mutator.ast.operations.IAstVisitor;
 
 public class File extends AstElement {
     
-    public List<Function> functions = new LinkedList<>();
+    public List<AstElement> functions = new LinkedList<>();
     
     public File(AstElement parent) {
         super(parent);

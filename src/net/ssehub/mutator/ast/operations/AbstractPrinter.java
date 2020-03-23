@@ -9,7 +9,9 @@ import net.ssehub.mutator.ast.DeclarationStmt;
 import net.ssehub.mutator.ast.EmptyStmt;
 import net.ssehub.mutator.ast.Expression;
 import net.ssehub.mutator.ast.ExpressionStmt;
+import net.ssehub.mutator.ast.Function;
 import net.ssehub.mutator.ast.FunctionCall;
+import net.ssehub.mutator.ast.FunctionDecl;
 import net.ssehub.mutator.ast.Identifier;
 import net.ssehub.mutator.ast.JumpStmt;
 import net.ssehub.mutator.ast.Literal;
@@ -79,6 +81,23 @@ abstract class AbstractPrinter implements IAstVisitor<String> {
             sj.add(param.accept(this));
         }
         return sj.toString();
+    }
+    
+    @Override
+    public String visitFunctionDecl(FunctionDecl decl) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(decl.type.accept(this)).append(" ").append(decl.name).append("(");
+        
+        StringJoiner sj = new StringJoiner(", ");
+        for (Declaration param : decl.parameters) {
+            sj.add(param.accept(this));
+        }
+        sb.append(sj.toString()).append(")");
+        if (!(decl.parent instanceof Function)) {
+            sb.append(";");
+        }
+        
+        return sb.toString();
     }
 
     @Override

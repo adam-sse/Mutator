@@ -1,4 +1,6 @@
 
+double dist(int num_cities, double *distances, int a, int b);
+
 int *solve_tsp(int num_cities, double *distances) {
 
 	double best_distance = -1;

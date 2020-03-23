@@ -81,8 +81,10 @@ public class SwapStatementOrder extends Mutation {
 
     public static SwapStatementOrder find(File file, Random random) {
         Collector<Block> collector = new Collector<>(Block.class);
-        for (Function func : file.functions) {
-            collector.collect(func.body);
+        for (AstElement func : file.functions) {
+            if (func instanceof Function) {
+                collector.collect(((Function) func).body);
+            }
         }
 
         SwapStatementOrder result = null;

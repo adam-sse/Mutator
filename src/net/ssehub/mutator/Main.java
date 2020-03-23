@@ -25,8 +25,8 @@ import net.ssehub.mutator.mutation.genetic.GeneticMutator;
 import net.ssehub.mutator.mutation.pattern_based.PatternBasedConfig;
 import net.ssehub.mutator.mutation.pattern_based.PatternBasedMutator;
 import net.ssehub.mutator.parsing.Converter;
-import net.ssehub.mutator.parsing.grammar.SimpleCLexer;
-import net.ssehub.mutator.parsing.grammar.SimpleCParser;
+import net.ssehub.mutator.parsing.SimpleCLexer;
+import net.ssehub.mutator.parsing.SimpleCParser;
 import net.ssehub.mutator.util.Logger;
 import net.ssehub.mutator.visualization.ControlFlowRenderer;
 

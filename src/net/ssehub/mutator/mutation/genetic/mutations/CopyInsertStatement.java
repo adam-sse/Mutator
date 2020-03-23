@@ -84,8 +84,10 @@ public class CopyInsertStatement extends Mutation {
     
     public static CopyInsertStatement find(File file, Random random) {
         Collector<Statement> collector = new Collector<>(Statement.class);
-        for (Function func : file.functions) {
-            collector.collect(func.body);
+        for (AstElement func : file.functions) {
+            if (func instanceof Function) {
+                collector.collect(((Function) func).body);
+            }
         }
         
         Statement mutationSource;
