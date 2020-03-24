@@ -64,7 +64,7 @@ public class BestFitnessRenderer extends AbstractDotRenderer {
         // axes
         dot
             .append("    subgraph axes {\n")
-            .append("        node [shape=none, width=0.4, height=0.4, fixedsize=true];\n")
+            .append("        node [shape=none, width=1.0, height=1.0, fixedsize=true];\n")
             .append("\n")
             .append("        \"origin\" [label=\"\", pos=\"0,0!\", width=0, height=0];\n")
             .append("        \"xHead\" [label=\"\", pos=\"11.2,0!\", width=0, height=0];\n")
