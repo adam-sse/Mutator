@@ -4,6 +4,7 @@ import java.util.Random;
 
 import net.ssehub.mutator.BaseConfig;
 import net.ssehub.mutator.mutation.IMutant;
+import net.ssehub.mutator.mutation.fitness.Fitness;
 
 public class DummyEvaluator extends Evaluator {
     
@@ -22,8 +23,8 @@ public class DummyEvaluator extends Evaluator {
     }
 
     @Override
-    public double measureFitness(IMutant mutant) {
-        return random.nextDouble() * 10;
+    public Fitness measureFitness(IMutant mutant) {
+        return new Fitness(random.nextDouble() * 10, random.nextDouble() * 10);
     }
 
 }

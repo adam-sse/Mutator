@@ -5,12 +5,17 @@ import java.util.LinkedList;
 import java.util.List;
 
 import net.ssehub.mutator.mutation.IMutant;
+import net.ssehub.mutator.mutation.fitness.Fitness;
+import net.ssehub.mutator.mutation.fitness.FitnessComparatorFactory;
+import net.ssehub.mutator.mutation.fitness.IFitnessComparator;
 
 public class TopXMutants {
 
+    private IFitnessComparator comparator;
+    
     private List<Mutant> mutants;
     
-    private List<Double> fitness;
+    private List<Fitness> fitness;
     
     private int numMutants;
     
@@ -18,12 +23,13 @@ public class TopXMutants {
         this.numMutants = numMutants;
         this.mutants = new LinkedList<>();
         this.fitness = new LinkedList<>();
+        this.comparator = FitnessComparatorFactory.get();
     }
     
-    public void insertMutant(Mutant mutant, double fitness) {
+    public void insertMutant(Mutant mutant, Fitness fitness) {
         boolean inserted = false;
         for (int i = 0; i < this.mutants.size(); i++) {
-            if (fitness > this.fitness.get(i)) {
+            if (comparator.isLower(this.fitness.get(i), fitness)) {
                 this.mutants.add(i, mutant);
                 this.fitness.add(i, fitness);
                 inserted = true;
@@ -51,7 +57,7 @@ public class TopXMutants {
         return mutants.get(0);
     }
     
-    public double getTopFitness() {
+    public Fitness getTopFitness() {
         return fitness.get(0);
     }
     

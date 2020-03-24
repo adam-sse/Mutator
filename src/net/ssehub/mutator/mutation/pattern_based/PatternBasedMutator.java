@@ -12,6 +12,9 @@ import net.ssehub.mutator.ast.File;
 import net.ssehub.mutator.evaluation.EvaluatorFactory;
 import net.ssehub.mutator.mutation.AbstractMutator;
 import net.ssehub.mutator.mutation.IMutant;
+import net.ssehub.mutator.mutation.fitness.Fitness;
+import net.ssehub.mutator.mutation.fitness.FitnessComparatorFactory;
+import net.ssehub.mutator.mutation.fitness.IFitnessComparator;
 import net.ssehub.mutator.mutation.pattern_based.patterns.IOpportunity;
 import net.ssehub.mutator.util.Logger;
 
@@ -27,9 +30,12 @@ public class PatternBasedMutator extends AbstractMutator {
     
     private int iteration;
     
+    private IFitnessComparator comparator;
+    
     public PatternBasedMutator(PatternBasedConfig config) {
         super(EvaluatorFactory.create(config));
         this.config = config;
+        this.comparator = FitnessComparatorFactory.get();
     }
     
     @Override
@@ -93,7 +99,7 @@ public class PatternBasedMutator extends AbstractMutator {
         initial.apply(originalAst);
         
         LOGGER.println("Original fitness:");
-        Double initialFitness = evaluate(initial, false, true);
+        Fitness initialFitness = evaluate(initial, false, true);
         if (initialFitness == null) {
             LOGGER.println("ERROR: Initial mutant doesn't pass");
             return new LinkedList<>();
@@ -139,9 +145,9 @@ public class PatternBasedMutator extends AbstractMutator {
                     }
                 }
                 
-                Double fitness = evaluate(neighbor, true, true);
+                Fitness fitness = evaluate(neighbor, true, true);
                 if (fitness != null) {
-                    if (fitness > mutantList.getTopFitness()) {
+                    if (comparator.isLower(mutantList.getTopFitness(), fitness)) {
                         LOGGER.println(" -> " + neighbor.getId() + " is better than "
                                 + mutantList.getTopMutant().getId());
                         improved = true;
@@ -161,7 +167,7 @@ public class PatternBasedMutator extends AbstractMutator {
         int maxIter = config.getMaxAnnealingIterations();
         
         Mutant currentMutant = mutantList.getTopMutant();
-        double currentFitness = mutantList.getTopFitness();
+        Fitness currentFitness = mutantList.getTopFitness();
         
         mutantList.clear();
         
@@ -183,7 +189,7 @@ public class PatternBasedMutator extends AbstractMutator {
             LOGGER.println("Generated " + neighbors.size() + " neighbors");
             
             Mutant neighbor;
-            Double nFitness;
+            Fitness nFitness;
             do {
                 neighbor = neighbors.get((int) (Math.random() * neighbors.size()));
                 neighbor.apply(originalAst);
@@ -203,19 +209,23 @@ public class PatternBasedMutator extends AbstractMutator {
                 nFitness = evaluate(neighbor, true, true);
             } while (nFitness == null); 
             
-            double delta = currentFitness - nFitness;
-            // TODO: normalise delta somehow?
             
-            if (delta < 0) {
+            if (comparator.isLower(currentFitness, nFitness)) {
                 LOGGER.println(" -> " + neighbor.getId() + " is better than " + currentMutant.getId());
                 currentMutant = neighbor;
                 currentFitness = nFitness;
-            } else if (Math.random() < Math.pow(Math.E, -delta / temperature)) {
-                LOGGER.println(" -> " + neighbor.getId() + " selected because of temperature");
-                currentMutant = neighbor;
-                currentFitness = nFitness;
             } else {
-                LOGGER.println(" -> " + neighbor.getId() + " not selected");
+                double delta = comparator.toSingleValue(currentFitness) - comparator.toSingleValue(nFitness);
+                // TODO: normalise delta somehow?
+                // TODO: use max delta for multi-objective?
+                
+                if (Math.random() < Math.pow(Math.E, -delta / temperature)) {
+                    LOGGER.println(" -> " + neighbor.getId() + " selected because of temperature");
+                    currentMutant = neighbor;
+                    currentFitness = nFitness;
+                } else {
+                    LOGGER.println(" -> " + neighbor.getId() + " not selected");
+                }
             }
             
             setBestInIteration(iteration, currentFitness);
@@ -241,7 +251,7 @@ public class PatternBasedMutator extends AbstractMutator {
         for (iteration = 1; iteration <= config.getRandomSearchIterations(); iteration++) {
             Mutant random = generateRandom();
             random.apply(originalAst);
-            Double fitness = evaluate(random, true, true);
+            Fitness fitness = evaluate(random, true, true);
             if (fitness != null) {
                 mutantList.insertMutant(random, fitness);
             }

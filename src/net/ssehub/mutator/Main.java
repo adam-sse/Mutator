@@ -28,6 +28,9 @@ import net.ssehub.mutator.evaluation.TestResult;
 import net.ssehub.mutator.mutation.IMutant;
 import net.ssehub.mutator.mutation.IMutator;
 import net.ssehub.mutator.mutation.PseudoMutant;
+import net.ssehub.mutator.mutation.fitness.Fitness;
+import net.ssehub.mutator.mutation.fitness.FitnessComparatorFactory;
+import net.ssehub.mutator.mutation.fitness.IFitnessComparator;
 import net.ssehub.mutator.mutation.genetic.GeneticConfig;
 import net.ssehub.mutator.mutation.genetic.GeneticMutator;
 import net.ssehub.mutator.mutation.pattern_based.PatternBasedConfig;
@@ -94,11 +97,13 @@ public class Main {
             switch (mutatorType) {
             case "genetic":
                 config = new GeneticConfig(props);
+                FitnessComparatorFactory.init(config);
                 config.setExecDir(execDir);
                 mutator = new GeneticMutator((GeneticConfig) config);
                 break;
             case "patternbased":
                 config = new PatternBasedConfig(props);
+                FitnessComparatorFactory.init(config);
                 config.setExecDir(execDir);
                 mutator = new PatternBasedMutator((PatternBasedConfig) config);
                 break;
@@ -131,12 +136,16 @@ public class Main {
             List<IMutant> mutants = mutator.run(file);
             
             // 3) print out
+            // TODO: multi-objective fitness
             LOGGER.println();
             LOGGER.println("Writing " + mutants.size() + " mutants...");
-            double bestFitness = mutants.size() > 0 ? mutator.getFitness(mutants.get(0).getId()) : 0.0;
+            IFitnessComparator comparator = FitnessComparatorFactory.get();
+            
+            double bestFitness = mutants.size() > 0 ?
+                    comparator.toSingleValue(mutator.getFitness(mutants.get(0).getId())) : 0.0;
             Double originalFitness = null;
             if (mutator.getUnmodifiedId() != null) {
-                originalFitness = mutator.getFitness(mutator.getUnmodifiedId());
+                originalFitness = comparator.toSingleValue(mutator.getFitness(mutator.getUnmodifiedId()));
             }
             
             LOGGER.print(" Rank |   Mutant   | Fitness |  Best  ");
@@ -155,14 +164,15 @@ public class Main {
             for (int i = 0; i < mutants.size(); i++) {
                 IMutant mutant = mutants.get(i);
                 
-                double fitness = mutator.getFitness(mutant.getId());
-                LOGGER.printf("  %2d  | %10s | %7.3f | %5.1f%%",
+                Fitness fitness = mutator.getFitness(mutant.getId());
+                double fd = comparator.toSingleValue(mutator.getFitness(mutant.getId()));
+                LOGGER.printf("  %2d  | %10s | %7s | %5.1f%%",
                         i + 1,
                         mutant.getId(),
                         fitness,
-                        fitness / bestFitness * 100);
+                        fd / bestFitness * 100);
                 if (originalFitness != null) {
-                    LOGGER.printf(" | %6.1f%%\n", fitness / originalFitness * 100);
+                    LOGGER.printf(" | %6.1f%%\n", fd / originalFitness * 100);
                 } else {
                     LOGGER.println();
                 }
@@ -243,6 +253,7 @@ public class Main {
         props.load(new FileReader(configFile));
         
         BaseConfig config = new BaseConfig(props);
+        FitnessComparatorFactory.init(config);
         
         // 1) parse file
         LOGGER.println("Parsing...");
@@ -270,9 +281,9 @@ public class Main {
         TestResult result = evaluator.test(mutant);
         LOGGER.println("Test result: " + result);
         if (result == TestResult.PASS) {
-            Double fitness = evaluator.measureFitness(mutant);
+            Fitness fitness = evaluator.measureFitness(mutant);
             LOGGER.println("Fitness: " + fitness);
-            
+            LOGGER.println("  (= " + FitnessComparatorFactory.get().toSingleValue(fitness) + ")");
         }
         
         // 4) clean up

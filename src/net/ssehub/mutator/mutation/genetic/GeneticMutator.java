@@ -10,6 +10,9 @@ import net.ssehub.mutator.ast.File;
 import net.ssehub.mutator.evaluation.EvaluatorFactory;
 import net.ssehub.mutator.mutation.AbstractMutator;
 import net.ssehub.mutator.mutation.IMutant;
+import net.ssehub.mutator.mutation.fitness.Fitness;
+import net.ssehub.mutator.mutation.fitness.FitnessComparatorFactory;
+import net.ssehub.mutator.mutation.fitness.IFitnessComparator;
 import net.ssehub.mutator.mutation.genetic.mutations.Mutation;
 import net.ssehub.mutator.mutation.genetic.mutations.MutationFactory;
 import net.ssehub.mutator.util.Logger;
@@ -70,7 +73,7 @@ public class GeneticMutator extends AbstractMutator {
             for (int i = 0; i < population.getSize(); i++) {
                 Mutant mutant = population.getMutant(i);
                 
-                Double fitness = evaluate(mutant, true, true);
+                Fitness fitness = evaluate(mutant, true, true);
                 
                 if (fitness == null) {
                     population.removeMutant(i);
@@ -87,7 +90,7 @@ public class GeneticMutator extends AbstractMutator {
             if (population.getSize() > 0) {
                 setBestInIteration(generation, population.getMutant(0));
             } else {
-                setBestInIteration(generation, 0.0);
+                setBestInIteration(generation, new Fitness(0.0));
             }
             
             nextGeneration();
@@ -275,14 +278,31 @@ public class GeneticMutator extends AbstractMutator {
         } while (!added);
     }
     
+    private boolean isWithinThreshold(Fitness originalFitness, Fitness newFitness, double threshold) {
+        if (originalFitness.numValues() != newFitness.numValues()) {
+            throw new IllegalArgumentException("Fitness values have different number of objectives");
+        }
+        
+        for (int i = 0; i < originalFitness.numValues(); i++) {
+            double o = originalFitness.getValue(i);
+            double n = newFitness.getValue(i);
+            if ((o - n) / o > threshold) {
+                return false;
+            }
+        }
+        return true;
+    }
+    
     private Mutant cleanMutations(Mutant original) {
         if (original.getId().endsWith("c")) {
             return original;
         }
         
         String cleanedId = original.getId() + "c";
-        double originalFitness = getFitness(original.getId());
+        Fitness originalFitness = getFitness(original.getId());
         List<Mutation> mutations = new ArrayList<>(original.getMutations());
+        
+        IFitnessComparator comparator = FitnessComparatorFactory.get();
         
         LOGGER.println("Cleaning " + original.getId());
         boolean changed;
@@ -299,15 +319,15 @@ public class GeneticMutator extends AbstractMutator {
                 }
                 
                 // evaluate
-                Double tempFitness = evaluate(temp, false, false);
+                Fitness tempFitness = evaluate(temp, false, false);
                 if (tempFitness != null) {
-                    if ((originalFitness - tempFitness) / originalFitness < config.getCleanThreshold()) {
+                    if (isWithinThreshold(originalFitness, tempFitness, config.getCleanThreshold())) {
                         LOGGER.println(" * Mutation " + mutations.get(i) + " is not required");
                         LOGGER.println("   (original fitness: " + originalFitness
                                 + "; w/o this mutation: " + tempFitness + ")");
                         
                         setFitness(cleanedId, tempFitness);
-                        if (tempFitness > originalFitness) {
+                        if (comparator.isLower(originalFitness, tempFitness)) {
                             originalFitness = tempFitness;
                         }
                         

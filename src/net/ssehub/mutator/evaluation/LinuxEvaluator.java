@@ -11,6 +11,9 @@ import java.util.concurrent.TimeUnit;
 
 import net.ssehub.mutator.BaseConfig;
 import net.ssehub.mutator.mutation.IMutant;
+import net.ssehub.mutator.mutation.fitness.Fitness;
+import net.ssehub.mutator.mutation.fitness.FitnessComparatorFactory;
+import net.ssehub.mutator.mutation.fitness.IFitnessComparator;
 
 public class LinuxEvaluator extends Evaluator {
     
@@ -28,18 +31,14 @@ public class LinuxEvaluator extends Evaluator {
             mutant.write(new File(config.getEvalDir(), config.getDropin()));
             boolean compilationSuccess = compile(config.getTestSrc(), getExe(config.getTestSrc()));
             if (compilationSuccess) {
-                String stdout = run(getExe(config.getTestSrc()));
+                List<String> stdout = run(getExe(config.getTestSrc()));
                 
-                switch (stdout) {
-                case "1":
-                    result = TestResult.PASS;
-                    break;
-                case "timeout":
+                if (stdout.size() == 1 && stdout.get(0).equals("timeout")) {
                     result = TestResult.TIMEOUT;
-                    break;
-                default:
+                } else  if (stdout.size() >= 1 && stdout.get(stdout.size() - 1).equals("1")) {
+                    result = TestResult.PASS;
+                } else {
                     result = TestResult.TEST_FAILED;
-                    break;
                 }
                 
             } else {
@@ -55,15 +54,16 @@ public class LinuxEvaluator extends Evaluator {
     }
 
     @Override
-    public double measureFitness(IMutant mutant) {
-        double fitness = RUNTIME_ERROR;
+    public Fitness measureFitness(IMutant mutant) {
+        IFitnessComparator comparator = FitnessComparatorFactory.get();
+        Fitness fitness = RUNTIME_ERROR;
         
         try {
             mutant.write(new File(config.getEvalDir(), config.getDropin()));
             boolean compilationSuccess = compile(config.getFitnessSrc(), getExe(config.getFitnessSrc()));
             if (compilationSuccess) {
                 
-                double[] measures = new double[config.getFitnessMeasures()];
+                Fitness[] measures = new Fitness[config.getFitnessMeasures()];
                 for (int i = 0; i < measures.length; i++) {
                     // sleep a bit so that we can cool down before performance measures take place
                     try {
@@ -71,17 +71,18 @@ public class LinuxEvaluator extends Evaluator {
                     } catch (InterruptedException e) {
                     }
                     
-                    String stdout = run(getExe(config.getFitnessSrc()));
-                    measures[i] = Double.parseDouble(stdout);
+                    List<String> stdout = run(getExe(config.getFitnessSrc()));
+                    double[] values = new double[stdout.size()];
+                    int j = 0;
+                    for (String line : stdout) {
+                        values[j++] = Double.parseDouble(line);
+                    }
+                    
+                    measures[i] = new Fitness(values);
                 }
-                Arrays.sort(measures);
+                Arrays.sort(measures, comparator);
                 
-                if (measures.length % 2 == 1) {
-                    fitness = measures[measures.length / 2];
-                } else {
-                    fitness = (measures[measures.length / 2] + measures[measures.length / 2 + 1]) / 2;
-                }
-                
+                fitness = measures[measures.length / 2];
             }
             
         } catch (NumberFormatException e) {
@@ -115,23 +116,20 @@ public class LinuxEvaluator extends Evaluator {
         return ret == 0;
     }
     
-    private String run(File exe) throws IOException {
+    private List<String> run(File exe) throws IOException {
         ProcessBuilder pb = new ProcessBuilder(exe.getPath());
         pb.redirectErrorStream(true);
 
         Process p = pb.start();
         
-        class ResultHolder {
-            private String result = "";
-        }
-        ResultHolder holder = new ResultHolder();
+        List<String> lines = new LinkedList<>();
         
         Thread reader = new Thread(() -> {
             try {
                 BufferedReader in = new BufferedReader(new InputStreamReader(p.getInputStream()));
                 String line;
                 while ((line = in.readLine()) != null) {
-                    holder.result = line;
+                    lines.add(line);
                 }
             } catch (IOException e) {
                 e.printStackTrace();
@@ -161,11 +159,11 @@ public class LinuxEvaluator extends Evaluator {
         }
         
         if (timeout) {
-            return "timeout";
+            return Arrays.asList("timeout");
         } else if (ret == 0) {
-            return holder.result;
+            return lines;
         } else {
-            return "error";
+            return Arrays.asList("error");
         }
     }
     

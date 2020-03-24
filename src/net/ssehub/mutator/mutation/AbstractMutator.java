@@ -8,13 +8,15 @@ import java.util.Map;
 
 import net.ssehub.mutator.evaluation.Evaluator;
 import net.ssehub.mutator.evaluation.TestResult;
+import net.ssehub.mutator.mutation.fitness.Fitness;
+import net.ssehub.mutator.mutation.fitness.FitnessComparatorFactory;
 import net.ssehub.mutator.util.Logger;
 
 public abstract class AbstractMutator implements IMutator {
 
     private static final Logger LOGGER = Logger.get(AbstractMutator.class.getSimpleName());
     
-    private Map<String, Double> fitnessStore;
+    private Map<String, Fitness> fitnessStore;
     
     private Evaluator evaluator;
     
@@ -33,11 +35,11 @@ public abstract class AbstractMutator implements IMutator {
     }
     
     @Override
-    public Double getFitness(String mutantId) {
+    public Fitness getFitness(String mutantId) {
         return this.fitnessStore.get(mutantId);
     }
     
-    protected void setFitness(String mutantId, double fitness) {
+    protected void setFitness(String mutantId, Fitness fitness) {
         this.fitnessStore.put(mutantId, fitness);
     }
     
@@ -45,8 +47,8 @@ public abstract class AbstractMutator implements IMutator {
         return getFitness(mutantId) != null;
     }
     
-    protected Double evaluate(IMutant mutant, boolean useCache, boolean printAndStats) {
-        Double fitness = null;
+    protected Fitness evaluate(IMutant mutant, boolean useCache, boolean printAndStats) {
+        Fitness fitness = null;
         
         if (useCache && hasFitness(mutant.getId())) {
             fitness = getFitness(mutant.getId());
@@ -106,11 +108,12 @@ public abstract class AbstractMutator implements IMutator {
         setBestInIteration(iteration, getFitness(bestMutant.getId()));
     }
     
-    protected void setBestInIteration(int iteration, double bestFitness) {
+    protected void setBestInIteration(int iteration, Fitness bestFitness) {
+        double single = FitnessComparatorFactory.get().toSingleValue(bestFitness);
         if (iteration - 1 < this.statBestInIteration.size()) {
-            this.statBestInIteration.set(iteration - 1, bestFitness);
+            this.statBestInIteration.set(iteration - 1, single);
         } else {
-            this.statBestInIteration.add(iteration - 1, bestFitness);
+            this.statBestInIteration.add(iteration - 1, single);
         }
     }
     
@@ -137,6 +140,8 @@ public abstract class AbstractMutator implements IMutator {
         if (statBestInIteration.size() >= 2) {
             LOGGER.println();
             LOGGER.println("Best Fitness per Iteration:");
+            
+            // TODO: one graph for each objective?
             
             double max = Collections.max(statBestInIteration);
             double min = Collections.min(statBestInIteration);

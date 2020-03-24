@@ -12,6 +12,10 @@ public class BaseConfig {
     
     private boolean saveIterations;
     
+    private String fitnessComparison;
+    
+    private double[] fitnessWeights;
+    
     private int timeout;
     
     private String dropin;
@@ -28,6 +32,15 @@ public class BaseConfig {
     
     public BaseConfig(Properties props) {
         this.saveIterations = Boolean.parseBoolean(props.getProperty("mutator.saveIterations"));
+        this.fitnessComparison = props.getProperty("mutator.fitness.comparison");
+        
+        if (props.containsKey("mutator.fitness.weights")) {
+            String[] tmp = props.getProperty("mutator.fitness.weights").split(",");
+            this.fitnessWeights = new double[tmp.length];
+            for (int i = 0; i < tmp.length; i++) {
+                this.fitnessWeights[i] = Double.parseDouble(tmp[i]);
+            }
+        }
         
         this.timeout = Integer.parseInt(props.getProperty("evaluator.timeout"));
         this.dropin = props.getProperty("evaluator.dropin");
@@ -59,6 +72,14 @@ public class BaseConfig {
     
     public boolean getSaveIterations() {
         return saveIterations;
+    }
+    
+    public String getFitnessComparison() {
+        return fitnessComparison;
+    }
+    
+    public double[] getFitnessWeights() {
+        return fitnessWeights;
     }
     
     public int getTimeout() {
