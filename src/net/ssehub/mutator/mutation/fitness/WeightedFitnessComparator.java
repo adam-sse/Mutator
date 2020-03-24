@@ -1,6 +1,6 @@
 package net.ssehub.mutator.mutation.fitness;
 
-public class WeightedFitnessComparator implements IFitnessComparator {
+class WeightedFitnessComparator implements IFitnessComparator {
 
     private double[] weights;
 

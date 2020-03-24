@@ -1,6 +1,6 @@
 package net.ssehub.mutator.mutation.fitness;
 
-public class ParetoFitnessComparator implements IFitnessComparator {
+class ParetoFitnessComparator implements IFitnessComparator {
 
     @Override
     public boolean isLower(Fitness f1, Fitness f2) {
