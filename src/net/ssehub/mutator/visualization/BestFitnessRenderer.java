@@ -42,6 +42,13 @@ public class BestFitnessRenderer extends AbstractDotRenderer {
             }
         }
         
+        if (xMax == xMin) {
+            xMax += 1.0;
+        }
+        if (yMax == yMin) {
+            yMax += 1.0;
+        }
+        
         double xStep = (xMax - xMin) / 10.0;
         double yStep = (yMax - yMin) / 10.0;
         
@@ -71,7 +78,7 @@ public class BestFitnessRenderer extends AbstractDotRenderer {
                 .append("        \"lx")
                 .append(i)
                 .append("\" [label=\"")
-                .append(String.format(Locale.ROOT, "%.2f", xMin + ((i - 1) * xStep)))
+                .append(String.format(Locale.ROOT, "%.2g", xMin + ((i - 1) * xStep)))
                 .append("\", pos=\"")
                 .append(i)
                 .append(",-0.2!\"];\n");
@@ -82,7 +89,7 @@ public class BestFitnessRenderer extends AbstractDotRenderer {
             .append("        \"ly")
             .append(i)
             .append("\" [label=\"")
-            .append(String.format(Locale.ROOT, "%.2f", yMin + ((i - 1) * yStep)))
+            .append(String.format(Locale.ROOT, "%.2g", yMin + ((i - 1) * yStep)))
             .append("\", pos=\"-0.2,")
             .append(i)
             .append("!\"];\n");

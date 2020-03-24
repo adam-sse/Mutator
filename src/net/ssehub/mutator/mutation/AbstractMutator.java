@@ -190,7 +190,7 @@ public abstract class AbstractMutator implements IMutator {
             if (statBestInIteration.get(0).numValues() == 2 && config.getDotExe() != null) {
                 File output = new File(config.getExecDir(), "fitness.svg");
                 LOGGER.println();
-                LOGGER.println("Rendering fitness evolution to " + output.getPath());
+                LOGGER.println("Rendering fitness evolution to " + output.getName());
                 try {
                     new BestFitnessRenderer(config.getDotExe()).render(statBestInIteration, output);
                 } catch (IOException e) {
