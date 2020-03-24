@@ -120,7 +120,9 @@ public class BestFitnessRenderer extends AbstractDotRenderer {
                     .append(x)
                     .append(",")
                     .append(y)
-                    .append("!\"];\n");
+                    .append("!\", tooltip=\"")
+                    .append(String.format(Locale.ROOT, "%." + xPrecision + "f, %." + yPrecision +"f", x, y))
+                    .append("\"];\n");
                 
                 if (previous != -1 && dist(x, y, previousX, previousY) > 0.45) {
                     // edge
