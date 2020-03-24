@@ -24,7 +24,7 @@ public class DummyEvaluator extends Evaluator {
 
     @Override
     public Fitness measureFitness(IMutant mutant) {
-        return new Fitness(random.nextDouble() * 10, random.nextDouble() * 10);
+        return new Fitness(random.nextDouble(), random.nextDouble());
     }
 
 }

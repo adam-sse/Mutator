@@ -52,6 +52,9 @@ public class BestFitnessRenderer extends AbstractDotRenderer {
         double xStep = (xMax - xMin) / 10.0;
         double yStep = (yMax - yMin) / 10.0;
         
+        int xPrecision = Math.max(magnitude(xStep) * -1, 0);
+        int yPrecision = Math.max(magnitude(yStep) * -1, 0);
+        
         StringBuilder dot = new StringBuilder();
         
         // preamble
@@ -78,7 +81,7 @@ public class BestFitnessRenderer extends AbstractDotRenderer {
                 .append("        \"lx")
                 .append(i)
                 .append("\" [label=\"")
-                .append(String.format(Locale.ROOT, "%.2g", xMin + ((i - 1) * xStep)))
+                .append(String.format(Locale.ROOT, "%." + xPrecision + "f", xMin + ((i - 1) * xStep)))
                 .append("\", pos=\"")
                 .append(i)
                 .append(",-0.2!\"];\n");
@@ -89,7 +92,7 @@ public class BestFitnessRenderer extends AbstractDotRenderer {
                 .append("        \"ly")
                 .append(i)
                 .append("\" [label=\"")
-                .append(String.format(Locale.ROOT, "%.2g", yMin + ((i - 1) * yStep)))
+                .append(String.format(Locale.ROOT, "%." + yPrecision + "f", yMin + ((i - 1) * yStep)))
                 .append("\", pos=\"-0.2,")
                 .append(i)
                 .append("!\"];\n");
@@ -145,6 +148,23 @@ public class BestFitnessRenderer extends AbstractDotRenderer {
         double dx = x2 - x1;
         double dy = y2 - y1;
         return Math.sqrt((dx * dx) + (dy * dy));
+    }
+    
+    private static int magnitude(double d) {
+        int magnitude = 0;
+        if (d < 1.0) {
+            while (d < 1.0) {
+                d *= 10;
+                magnitude--;
+            }
+        } else {
+            while (d >= 10) {
+                d /= 10;
+                magnitude++;
+            }
+        }
+
+        return magnitude;
     }
     
 }
