@@ -7,7 +7,6 @@ import java.util.Locale;
 import java.util.Random;
 
 import net.ssehub.mutator.ast.File;
-import net.ssehub.mutator.evaluation.EvaluatorFactory;
 import net.ssehub.mutator.mutation.AbstractMutator;
 import net.ssehub.mutator.mutation.IMutant;
 import net.ssehub.mutator.mutation.fitness.Fitness;
@@ -34,7 +33,7 @@ public class GeneticMutator extends AbstractMutator {
     private int nextMutantId;
     
     public GeneticMutator(GeneticConfig config) {
-        super(EvaluatorFactory.create(config));
+        super(config);
         this.config = config;
         random = new Random(config.getSeed());
     }

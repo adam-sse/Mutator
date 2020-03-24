@@ -30,6 +30,8 @@ public class BaseConfig {
     
     private long sleepBeforeFitness;
     
+    private String dotExe;
+    
     public BaseConfig(Properties props) {
         this.saveIterations = Boolean.parseBoolean(props.getProperty("mutator.saveIterations"));
         this.fitnessComparison = props.getProperty("mutator.fitness.comparison");
@@ -56,6 +58,8 @@ public class BaseConfig {
         this.fitnessSrc = new File(props.getProperty("evaluator.fitness.src"));
         this.fitnessMeasures = Integer.parseInt(props.getProperty("evaluator.fitness.measures"));
         this.sleepBeforeFitness = Long.parseLong(props.getProperty("evaluator.fitness.sleepBefore"));
+        
+        this.dotExe = props.getProperty("visualization.dotExe");
     }
     
     public File getExecDir() {
@@ -116,6 +120,10 @@ public class BaseConfig {
 
     public long getSleepBeforeFitness() {
         return sleepBeforeFitness;
+    }
+    
+    public String getDotExe() {
+        return dotExe;
     }
     
 }

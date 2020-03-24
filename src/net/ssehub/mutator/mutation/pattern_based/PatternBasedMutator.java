@@ -9,7 +9,6 @@ import java.util.Locale;
 import java.util.Random;
 
 import net.ssehub.mutator.ast.File;
-import net.ssehub.mutator.evaluation.EvaluatorFactory;
 import net.ssehub.mutator.mutation.AbstractMutator;
 import net.ssehub.mutator.mutation.IMutant;
 import net.ssehub.mutator.mutation.fitness.Fitness;
@@ -33,7 +32,7 @@ public class PatternBasedMutator extends AbstractMutator {
     private IFitnessComparator comparator;
     
     public PatternBasedMutator(PatternBasedConfig config) {
-        super(EvaluatorFactory.create(config));
+        super(config);
         this.config = config;
         this.comparator = FitnessComparatorFactory.get();
     }

@@ -1,21 +1,28 @@
 package net.ssehub.mutator.mutation;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import net.ssehub.mutator.BaseConfig;
 import net.ssehub.mutator.evaluation.Evaluator;
+import net.ssehub.mutator.evaluation.EvaluatorFactory;
 import net.ssehub.mutator.evaluation.TestResult;
 import net.ssehub.mutator.mutation.fitness.Fitness;
 import net.ssehub.mutator.util.Logger;
+import net.ssehub.mutator.visualization.BestFitnessRenderer;
 
 public abstract class AbstractMutator implements IMutator {
 
     private static final Logger LOGGER = Logger.get(AbstractMutator.class.getSimpleName());
     
     private Map<String, Fitness> fitnessStore;
+    
+    private BaseConfig config;
     
     private Evaluator evaluator;
     
@@ -27,8 +34,9 @@ public abstract class AbstractMutator implements IMutator {
     private int statNumError;
     private List<Fitness> statBestInIteration;
     
-    public AbstractMutator(Evaluator evaluator) {
-        this.evaluator = evaluator;
+    public AbstractMutator(BaseConfig config) {
+        this.config = config;
+        this.evaluator = EvaluatorFactory.create(config);
         this.fitnessStore = new HashMap<>();
         this.statBestInIteration = new ArrayList<>();
     }
@@ -177,6 +185,17 @@ public abstract class AbstractMutator implements IMutator {
                     LOGGER.printf("%03d ", iteration + 1);
                 }
                 LOGGER.println();
+            }
+            
+            if (statBestInIteration.get(0).numValues() == 2 && config.getDotExe() != null) {
+                File output = new File(config.getExecDir(), "fitness.svg");
+                LOGGER.println();
+                LOGGER.println("Rendering fitness evolution to " + output.getPath());
+                try {
+                    new BestFitnessRenderer(config.getDotExe()).render(statBestInIteration, output);
+                } catch (IOException e) {
+                    LOGGER.logException(e);
+                }
             }
         }
     }

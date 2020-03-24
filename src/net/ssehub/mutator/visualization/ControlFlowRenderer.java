@@ -1,6 +1,5 @@
 package net.ssehub.mutator.visualization;
 
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
@@ -12,15 +11,12 @@ import net.ssehub.mutator.ast.control_flow.ControlFlowBlock;
 import net.ssehub.mutator.ast.control_flow.ControlFlowCreator;
 import net.ssehub.mutator.ast.control_flow.ControlFlowFunction;
 
-public class ControlFlowRenderer {
+public class ControlFlowRenderer extends AbstractDotRenderer {
 
-
-    private String dotExe;
-    
     private StringBuilder dot;
     
     public ControlFlowRenderer(String dotExe) {
-        this.dotExe = dotExe;
+        super(dotExe);
     }
     
     public void render(File file, java.io.File output) throws IOException {
@@ -67,30 +63,7 @@ public class ControlFlowRenderer {
         
         epilog();
         
-        if (output.getName().endsWith(".dot")) {
-            try (FileWriter out = new FileWriter(output)) {
-                out.write(this.dot.toString());
-            }
-            
-        } else {
-            java.io.File tmp = java.io.File.createTempFile("mutator_", ".dot");
-            tmp.deleteOnExit();
-            try (FileWriter out = new FileWriter(tmp)) {
-                out.write(this.dot.toString());
-            }
-            
-            ProcessBuilder pb = new ProcessBuilder(dotExe,
-                    "-T" + output.getName().substring(output.getName().lastIndexOf('.') + 1),
-                    "-o", output.getAbsolutePath(), tmp.getAbsolutePath());
-            pb.inheritIO();
-            pb.redirectErrorStream(true);
-            
-            try {
-                pb.start().waitFor();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
+        render(this.dot.toString(), "dot", output);
     }
     
     private void preamble() {
