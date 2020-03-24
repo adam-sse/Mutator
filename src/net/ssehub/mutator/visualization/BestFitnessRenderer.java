@@ -86,13 +86,13 @@ public class BestFitnessRenderer extends AbstractDotRenderer {
         dot.append("\n");
         for (int i = 1; i <= 11; i++) {
             dot
-            .append("        \"ly")
-            .append(i)
-            .append("\" [label=\"")
-            .append(String.format(Locale.ROOT, "%.2g", yMin + ((i - 1) * yStep)))
-            .append("\", pos=\"-0.2,")
-            .append(i)
-            .append("!\"];\n");
+                .append("        \"ly")
+                .append(i)
+                .append("\" [label=\"")
+                .append(String.format(Locale.ROOT, "%.2g", yMin + ((i - 1) * yStep)))
+                .append("\", pos=\"-0.2,")
+                .append(i)
+                .append("!\"];\n");
         }
         dot.append("    }\n").append("\n");
         
