@@ -125,7 +125,47 @@ public class BestFitnessRenderer3D extends BestFitnessRenderer {
             .append("        \"zOrigin\" -> \"zHead\";\n")
             .append("\n");
         
-        // axis labels aren't rendered anyway
+        for (int i = 0; i <= 10; i++) {
+            double x = xMin + (i * xStep);
+            dot
+                .append("        \"lx")
+                .append(i)
+                .append("\" [label=\"")
+                .append(String.format(Locale.ROOT, "%." + xPrecision + "f", x))
+                .append("\", tooltip=\"")
+                .append(String.format(Locale.ROOT, "%." + (xPrecision + 1) + "f", x))
+                .append("\", pos=")
+                .append(getPos(i, yZero - 0.2, zZero))
+                .append(", shape=box, color=white];\n");
+        }
+        dot.append("\n");
+        for (int i = 0; i <= 10; i++) {
+            double y = yMin + (i * yStep);
+            dot
+                .append("        \"ly")
+                .append(i)
+                .append("\" [label=\"")
+                .append(String.format(Locale.ROOT, "%." + yPrecision + "f", y))
+                .append("\", tooltip=\"")
+                .append(String.format(Locale.ROOT, "%." + (yPrecision + 1) + "f", y))
+                .append("\", pos=")
+                .append(getPos(xZero - 0.2, i, zZero))
+                .append(", shape=box, color=white];\n");
+        }
+        dot.append("\n");
+        for (int i = 0; i <= 10; i++) {
+            double z = zMin + (i * zStep);
+            dot
+                .append("        \"lz")
+                .append(i)
+                .append("\" [label=\"")
+                .append(String.format(Locale.ROOT, "%." + zPrecision + "f", z))
+                .append("\", tooltip=\"")
+                .append(String.format(Locale.ROOT, "%." + (zPrecision + 1) + "f", z))
+                .append("\", pos=")
+                .append(getPos(xZero, yZero - 0.2, i))
+                .append(", shape=box, color=white];\n");
+        }
     }
     
     @Override
@@ -146,6 +186,17 @@ public class BestFitnessRenderer3D extends BestFitnessRenderer {
         double dy = y2 - y1;
         double dz = z2 - z1;
         return Math.sqrt((dx * dx) + (dy * dy) + (dz * dz));
+    }
+    
+    @Override
+    protected String getSpecialNodeAttributes(boolean first, boolean last) {
+        if (first) {
+            return "color=\"#fdc086\"";
+        } else if (last) {
+            return "color=\"#7fc97f\"";
+        } else {
+            return "color=\"#beaed4\"";
+        }
     }
     
 }

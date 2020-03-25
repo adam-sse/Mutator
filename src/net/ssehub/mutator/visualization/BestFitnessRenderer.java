@@ -170,6 +170,16 @@ public class BestFitnessRenderer extends AbstractDotRenderer {
         return dist(x1, y1, x2, y2) > minDist;
     }
     
+    protected String getSpecialNodeAttributes(boolean first, boolean last) {
+        if (first) {
+            return "style=filled, fillcolor=\"#fdc086\"";
+        } else if (last) {
+            return "style=filled, fillcolor=\"#7fc97f\"";
+        } else {
+            return null;
+        }
+    }
+    
     public void render(List<Fitness> bestFitnesses, File output) throws IOException {
         if (!checkDimension(bestFitnesses)) {
             LOGGER.println("Can only log two-dimensional fitnesses");
@@ -201,11 +211,14 @@ public class BestFitnessRenderer extends AbstractDotRenderer {
         Fitness previousFitness = null;
         int previous = -1;
         
-        int iteration = 0;
-        for (Fitness fitness : bestFitnesses) {
-            iteration++;
+        for (int i = 0; i < bestFitnesses.size(); i++) {
+            Fitness fitness = bestFitnesses.get(i);
+            int iteration = i + 1;
             
-            if (previous == -1 || checkDistance(previousFitness, fitness, 0.4)) {
+            boolean first = i == 0;
+            boolean last = i == bestFitnesses.size() - 1;
+            
+            if (first || last || checkDistance(previousFitness, fitness, 0.4)) {
                 // node
                 dot
                     .append("    \"")
@@ -213,10 +226,16 @@ public class BestFitnessRenderer extends AbstractDotRenderer {
                     .append("\" [pos=")
                     .append(getPos(fitness))
                     .append(", tooltip=")
-                    .append(getTooltipp(fitness))
-                    .append("];\n");
+                    .append(getTooltipp(fitness));
                 
-                if (previous != -1 && checkDistance(previousFitness, fitness, 0.45)) {
+                String specialAttr = getSpecialNodeAttributes(first, last);
+                if (specialAttr != null) {
+                    dot.append(", ").append(specialAttr);
+                }
+                
+                dot.append("];\n");
+                
+                if (!first && checkDistance(previousFitness, fitness, 0.45)) {
                     // edge
                     dot
                         .append("    \"")
