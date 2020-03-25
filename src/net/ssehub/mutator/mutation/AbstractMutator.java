@@ -2,6 +2,8 @@ package net.ssehub.mutator.mutation;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -15,6 +17,7 @@ import net.ssehub.mutator.evaluation.TestResult;
 import net.ssehub.mutator.mutation.fitness.Fitness;
 import net.ssehub.mutator.util.Logger;
 import net.ssehub.mutator.visualization.BestFitnessRenderer;
+import net.ssehub.mutator.visualization.BestFitnessRenderer3D;
 
 public abstract class AbstractMutator implements IMutator {
 
@@ -187,16 +190,30 @@ public abstract class AbstractMutator implements IMutator {
                 LOGGER.println();
             }
             
-            if (statBestInIteration.get(0).numValues() == 2 && config.getDotExe() != null) {
-                File output = new File(config.getExecDir(), "fitness.svg");
-                LOGGER.println();
-                LOGGER.println("Rendering fitness evolution to " + output.getName());
-                try {
-                    new BestFitnessRenderer(config.getDotExe()).render(statBestInIteration, output);
-                } catch (IOException e) {
-                    LOGGER.logException(e);
+            if (config.getDotExe() != null) {
+                if (statBestInIteration.get(0).numValues() == 2) {
+                    File output = new File(config.getExecDir(), "fitness.svg");
+                    LOGGER.println();
+                    LOGGER.println("Rendering fitness evolution to " + output.getName());
+                    try {
+                        new BestFitnessRenderer(config.getDotExe()).render(statBestInIteration, output);
+                    } catch (IOException e) {
+                        LOGGER.logException(e);
+                    }
+                } else if (statBestInIteration.get(0).numValues() == 3) {
+                    File output = new File(config.getExecDir(), "fitness.vrml");
+                    File output2 = new File(config.getExecDir(), "fitness.wrl");
+                    LOGGER.println();
+                    LOGGER.println("Rendering fitness evolution to " + output2.getName());
+                    try {
+                        new BestFitnessRenderer3D(config.getDotExe()).render(statBestInIteration, output);
+                        Files.move(output.toPath(), output2.toPath(), StandardCopyOption.ATOMIC_MOVE);
+                    } catch (IOException e) {
+                        LOGGER.logException(e);
+                    }
                 }
             }
+            
         }
     }
     

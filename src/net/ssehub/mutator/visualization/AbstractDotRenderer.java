@@ -40,6 +40,7 @@ abstract class AbstractDotRenderer {
             command.add(tmp.getAbsolutePath());
             
             ProcessBuilder pb = new ProcessBuilder(command);
+            pb.directory(output.getAbsoluteFile().getParentFile());
             pb.inheritIO();
             pb.redirectErrorStream(true);
             
