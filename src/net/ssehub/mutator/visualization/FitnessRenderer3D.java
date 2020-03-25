@@ -1,11 +1,11 @@
 package net.ssehub.mutator.visualization;
 
-import java.util.List;
+import java.util.Collection;
 import java.util.Locale;
 
 import net.ssehub.mutator.mutation.fitness.Fitness;
 
-public class BestFitnessRenderer3D extends BestFitnessRenderer {
+public class FitnessRenderer3D extends FitnessRenderer {
 
     private double zMin;
     private double zMax;
@@ -14,12 +14,12 @@ public class BestFitnessRenderer3D extends BestFitnessRenderer {
     
     private int zPrecision;
     
-    public BestFitnessRenderer3D(String dotExe) {
-        super(dotExe);
+    public FitnessRenderer3D(String dotExe, boolean connectWithEdges, boolean preventOverlap) {
+        super(dotExe, connectWithEdges, preventOverlap);
     }
     
     @Override
-    protected boolean checkDimension(List<Fitness> bestFitnesses) {
+    protected boolean checkDimension(Collection<Fitness> bestFitnesses) {
         for (Fitness fitness : bestFitnesses) {
             if (fitness.numValues() != 3) {
                 return false;
@@ -29,7 +29,7 @@ public class BestFitnessRenderer3D extends BestFitnessRenderer {
     }
     
     @Override
-    protected void calcAxisScale(List<Fitness> bestFitnesses) {
+    protected void calcAxisScale(Collection<Fitness> bestFitnesses) {
         super.calcAxisScale(bestFitnesses);
         
         zMin = Double.MAX_VALUE;
@@ -85,7 +85,7 @@ public class BestFitnessRenderer3D extends BestFitnessRenderer {
     }
 
     @Override
-    protected String getTooltipp(Fitness fitness) {
+    protected String getPosTooltipp(Fitness fitness) {
         return String.format(Locale.ROOT, "\"%." + (xPrecision + 1) + "f, %." + (yPrecision + 1) + "f"
                 + ", %." + (zPrecision + 1) + "f\"",
                 fitness.getValue(0), fitness.getValue(1), fitness.getValue(2));
@@ -198,5 +198,6 @@ public class BestFitnessRenderer3D extends BestFitnessRenderer {
             return "color=\"#beaed4\"";
         }
     }
+    
     
 }

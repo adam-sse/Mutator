@@ -13,20 +13,23 @@ import net.ssehub.mutator.evaluation.Evaluator;
 import net.ssehub.mutator.evaluation.EvaluatorFactory;
 import net.ssehub.mutator.evaluation.TestResult;
 import net.ssehub.mutator.mutation.fitness.Fitness;
+import net.ssehub.mutator.mutation.fitness.FitnessComparatorFactory;
+import net.ssehub.mutator.mutation.fitness.IFitnessComparator;
 import net.ssehub.mutator.util.Logger;
 import net.ssehub.mutator.visualization.BestFitnessRenderer;
-import net.ssehub.mutator.visualization.BestFitnessRenderer3D;
+import net.ssehub.mutator.visualization.FitnessRenderer;
+import net.ssehub.mutator.visualization.FitnessRenderer3D;
 
 public abstract class AbstractMutator implements IMutator {
 
     private static final Logger LOGGER = Logger.get(AbstractMutator.class.getSimpleName());
-    
+
     private Map<String, Fitness> fitnessStore;
-    
+
     private BaseConfig config;
-    
+
     private Evaluator evaluator;
-    
+
     private int statNumEvaluated;
     private int statNumCompileError;
     private int statNumTimeout;
@@ -34,30 +37,30 @@ public abstract class AbstractMutator implements IMutator {
     private int statNumRuntimeError;
     private int statNumError;
     private List<Fitness> statBestInIteration;
-    
+
     public AbstractMutator(BaseConfig config) {
         this.config = config;
         this.evaluator = EvaluatorFactory.create(config);
         this.fitnessStore = new HashMap<>();
         this.statBestInIteration = new ArrayList<>();
     }
-    
+
     @Override
     public Fitness getFitness(String mutantId) {
         return this.fitnessStore.get(mutantId);
     }
-    
+
     protected void setFitness(String mutantId, Fitness fitness) {
         this.fitnessStore.put(mutantId, fitness);
     }
-    
+
     protected boolean hasFitness(String mutantId) {
         return getFitness(mutantId) != null;
     }
-    
+
     protected Fitness evaluate(IMutant mutant, boolean useCache, boolean printAndStats) {
         Fitness fitness = null;
-        
+
         if (useCache && hasFitness(mutant.getId())) {
             fitness = getFitness(mutant.getId());
             if (printAndStats) {
@@ -69,12 +72,12 @@ public abstract class AbstractMutator implements IMutator {
         if (printAndStats) {
             statNumEvaluated++;
         }
-        
+
         TestResult testResult = this.evaluator.test(mutant);
         if (testResult != TestResult.PASS) {
             if (printAndStats) {
                 LOGGER.println(mutant.getId() + " " + testResult);
-            
+
                 switch (testResult) {
                 case COMPILATION_FAILED:
                     statNumCompileError++;
@@ -91,7 +94,7 @@ public abstract class AbstractMutator implements IMutator {
                 default:
                 }
             }
-            
+
         } else {
             fitness = this.evaluator.measureFitness(mutant);
             if (fitness == Evaluator.RUNTIME_ERROR) {
@@ -100,7 +103,7 @@ public abstract class AbstractMutator implements IMutator {
                     statNumRuntimeError++;
                 }
                 fitness = null;
-                
+
             } else {
                 if (printAndStats) {
                     LOGGER.println(mutant.getId() + ": " + fitness);
@@ -108,14 +111,14 @@ public abstract class AbstractMutator implements IMutator {
                 setFitness(mutant.getId(), fitness);
             }
         }
-        
+
         return fitness;
     }
-    
+
     protected void setBestInIteration(int iteration, IMutant bestMutant) {
         setBestInIteration(iteration, getFitness(bestMutant.getId()));
     }
-    
+
     protected void setBestInIteration(int iteration, Fitness bestFitness) {
         if (iteration - 1 < this.statBestInIteration.size()) {
             this.statBestInIteration.set(iteration - 1, bestFitness);
@@ -123,7 +126,7 @@ public abstract class AbstractMutator implements IMutator {
             this.statBestInIteration.add(iteration - 1, bestFitness);
         }
     }
-    
+
     @Override
     public void printStatistics() {
         LOGGER.println("Evaluated: " + statNumEvaluated);
@@ -186,26 +189,26 @@ public abstract class AbstractMutator implements IMutator {
                     LOGGER.printf("%03d ", iteration + 1);
                 }
                 LOGGER.println();
+                LOGGER.println();
             }
             
             if (config.getDotExe() != null) {
                 int dimension = statBestInIteration.get(0).numValues();
-                File output = null;
-                BestFitnessRenderer renderer = null;
+                File bestFitOutput = null;
+                BestFitnessRenderer bestFitRenderer = null;
                 
                 if (dimension == 2) {
-                    output = new File(config.getExecDir(), "fitness.svg");
-                    renderer = new BestFitnessRenderer(config.getDotExe());
+                    bestFitOutput = new File(config.getExecDir(), "fitness-evolution.svg");
+                    bestFitRenderer = new BestFitnessRenderer(config.getDotExe(), false);
                 } else if (statBestInIteration.get(0).numValues() == 3) {
-                    output = new File(config.getExecDir(), "fitness.wrl");
-                    renderer = new BestFitnessRenderer3D(config.getDotExe());
+                    bestFitOutput = new File(config.getExecDir(), "fitness-evolution.wrl");
+                    bestFitRenderer = new BestFitnessRenderer(config.getDotExe(), true);
                 }
 
-                if (renderer != null) {
-                    LOGGER.println();
-                    LOGGER.println("Rendering fitness evolution to " + output.getName());
+                if (bestFitRenderer != null) {
+                    LOGGER.println("Rendering fitness evolution to " + bestFitOutput.getName());
                     try {
-                        renderer.render(statBestInIteration, output);
+                        bestFitRenderer.render(statBestInIteration, bestFitOutput);
                     } catch (IOException e) {
                         LOGGER.logException(e);
                     }
@@ -213,6 +216,47 @@ public abstract class AbstractMutator implements IMutator {
             }
             
         }
+        
+        if (config.getDotExe() != null) {
+            int dimension = statBestInIteration.get(0).numValues();
+            
+            File allFitOutput = null;
+            FitnessRenderer allFitRenderer = null;
+            
+            if (dimension == 2) {
+                allFitOutput = new File(config.getExecDir(), "fitness-all.svg");
+                allFitRenderer = new FitnessRenderer(config.getDotExe(), false, false);
+            } else if (statBestInIteration.get(0).numValues() == 3) {
+                allFitOutput = new File(config.getExecDir(), "fitness-all.wrl");
+                allFitRenderer = new FitnessRenderer3D(config.getDotExe(), false, false);
+            }
+            
+            if (allFitRenderer != null) {
+                LOGGER.println("Rendering all fitness values to " + allFitOutput.getName());
+                
+                try {
+                    if (allFitRenderer.init(fitnessStore.values())) {
+                        // initial node first
+                        allFitRenderer.addNode(fitnessStore.get(getUnmodifiedId()), getUnmodifiedId(), false);
+                        
+                        
+                        // find best seen fitness
+                        IFitnessComparator comparator = FitnessComparatorFactory.get();
+                        Fitness best = Collections.max(fitnessStore.values(), comparator);
+                        
+                        for (Map.Entry<String, Fitness> entry : fitnessStore.entrySet()) {
+                            boolean isBest = !comparator.isLower(entry.getValue(), best);
+                            
+                            allFitRenderer.addNode(entry.getValue(), isBest ? entry.getKey() : "", isBest);
+                        }
+                        
+                        allFitRenderer.render(allFitOutput);
+                    }
+                } catch (IOException e) {
+                    LOGGER.logException(e);
+                }
+            }
+        }
     }
-    
+
 }
