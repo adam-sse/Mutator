@@ -42,11 +42,18 @@ public class BestFitnessRenderer extends AbstractDotRenderer {
             }
         }
         
+        xMax = ceilToMagnitude(xMax, magnitude(xMax - xMin));
+        yMax = ceilToMagnitude(yMax, magnitude(yMax - yMin));
+        xMin = floorToMagnitude(xMin, magnitude(xMax - xMin));
+        yMin = floorToMagnitude(yMin, magnitude(yMax - yMin));
+        
         if (xMax == xMin) {
-            xMax += 1.0;
+            xMax += 0.5;
+            xMin -= 0.5;
         }
         if (yMax == yMin) {
-            yMax += 1.0;
+            yMax += 0.5;
+            yMin -= 0.5;
         }
         
         double xStep = (xMax - xMin) / 10.0;
@@ -77,22 +84,28 @@ public class BestFitnessRenderer extends AbstractDotRenderer {
             .append("\n");
         
         for (int i = 1; i <= 11; i++) {
+            double x = xMin + ((i - 1) * xStep);
             dot
                 .append("        \"lx")
                 .append(i)
                 .append("\" [label=\"")
-                .append(String.format(Locale.ROOT, "%." + xPrecision + "f", xMin + ((i - 1) * xStep)))
+                .append(String.format(Locale.ROOT, "%." + xPrecision + "f", x))
+                .append("\", tooltip=\"")
+                .append(String.format(Locale.ROOT, "%." + (xPrecision + 1) + "f", x))
                 .append("\", pos=\"")
                 .append(i)
                 .append(",-0.2!\"];\n");
         }
         dot.append("\n");
         for (int i = 1; i <= 11; i++) {
+            double y = yMin + ((i - 1) * yStep);
             dot
                 .append("        \"ly")
                 .append(i)
                 .append("\" [label=\"")
-                .append(String.format(Locale.ROOT, "%." + yPrecision + "f", yMin + ((i - 1) * yStep)))
+                .append(String.format(Locale.ROOT, "%." + yPrecision + "f", y))
+                .append("\", tooltip=\"")
+                .append(String.format(Locale.ROOT, "%." + (yPrecision + 1) + "f", y))
                 .append("\", pos=\"-0.2,")
                 .append(i)
                 .append("!\"];\n");
@@ -121,7 +134,8 @@ public class BestFitnessRenderer extends AbstractDotRenderer {
                     .append(",")
                     .append(y)
                     .append("!\", tooltip=\"")
-                    .append(String.format(Locale.ROOT, "%." + xPrecision + "f, %." + yPrecision +"f", x, y))
+                    .append(String.format(Locale.ROOT, "%." + (xPrecision + 1) + "f, %." + (yPrecision + 1) +"f",
+                            fitness.getValue(0), fitness.getValue(1)))
                     .append("\"];\n");
                 
                 if (previous != -1 && dist(x, y, previousX, previousY) > 0.45) {
@@ -153,6 +167,7 @@ public class BestFitnessRenderer extends AbstractDotRenderer {
     }
     
     private static int magnitude(double d) {
+        d = Math.abs(d);
         int magnitude = 0;
         if (d < 1.0) {
             while (d < 1.0) {
@@ -167,6 +182,16 @@ public class BestFitnessRenderer extends AbstractDotRenderer {
         }
 
         return magnitude;
+    }
+    
+    private static double ceilToMagnitude(double d, int magnitude) {
+        double factor = Math.pow(10, magnitude);
+        return Math.ceil(d / factor) * factor;
+    }
+    
+    private static double floorToMagnitude(double d, int magnitude) {
+        double factor = Math.pow(10, magnitude);
+        return Math.floor(d / factor) * factor;
     }
     
 }
