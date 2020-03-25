@@ -33,7 +33,7 @@ public class BestFitnessRenderer3D extends BestFitnessRenderer {
         super.calcAxisScale(bestFitnesses);
         
         zMin = Double.MAX_VALUE;
-        zMax = Double.MIN_VALUE;
+        zMax = -Double.MAX_VALUE;
         
         for (Fitness fitness : bestFitnesses) {
             if (fitness.getValue(2) < zMin) {
@@ -67,8 +67,8 @@ public class BestFitnessRenderer3D extends BestFitnessRenderer {
     }
     
     @Override
-    protected String getArrowHead() {
-        return "triangle";
+    protected String getArrowAttributes() {
+        return "arrowhead=normal, arrowsize=2";
     }
     
     private String getPos(double x, double y, double z) {
@@ -77,9 +77,9 @@ public class BestFitnessRenderer3D extends BestFitnessRenderer {
     
     @Override
     protected String getPos(Fitness fitness) {
-        double x = (fitness.getValue(0) - xMin) / xStep + 1.0;
-        double y = (fitness.getValue(1) - yMin) / yStep + 1.0;
-        double z = (fitness.getValue(2) - zMin) / zStep + 1.0;
+        double x = (fitness.getValue(0) - xMin) / xStep;
+        double y = (fitness.getValue(1) - yMin) / yStep;
+        double z = (fitness.getValue(2) - zMin) / zStep;
         
         return getPos(x, y, z);
     }
@@ -93,14 +93,36 @@ public class BestFitnessRenderer3D extends BestFitnessRenderer {
     
     @Override
     protected void createAxes(StringBuilder dot) {
+        double xZero = -xMin / xStep;
+        double yZero = -yMin / yStep;
+        double zZero = -zMin / zStep;
+        
+        if (xZero < 0) {
+            xZero = 0;
+        } else if (xZero > 10) {
+            xZero = 10;
+        }
+        if (yZero < 0) {
+            yZero = 0;
+        } else if (yZero > 10) {
+            yZero = 10;
+        }
+        if (zZero < 0) {
+            zZero = 0;
+        } else if (zZero > 10) {
+            zZero = 10;
+        }
+        
         dot
-            .append("        \"origin\" [label=\"\", pos=" + getPos(0, 0, 0) + ", width=0, height=0];\n")
-            .append("        \"xHead\" [label=\"\", pos=" + getPos(11.2, 0, 0) + ", width=0, height=0];\n")
-            .append("        \"yHead\" [label=\"\", pos=" + getPos(0, 11.2, 0) + ", width=0, height=0];\n")
-            .append("        \"zHead\" [label=\"\", pos=" + getPos(0, 0, 11.2) + ", width=0, height=0];\n")
-            .append("        \"origin\" -> \"xHead\";\n")
-            .append("        \"origin\" -> \"yHead\";\n")
-            .append("        \"origin\" -> \"zHead\";\n")
+            .append("        \"xOrigin\" [label=\"\", pos=" + getPos(0, yZero, zZero) + ", width=0, height=0];\n")
+            .append("        \"xHead\" [label=\"\", pos=" + getPos(9.9, yZero, zZero) + ", width=0, height=0];\n")
+            .append("        \"yOrigin\" [label=\"\", pos=" + getPos(xZero, 0, zZero) + ", width=0, height=0];\n")
+            .append("        \"yHead\" [label=\"\", pos=" + getPos(xZero, 9.9, zZero) + ", width=0, height=0];\n")
+            .append("        \"zOrigin\" [label=\"\", pos=" + getPos(xZero, yZero, 0) + ", width=0, height=0];\n")
+            .append("        \"zHead\" [label=\"\", pos=" + getPos(xZero, yZero, 9.9) + ", width=0, height=0];\n")
+            .append("        \"xOrigin\" -> \"xHead\";\n")
+            .append("        \"yOrigin\" -> \"yHead\";\n")
+            .append("        \"zOrigin\" -> \"zHead\";\n")
             .append("\n");
         
         // axis labels aren't rendered anyway
@@ -108,14 +130,13 @@ public class BestFitnessRenderer3D extends BestFitnessRenderer {
     
     @Override
     protected boolean checkDistance(Fitness previous, Fitness current, double minDist) {
-        double x1 = (previous.getValue(0) - xMin) / xStep + 1.0;
-        double y1 = (previous.getValue(1) - yMin) / yStep + 1.0;
-        double z1 = (previous.getValue(2) - zMin) / zStep + 1.0;
+        double x1 = (previous.getValue(0) - xMin) / xStep;
+        double y1 = (previous.getValue(1) - yMin) / yStep;
+        double z1 = (previous.getValue(2) - zMin) / zStep;
         
-        double x2 = (current.getValue(0) - xMin) / xStep + 1.0;
-        double y2 = (current.getValue(1) - yMin) / yStep + 1.0;
-        double z2 = (current.getValue(2) - zMin) / zStep + 1.0;
-        
+        double x2 = (current.getValue(0) - xMin) / xStep;
+        double y2 = (current.getValue(1) - yMin) / yStep;
+        double z2 = (current.getValue(2) - zMin) / zStep;
         
         return dist(x1, y1, z1, x2, y2, z2) > minDist;
     }

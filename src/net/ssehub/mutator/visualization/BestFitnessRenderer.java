@@ -39,9 +39,9 @@ public class BestFitnessRenderer extends AbstractDotRenderer {
     
     protected void calcAxisScale(List<Fitness> bestFitnesses) {
         xMin = Double.MAX_VALUE;
-        xMax = Double.MIN_VALUE;
+        xMax = -Double.MAX_VALUE;
         yMin = Double.MAX_VALUE;
-        yMax = Double.MIN_VALUE;
+        yMax = -Double.MAX_VALUE;
         
         for (Fitness fitness : bestFitnesses) {
             if (fitness.getValue(0) < xMin) {
@@ -87,8 +87,8 @@ public class BestFitnessRenderer extends AbstractDotRenderer {
         return "circle";
     }
     
-    protected String getArrowHead() {
-        return "vee";
+    protected String getArrowAttributes() {
+        return "arrowhead=vee, arrowsize=0.8";
     }
     
     private String getPos(double x, double y) {
@@ -96,8 +96,8 @@ public class BestFitnessRenderer extends AbstractDotRenderer {
     }
     
     protected String getPos(Fitness fitness) {
-        double x = (fitness.getValue(0) - xMin) / xStep + 1.0;
-        double y = (fitness.getValue(1) - yMin) / yStep + 1.0;
+        double x = (fitness.getValue(0) - xMin) / xStep;
+        double y = (fitness.getValue(1) - yMin) / yStep;
         
         return getPos(x, y);
     }
@@ -108,16 +108,31 @@ public class BestFitnessRenderer extends AbstractDotRenderer {
     }
     
     protected void createAxes(StringBuilder dot) {
+        double xZero = -xMin / xStep;
+        double yZero = -yMin / yStep;
+        
+        if (xZero < 0) {
+            xZero = 0;
+        } else if (xZero > 10) {
+            xZero = 10;
+        }
+        if (yZero < 0) {
+            yZero = 0;
+        } else if (yZero > 10) {
+            yZero = 10;
+        }
+        
         dot
-            .append("        \"origin\" [label=\"\", pos=" + getPos(0, 0) + ", width=0, height=0];\n")
-            .append("        \"xHead\" [label=\"\", pos=" + getPos(11.2, 0) + ", width=0, height=0];\n")
-            .append("        \"yHead\" [label=\"\", pos=" + getPos(0, 11.2) + ", width=0, height=0];\n")
-            .append("        \"origin\" -> \"xHead\";\n")
-            .append("        \"origin\" -> \"yHead\";\n")
+            .append("        \"xOrigin\" [label=\"\", pos=" + getPos(0.0, yZero) + ", width=0, height=0];\n")
+            .append("        \"xHead\" [label=\"\", pos=" + getPos(10.2, yZero) + ", width=0, height=0];\n")
+            .append("        \"yOrigin\" [label=\"\", pos=" + getPos(xZero, 0.0) + ", width=0, height=0];\n")
+            .append("        \"yHead\" [label=\"\", pos=" + getPos(xZero, 10.2) + ", width=0, height=0];\n")
+            .append("        \"xOrigin\" -> \"xHead\";\n")
+            .append("        \"yOrigin\" -> \"yHead\";\n")
             .append("\n");
         
-        for (int i = 1; i <= 11; i++) {
-            double x = xMin + ((i - 1) * xStep);
+        for (int i = 0; i <= 10; i++) {
+            double x = xMin + (i * xStep);
             dot
                 .append("        \"lx")
                 .append(i)
@@ -126,12 +141,12 @@ public class BestFitnessRenderer extends AbstractDotRenderer {
                 .append("\", tooltip=\"")
                 .append(String.format(Locale.ROOT, "%." + (xPrecision + 1) + "f", x))
                 .append("\", pos=")
-                .append(getPos(i, -0.2))
+                .append(getPos(i, yZero - 0.2))
                 .append("];\n");
         }
         dot.append("\n");
-        for (int i = 1; i <= 11; i++) {
-            double y = yMin + ((i - 1) * yStep);
+        for (int i = 0; i <= 10; i++) {
+            double y = yMin + (i * yStep);
             dot
                 .append("        \"ly")
                 .append(i)
@@ -140,17 +155,17 @@ public class BestFitnessRenderer extends AbstractDotRenderer {
                 .append("\", tooltip=\"")
                 .append(String.format(Locale.ROOT, "%." + (yPrecision + 1) + "f", y))
                 .append("\", pos=")
-                .append(getPos(-0.2, i))
+                .append(getPos(xZero - 0.2, i))
                 .append("];\n");
         }
     }
     
     protected boolean checkDistance(Fitness previous, Fitness current, double minDist) {
-        double x1 = (previous.getValue(0) - xMin) / xStep + 1.0;
-        double y1 = (previous.getValue(1) - yMin) / yStep + 1.0;
+        double x1 = (previous.getValue(0) - xMin) / xStep;
+        double y1 = (previous.getValue(1) - yMin) / yStep;
         
-        double x2 = (current.getValue(0) - xMin) / xStep + 1.0;
-        double y2 = (current.getValue(1) - yMin) / yStep + 1.0;
+        double x2 = (current.getValue(0) - xMin) / xStep;
+        double y2 = (current.getValue(1) - yMin) / yStep;
         
         return dist(x1, y1, x2, y2) > minDist;
     }
@@ -170,7 +185,7 @@ public class BestFitnessRenderer extends AbstractDotRenderer {
             .append("digraph fitness {\n")
             .append("    " + getGraphAttributes() + "\n")
             .append("    node [shape=" + getNodeShape() + ", margin=\"0.1\", width=0.4, height=0.4, fixedsize=true];\n")
-            .append("    edge [arrowhead=" + getArrowHead() + ", arrowsize=0.8];\n")
+            .append("    edge [" + getArrowAttributes() + "];\n")
             .append("\n");
         
         // axes
