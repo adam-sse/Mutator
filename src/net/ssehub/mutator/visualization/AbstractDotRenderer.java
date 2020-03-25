@@ -31,9 +31,14 @@ abstract class AbstractDotRenderer {
                 out.write(dotGraph);
             }
             
+            String type = output.getName().substring(output.getName().lastIndexOf('.') + 1);
+            if (type.equals("wrl")) {
+                type = "vrml";
+            }
+            
             List<String> command = new LinkedList<>();
             command.add(dotExe);
-            command.add("-T" + output.getName().substring(output.getName().lastIndexOf('.') + 1));
+            command.add("-T" + type);
             command.add("-K" + engine);
             command.add("-o");
             command.add(output.getAbsolutePath());

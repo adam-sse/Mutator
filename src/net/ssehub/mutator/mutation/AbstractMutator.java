@@ -2,8 +2,6 @@ package net.ssehub.mutator.mutation;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -191,25 +189,23 @@ public abstract class AbstractMutator implements IMutator {
             }
             
             if (config.getDotExe() != null) {
-                if (statBestInIteration.get(0).numValues() == 2) {
-                    File output = new File(config.getExecDir(), "fitness.svg");
+                int dimension = statBestInIteration.get(0).numValues();
+                File output = null;
+                BestFitnessRenderer renderer = null;
+                
+                if (dimension == 2) {
+                    output = new File(config.getExecDir(), "fitness.svg");
+                    renderer = new BestFitnessRenderer(config.getDotExe());
+                } else if (statBestInIteration.get(0).numValues() == 3) {
+                    output = new File(config.getExecDir(), "fitness.wrl");
+                    renderer = new BestFitnessRenderer3D(config.getDotExe());
+                }
+
+                if (renderer != null) {
                     LOGGER.println();
                     LOGGER.println("Rendering fitness evolution to " + output.getName());
                     try {
-                        new BestFitnessRenderer(config.getDotExe()).render(statBestInIteration, output);
-                    } catch (IOException e) {
-                        LOGGER.logException(e);
-                    }
-                } else if (statBestInIteration.get(0).numValues() == 3) {
-                    File output = new File(config.getExecDir(), "fitness.vrml");
-                    File output2 = new File(config.getExecDir(), "fitness.wrl");
-                    LOGGER.println();
-                    LOGGER.println("Rendering fitness evolution to " + output2.getName());
-                    try {
-                        new BestFitnessRenderer3D(config.getDotExe()).render(statBestInIteration, output);
-                        if (output.isFile()) {
-                            Files.move(output.toPath(), output2.toPath(), StandardCopyOption.ATOMIC_MOVE);
-                        }
+                        renderer.render(statBestInIteration, output);
                     } catch (IOException e) {
                         LOGGER.logException(e);
                     }
