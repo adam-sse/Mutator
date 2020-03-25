@@ -263,6 +263,10 @@ public class BestFitnessRenderer extends AbstractDotRenderer {
     }
     
     protected static int magnitude(double d) {
+        if (d == 0.0) {
+            return 0;
+        }
+        
         d = Math.abs(d);
         int magnitude = 0;
         if (d < 1.0) {
