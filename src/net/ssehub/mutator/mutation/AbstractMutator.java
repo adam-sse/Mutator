@@ -207,7 +207,9 @@ public abstract class AbstractMutator implements IMutator {
                     LOGGER.println("Rendering fitness evolution to " + output2.getName());
                     try {
                         new BestFitnessRenderer3D(config.getDotExe()).render(statBestInIteration, output);
-                        Files.move(output.toPath(), output2.toPath(), StandardCopyOption.ATOMIC_MOVE);
+                        if (output.isFile()) {
+                            Files.move(output.toPath(), output2.toPath(), StandardCopyOption.ATOMIC_MOVE);
+                        }
                     } catch (IOException e) {
                         LOGGER.logException(e);
                     }
