@@ -43,6 +43,7 @@ import net.ssehub.mutator.parsing.Converter;
 import net.ssehub.mutator.parsing.SimpleCLexer;
 import net.ssehub.mutator.parsing.SimpleCParser;
 import net.ssehub.mutator.util.Logger;
+import net.ssehub.mutator.visualization.AstRenderer;
 import net.ssehub.mutator.visualization.ControlFlowRenderer;
 
 public class Main {
@@ -66,6 +67,8 @@ public class Main {
     private File output;
     
     private String dotExe;
+    
+    private String renderType;
     
     public boolean parseOptions(String[] args) {
         LinkedList<String> arguments = new LinkedList<>(Arrays.asList(args));
@@ -132,6 +135,15 @@ public class Main {
             break;
             
         case "render":
+            if ((this.renderType = getArgument(arguments, "render type")) == null) {
+                return false;
+            }
+            if (!this.renderType.equals("control-flow") && !this.renderType.equals("ast")) {
+                System.out.println("Invalid render type " + this.renderType);
+                this.renderType = null;
+                return false;
+            }
+            
             if ((this.input = getFileArgument(arguments, "INPUT", true)) == null) {
                 return false;
             }
@@ -461,10 +473,19 @@ public class Main {
             
             // 2) print out
             LOGGER.println("Rendering...");
-            ControlFlowRenderer renderer = new ControlFlowRenderer(this.dotExe);
-            renderer.render(file, this.output);
+            switch (renderType) {
+            case "control-flow": {
+                ControlFlowRenderer renderer = new ControlFlowRenderer(this.dotExe);
+                renderer.render(file, this.output);
+            } break;
+                
+            case "ast": {
+                AstRenderer renderer = new AstRenderer(this.dotExe);
+                renderer.render(file, this.output);
+            } break;
+            }
             
-        } catch (IOException | IllegalArgumentException e) {
+        } catch (IOException e) {
             LOGGER.logException(e);
             return false;
         }
@@ -491,7 +512,12 @@ public class Main {
         System.out.println("        according to the configuration.");
         System.out.println("  clean INPUT OUTPUT");
         System.out.println("        Pretty-print the given file.");
-        System.out.println("  render INPUT OUTPUT [DOT]");
+        System.out.println("  render ast INPUT OUTPUT [DOT]");
+        System.out.println("        Renders the abstract syntax tree of the given");
+        System.out.println("        source-code file. DOT is the graphviz dot command to");
+        System.out.println("        use. OUTPUT must have a valid filename extension");
+        System.out.println("        (svg, png, pdf, or dot).");
+        System.out.println("  render control-flow INPUT OUTPUT [DOT]");
         System.out.println("        Renders the control-flow graph of the given source-");
         System.out.println("        code file. DOT is the graphviz dot command to use.");
         System.out.println("        OUTPUT must have a valid filename extension (svg,");

@@ -206,7 +206,7 @@ public class FitnessRenderer extends AbstractDotRenderer {
         
         // preamble
         dot
-            .append("digraph fitness {\n")
+            .append("digraph \"Fitness Graph\" {\n")
             .append("    " + getGraphAttributes() + "\n")
             .append("    node [shape=" + getNodeShape() + ", margin=\"0.1\", width=0.4, height=0.4, fixedsize=true];\n")
             .append("    edge [" + getArrowAttributes() + "];\n")

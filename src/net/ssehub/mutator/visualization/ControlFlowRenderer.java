@@ -67,7 +67,7 @@ public class ControlFlowRenderer extends AbstractDotRenderer {
     }
     
     private void preamble() {
-        this.dot.append("digraph ast {\n")
+        this.dot.append("digraph \"Control-Flow\" {\n")
             .append("    graph [fontname=\"Liberation Mono\"; fontsize=9];\n")
             .append("    node [fontname=\"Liberation Mono\"; fontsize=9; shape=\"rectangle\"; nojustify=\"true\"; margin=\"0.1\"; style=filled; fillcolor=white];\n")
             .append("    edge [fontname=\"Liberation Mono\"; fontsize=9; tailport=\"s\"; headport=\"n\"; arrowhead=\"vee\"; arrowsize=0.8];\n")
