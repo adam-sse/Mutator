@@ -1,6 +1,6 @@
 package net.ssehub.mutator.ast;
 
-import net.ssehub.mutator.ast.operations.IAstVisitor;
+import net.ssehub.mutator.ast.operations.IExpressionVisitor;
 
 public class BinaryExpr extends Expression {
     
@@ -34,7 +34,7 @@ public class BinaryExpr extends Expression {
     }
     
     @Override
-    public <T> T accept(IAstVisitor<T> visitor) {
+    public <T> T accept(IExpressionVisitor<T> visitor) {
         return visitor.visitBinaryExpr(this);
     }
     

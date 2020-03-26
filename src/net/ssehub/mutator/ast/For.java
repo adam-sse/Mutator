@@ -1,6 +1,6 @@
 package net.ssehub.mutator.ast;
 
-import net.ssehub.mutator.ast.operations.IAstVisitor;
+import net.ssehub.mutator.ast.operations.IStatementVisitor;
 
 public class For extends Loop {
 
@@ -23,7 +23,7 @@ public class For extends Loop {
     }
     
     @Override
-    public <T> T accept(IAstVisitor<T> visitor) {
+    public <T> T accept(IStatementVisitor<T> visitor) {
         return visitor.visitFor(this);
     }
     

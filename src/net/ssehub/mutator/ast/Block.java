@@ -3,7 +3,7 @@ package net.ssehub.mutator.ast;
 import java.util.LinkedList;
 import java.util.List;
 
-import net.ssehub.mutator.ast.operations.IAstVisitor;
+import net.ssehub.mutator.ast.operations.IStatementVisitor;
 
 public class Block extends Statement {
 
@@ -24,7 +24,7 @@ public class Block extends Statement {
     }
     
     @Override
-    public <T> T accept(IAstVisitor<T> visitor) {
+    public <T> T accept(IStatementVisitor<T> visitor) {
         return visitor.visitBlock(this);
     }
 

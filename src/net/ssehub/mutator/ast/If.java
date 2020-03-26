@@ -1,6 +1,6 @@
 package net.ssehub.mutator.ast;
 
-import net.ssehub.mutator.ast.operations.IAstVisitor;
+import net.ssehub.mutator.ast.operations.IStatementVisitor;
 
 public class If extends Statement {
 
@@ -35,7 +35,7 @@ public class If extends Statement {
     }
     
     @Override
-    public <T> T accept(IAstVisitor<T> visitor) {
+    public <T> T accept(IStatementVisitor<T> visitor) {
         return visitor.visitIf(this);
     }
 

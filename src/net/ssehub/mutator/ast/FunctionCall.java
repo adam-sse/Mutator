@@ -3,7 +3,7 @@ package net.ssehub.mutator.ast;
 import java.util.LinkedList;
 import java.util.List;
 
-import net.ssehub.mutator.ast.operations.IAstVisitor;
+import net.ssehub.mutator.ast.operations.IExpressionVisitor;
 
 public class FunctionCall extends Expression {
 
@@ -31,7 +31,7 @@ public class FunctionCall extends Expression {
     }
     
     @Override
-    public <T> T accept(IAstVisitor<T> visitor) {
+    public <T> T accept(IExpressionVisitor<T> visitor) {
         return visitor.visitFunctionCall(this);
     }
 

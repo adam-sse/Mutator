@@ -29,6 +29,7 @@ import net.ssehub.mutator.ast.UnaryExpr;
 import net.ssehub.mutator.ast.While;
 import net.ssehub.mutator.ast.operations.FullVisitor;
 import net.ssehub.mutator.ast.operations.IAstVisitor;
+import net.ssehub.mutator.ast.operations.SingleOperationVisitor;
 
 public class AstRenderer extends AbstractDotRenderer {
 
@@ -84,7 +85,7 @@ public class AstRenderer extends AbstractDotRenderer {
         render(dot.toString(), "dot", output);
     }
     
-    private static class RankCollector implements IAstVisitor<Void> {
+    private static class RankCollector extends SingleOperationVisitor<Void> {
 
         private Map<Integer, List<AstElement>> ranks = new HashMap<>();
         
@@ -97,7 +98,8 @@ public class AstRenderer extends AbstractDotRenderer {
             return rank;
         }
         
-        private void add(AstElement element) {
+        @Override
+        protected Void visit(AstElement element) {
             int rank = getRank(element);
             List<AstElement> list = ranks.get(rank);
             if (list == null) {
@@ -105,125 +107,6 @@ public class AstRenderer extends AbstractDotRenderer {
                 ranks.put(rank, list);
             }
             list.add(element);
-        }
-        
-        @Override
-        public Void visitBinaryExpr(BinaryExpr expr) {
-            add(expr);
-            return null;
-        }
-
-        @Override
-        public Void visitBlock(Block stmt) {
-            add(stmt);
-            return null;
-        }
-
-        @Override
-        public Void visitDeclaration(Declaration decl) {
-            add(decl);
-            return null;
-        }
-
-        @Override
-        public Void visitDeclarationStmt(DeclarationStmt stmt) {
-            add(stmt);
-            return null;
-        }
-
-        @Override
-        public Void visitDoWhileLoop(DoWhileLoop stmt) {
-            add(stmt);
-            return null;
-        }
-
-        @Override
-        public Void visitEmptyStmt(EmptyStmt stmt) {
-            add(stmt);
-            return null;
-        }
-
-        @Override
-        public Void visitExpressionStmt(ExpressionStmt stmt) {
-            add(stmt);
-            return null;
-        }
-
-        @Override
-        public Void visitFile(File file) {
-            add(file);
-            return null;
-        }
-
-        @Override
-        public Void visitFor(For stmt) {
-            add(stmt);
-            return null;
-        }
-
-        @Override
-        public Void visitFunction(Function func) {
-            add(func);
-            return null;
-        }
-
-        @Override
-        public Void visitFunctionCall(FunctionCall expr) {
-            add(expr);
-            return null;
-        }
-
-        @Override
-        public Void visitFunctionDecl(FunctionDecl decl) {
-            add(decl);
-            return null;
-        }
-
-        @Override
-        public Void visitIdentifier(Identifier expr) {
-            add(expr);
-            return null;
-        }
-
-        @Override
-        public Void visitIf(If stmt) {
-            add(stmt);
-            return null;
-        }
-
-        @Override
-        public Void visitJumpStmt(JumpStmt stmt) {
-            add(stmt);
-            return null;
-        }
-
-        @Override
-        public Void visitLiteral(Literal expr) {
-            add(expr);
-            return null;
-        }
-
-        @Override
-        public Void visitReturn(Return stmt) {
-            add(stmt);
-            return null;
-        }
-
-        @Override
-        public Void visitType(Type type) {
-            add(type);
-            return null;
-        }
-
-        @Override
-        public Void visitUnaryExpr(UnaryExpr expr) {
-            add(expr);
-            return null;
-        }
-
-        @Override
-        public Void visitWhile(While stmt) {
-            add(stmt);
             return null;
         }
         

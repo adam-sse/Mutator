@@ -1,6 +1,6 @@
 package net.ssehub.mutator.ast;
 
-import net.ssehub.mutator.ast.operations.IAstVisitor;
+import net.ssehub.mutator.ast.operations.IStatementVisitor;
 
 public class Return extends Statement {
 
@@ -25,7 +25,7 @@ public class Return extends Statement {
     }
     
     @Override
-    public <T> T accept(IAstVisitor<T> visitor) {
+    public <T> T accept(IStatementVisitor<T> visitor) {
         return visitor.visitReturn(this);
     }
 

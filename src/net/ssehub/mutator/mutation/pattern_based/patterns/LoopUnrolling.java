@@ -29,8 +29,10 @@ import net.ssehub.mutator.ast.UnaryExpr;
 import net.ssehub.mutator.ast.UnaryOperator;
 import net.ssehub.mutator.ast.While;
 import net.ssehub.mutator.ast.operations.AstCloner;
+import net.ssehub.mutator.ast.operations.FullStatementVisitor;
 import net.ssehub.mutator.ast.operations.FullVisitor;
 import net.ssehub.mutator.ast.operations.IAstVisitor;
+import net.ssehub.mutator.ast.operations.IStatementVisitor;
 import net.ssehub.mutator.ast.operations.IdFinder;
 import net.ssehub.mutator.mutation.genetic.mutations.StatementInserter;
 
@@ -411,7 +413,7 @@ public class LoopUnrolling implements IOpportunity {
 
     public static List<LoopUnrolling> findOpportunities(File ast) {
         LoopUnrollingFinder finder = new LoopUnrollingFinder();
-        ast.accept(new FullVisitor(finder));
+        ast.accept(new FullStatementVisitor(finder));
         
         // sort higher IDs first -> inner loops come before outer loops
         finder.opportunities.sort((o1, o2) -> Long.compare(o2.loopId, o1.loopId));
@@ -419,22 +421,12 @@ public class LoopUnrolling implements IOpportunity {
         return finder.opportunities;
     }
     
-    private static class LoopUnrollingFinder implements IAstVisitor<Void> {
+    private static class LoopUnrollingFinder implements IStatementVisitor<Void> {
 
         private List<LoopUnrolling> opportunities = new LinkedList<>();
         
         @Override
-        public Void visitBinaryExpr(BinaryExpr expr) {
-            return null;
-        }
-
-        @Override
         public Void visitBlock(Block stmt) {
-            return null;
-        }
-
-        @Override
-        public Void visitDeclaration(Declaration decl) {
             return null;
         }
 
@@ -455,11 +447,6 @@ public class LoopUnrolling implements IOpportunity {
 
         @Override
         public Void visitExpressionStmt(ExpressionStmt stmt) {
-            return null;
-        }
-
-        @Override
-        public Void visitFile(File file) {
             return null;
         }
 
@@ -569,26 +556,6 @@ public class LoopUnrolling implements IOpportunity {
         }
 
         @Override
-        public Void visitFunction(Function func) {
-            return null;
-        }
-
-        @Override
-        public Void visitFunctionCall(FunctionCall expr) {
-            return null;
-        }
-        
-        @Override
-        public Void visitFunctionDecl(FunctionDecl decl) {
-            return null;
-        }
-
-        @Override
-        public Void visitIdentifier(Identifier expr) {
-            return null;
-        }
-
-        @Override
         public Void visitIf(If stmt) {
             return null;
         }
@@ -599,22 +566,7 @@ public class LoopUnrolling implements IOpportunity {
         }
 
         @Override
-        public Void visitLiteral(Literal expr) {
-            return null;
-        }
-
-        @Override
         public Void visitReturn(Return stmt) {
-            return null;
-        }
-
-        @Override
-        public Void visitType(Type type) {
-            return null;
-        }
-
-        @Override
-        public Void visitUnaryExpr(UnaryExpr expr) {
             return null;
         }
 

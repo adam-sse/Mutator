@@ -18,28 +18,19 @@ import net.ssehub.mutator.ast.BinaryOperator;
 import net.ssehub.mutator.ast.Block;
 import net.ssehub.mutator.ast.Declaration;
 import net.ssehub.mutator.ast.DeclarationStmt;
-import net.ssehub.mutator.ast.DoWhileLoop;
-import net.ssehub.mutator.ast.EmptyStmt;
 import net.ssehub.mutator.ast.Expression;
-import net.ssehub.mutator.ast.ExpressionStmt;
 import net.ssehub.mutator.ast.File;
 import net.ssehub.mutator.ast.For;
-import net.ssehub.mutator.ast.Function;
 import net.ssehub.mutator.ast.FunctionCall;
-import net.ssehub.mutator.ast.FunctionDecl;
 import net.ssehub.mutator.ast.Identifier;
-import net.ssehub.mutator.ast.If;
-import net.ssehub.mutator.ast.JumpStmt;
 import net.ssehub.mutator.ast.Literal;
-import net.ssehub.mutator.ast.Return;
 import net.ssehub.mutator.ast.Statement;
 import net.ssehub.mutator.ast.Type;
 import net.ssehub.mutator.ast.UnaryExpr;
 import net.ssehub.mutator.ast.UnaryOperator;
-import net.ssehub.mutator.ast.While;
 import net.ssehub.mutator.ast.operations.AstCloner;
-import net.ssehub.mutator.ast.operations.FullVisitor;
-import net.ssehub.mutator.ast.operations.IAstVisitor;
+import net.ssehub.mutator.ast.operations.FullExpressionVisitor;
+import net.ssehub.mutator.ast.operations.IExpressionVisitor;
 import net.ssehub.mutator.ast.operations.IdFinder;
 import net.ssehub.mutator.mutation.genetic.mutations.ElementReplacer;
 import net.ssehub.mutator.mutation.genetic.mutations.StatementInserter;
@@ -162,7 +153,7 @@ public class CommonSubExpressionElimination implements IOpportunity {
     public static List<CommonSubExpressionElimination> findOpportunities(File ast) {
         
         ExpressionCounter counter = new ExpressionCounter();
-        ast.accept(new FullVisitor(counter));
+        ast.accept(new FullExpressionVisitor(counter));
         
         List<Map.Entry<Expression, Integer>> entries = new ArrayList<>(counter.count.entrySet());
         entries = entries.stream()
@@ -242,7 +233,7 @@ public class CommonSubExpressionElimination implements IOpportunity {
         return elements[0];
     }
     
-    private static class ExpressionCounter implements IAstVisitor<Void> {
+    private static class ExpressionCounter implements IExpressionVisitor<Void> {
 
         private static final Set<BinaryOperator> ASSIGNMENTS = new HashSet<>(Arrays.asList(
                 BinaryOperator.ASSIGNMENT, BinaryOperator.ASSIGNMENT_AND, BinaryOperator.ASSIGNMENT_DIV,
@@ -291,61 +282,11 @@ public class CommonSubExpressionElimination implements IOpportunity {
         }
 
         @Override
-        public Void visitBlock(Block stmt) {
-            return null;
-        }
-
-        @Override
-        public Void visitDeclaration(Declaration decl) {
-            return null;
-        }
-
-        @Override
-        public Void visitDeclarationStmt(DeclarationStmt stmt) {
-            return null;
-        }
-
-        @Override
-        public Void visitDoWhileLoop(DoWhileLoop stmt) {
-            return null;
-        }
-
-        @Override
-        public Void visitEmptyStmt(EmptyStmt stmt) {
-            return null;
-        }
-
-        @Override
-        public Void visitExpressionStmt(ExpressionStmt stmt) {
-            return null;
-        }
-
-        @Override
-        public Void visitFile(File file) {
-            return null;
-        }
-
-        @Override
-        public Void visitFor(For stmt) {
-            return null;
-        }
-
-        @Override
-        public Void visitFunction(Function func) {
-            return null;
-        }
-
-        @Override
         public Void visitFunctionCall(FunctionCall expr) {
             addAndIncrement(expr);
             return null;
         }
 
-        @Override
-        public Void visitFunctionDecl(FunctionDecl decl) {
-            return null;
-        }
-        
         @Override
         public Void visitIdentifier(Identifier expr) {
             // don't add single identifiers
@@ -353,28 +294,8 @@ public class CommonSubExpressionElimination implements IOpportunity {
         }
 
         @Override
-        public Void visitIf(If stmt) {
-            return null;
-        }
-
-        @Override
-        public Void visitJumpStmt(JumpStmt stmt) {
-            return null;
-        }
-
-        @Override
         public Void visitLiteral(Literal expr) {
             // don't add single literals
-            return null;
-        }
-
-        @Override
-        public Void visitReturn(Return stmt) {
-            return null;
-        }
-
-        @Override
-        public Void visitType(Type type) {
             return null;
         }
 
@@ -389,63 +310,13 @@ public class CommonSubExpressionElimination implements IOpportunity {
             return null;
         }
 
-        @Override
-        public Void visitWhile(While stmt) {
-            return null;
-        }
-        
     }
     
-    private static class ExpressionComplexityMeasuerer implements IAstVisitor<Integer> {
+    private static class ExpressionComplexityMeasuerer implements IExpressionVisitor<Integer> {
 
         @Override
         public Integer visitBinaryExpr(BinaryExpr expr) {
             return 1 + expr.left.accept(this) + expr.right.accept(this);
-        }
-
-        @Override
-        public Integer visitBlock(Block stmt) {
-            return null;
-        }
-
-        @Override
-        public Integer visitDeclaration(Declaration decl) {
-            return null;
-        }
-
-        @Override
-        public Integer visitDeclarationStmt(DeclarationStmt stmt) {
-            return null;
-        }
-
-        @Override
-        public Integer visitDoWhileLoop(DoWhileLoop stmt) {
-            return null;
-        }
-
-        @Override
-        public Integer visitEmptyStmt(EmptyStmt stmt) {
-            return null;
-        }
-
-        @Override
-        public Integer visitExpressionStmt(ExpressionStmt stmt) {
-            return null;
-        }
-
-        @Override
-        public Integer visitFile(File file) {
-            return null;
-        }
-
-        @Override
-        public Integer visitFor(For stmt) {
-            return null;
-        }
-
-        @Override
-        public Integer visitFunction(Function func) {
-            return null;
         }
 
         @Override
@@ -458,23 +329,8 @@ public class CommonSubExpressionElimination implements IOpportunity {
         }
 
         @Override
-        public Integer visitFunctionDecl(FunctionDecl decl) {
-            return null;
-        }
-        
-        @Override
         public Integer visitIdentifier(Identifier expr) {
             return 1;
-        }
-
-        @Override
-        public Integer visitIf(If stmt) {
-            return null;
-        }
-
-        @Override
-        public Integer visitJumpStmt(JumpStmt stmt) {
-            return null;
         }
 
         @Override
@@ -483,23 +339,8 @@ public class CommonSubExpressionElimination implements IOpportunity {
         }
 
         @Override
-        public Integer visitReturn(Return stmt) {
-            return null;
-        }
-
-        @Override
-        public Integer visitType(Type type) {
-            return null;
-        }
-
-        @Override
         public Integer visitUnaryExpr(UnaryExpr expr) {
             return 1 + expr.expr.accept(this);
-        }
-
-        @Override
-        public Integer visitWhile(While stmt) {
-            return null;
         }
         
     }
