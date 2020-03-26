@@ -11,8 +11,12 @@ import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Properties;
 
 import org.antlr.v4.runtime.BaseErrorListener;
@@ -45,36 +49,210 @@ public class Main {
     
     private static final Logger LOGGER = Logger.get(Main.class.getSimpleName());
     
-    private static int help() {
-        LOGGER.println("Usage: <command> <command-specific arguments>*");
-        LOGGER.println("Available commands:");
-        LOGGER.println("  help                             : "
-                + "Display this help message");
-        LOGGER.println("  run <configuration> <input file> : "
-                + "Run the main Mutator program with the given configuration");
-        LOGGER.println("  clean <input file> <output file> : "
-                + "Pretty-print the given file");
-        LOGGER.println("  render <dot exe> <input file> <output file> : "
-                + "Renders the control-flow graph of the given source code file");
-        LOGGER.println("  evaluate <configuration> <input file> : "
-                + "Evaluates the given input file according to the configuration");
-        return 0;
+    private static final int SUCCESS = 0;
+    
+    private static final int INVALID_USAGE = 1;
+    
+    private static final int ERROR = 2;
+    
+    private String argCommand;
+    
+    private File propertiesFile;
+    
+    private Properties properties;
+    
+    private File input;
+    
+    private File output;
+    
+    private String dotExe;
+    
+    public boolean parseOptions(String[] args) {
+        LinkedList<String> arguments = new LinkedList<>(Arrays.asList(args));
+        
+        Map<String, String> cliConfig = new HashMap<>(args.length);
+        
+        while (!arguments.isEmpty() && arguments.peek().startsWith("-")) {
+            String option = arguments.remove();
+            switch (option) {
+            case "-D": {
+                if (arguments.isEmpty()) {
+                    System.out.println("Missing KEY=VALUE for option -D");
+                    return false;
+                }
+                String assignment = arguments.remove();
+                int equalsIndex = assignment.indexOf('=');
+                if (equalsIndex == -1) {
+                    System.out.println("Expecting KEY=VALUE after option -D");
+                    return false;
+                }
+                
+                cliConfig.put(assignment.substring(0, equalsIndex), assignment.substring(equalsIndex + 1));
+            } break;
+            
+            default:
+                System.out.println("Unknown option: " + option);
+                return false;
+            }
+        }
+        
+        if (arguments.isEmpty()) {
+            System.out.println("Missing COMMAND");
+            return false;
+        }
+        
+        this.argCommand = arguments.remove();
+        switch (this.argCommand) {
+        
+        case "run":
+            if ((this.propertiesFile = getFileArgument(arguments, "CONFIGURATION", true)) == null) {
+                return false;
+            }
+            if ((this.input = getFileArgument(arguments, "INPUT", true)) == null) {
+                return false;
+            }
+            break;
+            
+        case "evaluate":
+            if ((this.propertiesFile = getFileArgument(arguments, "CONFIGURATION", true)) == null) {
+                return false;
+            }
+            if ((this.input = getFileArgument(arguments, "INPUT", true)) == null) {
+                return false;
+            }
+            break;
+            
+        case "clean":
+            if ((this.input = getFileArgument(arguments, "INPUT", true)) == null) {
+                return false;
+            }
+            if ((this.output = getFileArgument(arguments, "OUTPUT", false)) == null) {
+                return false;
+            }
+            break;
+            
+        case "render":
+            if ((this.input = getFileArgument(arguments, "INPUT", true)) == null) {
+                return false;
+            }
+            if ((this.output = getFileArgument(arguments, "OUTPUT", false)) == null) {
+                return false;
+            }
+            if (!arguments.isEmpty()) {
+                this.dotExe = arguments.remove();
+            } else {
+                this.dotExe = "dot";
+            }
+            
+            if (!this.output.getName().endsWith(".svg") && !this.output.getName().endsWith(".png")
+                    && !this.output.getName().endsWith(".pdf") && !this.output.getName().endsWith(".dot")) {
+                System.out.println("OUTPUT must be either .svg, .png, .pdf, or .dot");
+                this.output = null;
+                return false;
+            }
+            
+            break;
+            
+        case "help":
+            break;
+        
+        default:
+            System.out.println("Unknown command: " + this.argCommand);
+            this.argCommand = null;
+            return false;
+        }
+        
+        if (!arguments.isEmpty()) {
+            System.out.println("Too many arguments: " + arguments);
+            return false;
+        }
+        
+        if (this.propertiesFile != null) {
+            this.properties = new Properties();
+            try {
+                this.properties.load(new FileReader(this.propertiesFile));
+            } catch (IOException e) {
+                System.out.println("Can't read " + this.propertiesFile + ": " + e.getMessage());
+                this.propertiesFile = null;
+                return false;
+            }
+            
+            for (Map.Entry<String, String> entry : cliConfig.entrySet()) {
+                this.properties.setProperty(entry.getKey(), entry.getValue());
+            }
+        }
+        
+        return true;
     }
     
-    private static int run(String configPath, String inputPath) {
+    private String getArgument(LinkedList<String> arguments, String missingName) {
+        if (arguments.isEmpty()) {
+            System.out.println("Missing argument " + missingName);
+            return null;
+        }
+        return arguments.remove();
+    }
+    
+    private File getFileArgument(LinkedList<String> arguments, String missingName, boolean requireExisting) {
+        String path = getArgument(arguments, missingName);
+        
+        File result = null;
+        if (path != null) {
+            result = new File(path);
+            
+            if (requireExisting && !result.isFile()) {
+                if (!result.exists()) {
+                    System.out.println(path + " doesn't exist");
+                } else {
+                    System.out.println(path + " is not a file");
+                }
+                result = null;
+            }
+        }
+        
+        return result;
+    }
+    
+    public boolean execute() {
+        boolean success;
+        
+        switch (this.argCommand) {
+        case "run":
+            success = run();
+            break;
+            
+        case "evaluate":
+            success = evaluate();
+            break;
+            
+        case "clean":
+            success = clean();
+            break;
+            
+        case "render":
+            success = render();
+            break;
+            
+        case "help":
+            success = help();
+            break;
+        
+        default:
+            // shouldn't happen, as parseOptions() already validated the input
+            throw new IllegalStateException("Invalid argCommand: " + this.argCommand);
+        }
+
+        return success;
+    }
+    
+    private boolean run() {
         try {
-            File input = new File(inputPath);
+            String mutatorType = this.properties.getProperty("mutator").toLowerCase();
             
-            File configFile = new File(configPath);
-            Properties props = new Properties();
-            props.load(new FileReader(configFile));
-            
-            String mutatorType = props.getProperty("mutator").toLowerCase();
-            
-            int inputDotIndex = input.getName().lastIndexOf('.');
-            String inputBase = input.getName().substring(0,
-                    inputDotIndex > 0 ? inputDotIndex : input.getName().length());
-            String inputSuffix = inputDotIndex > 0 ? input.getName().substring(inputDotIndex + 1) : "";
+            int inputDotIndex = this.input.getName().lastIndexOf('.');
+            String inputBase = this.input.getName().substring(0,
+                    inputDotIndex > 0 ? inputDotIndex : this.input.getName().length());
+            String inputSuffix = inputDotIndex > 0 ? this.input.getName().substring(inputDotIndex + 1) : "";
             
             // create an execution directory
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss", Locale.ROOT);
@@ -82,7 +260,7 @@ public class Main {
             LOGGER.println("Execution directory is at " + execDir.getAbsolutePath());
             if (execDir.exists()) {
                 LOGGER.println(execDir + " already exists");
-                return 2;
+                return false;
             }
             execDir.mkdir();
             
@@ -90,26 +268,26 @@ public class Main {
             Logger.setFileOut(new File(execDir, "mutator.log"));
             
             // copy config to execDir
-            Files.copy(configFile.toPath(), new File(execDir, "config.properties").toPath());
+            Files.copy(this.propertiesFile.toPath(), new File(execDir, "config.properties").toPath());
             
             IMutator mutator;
             BaseConfig config;
             switch (mutatorType) {
             case "genetic":
-                config = new GeneticConfig(props);
+                config = new GeneticConfig(this.properties);
                 FitnessComparatorFactory.init(config);
                 config.setExecDir(execDir);
                 mutator = new GeneticMutator((GeneticConfig) config);
                 break;
             case "patternbased":
-                config = new PatternBasedConfig(props);
+                config = new PatternBasedConfig(this.properties);
                 FitnessComparatorFactory.init(config);
                 config.setExecDir(execDir);
                 mutator = new PatternBasedMutator((PatternBasedConfig) config);
                 break;
             default:
                 LOGGER.println("Invalid mutator setting: " + mutatorType);
-                return 2;
+                return false;
             }
             
             // copy the evaluation resources to the exec directory
@@ -123,7 +301,7 @@ public class Main {
             
             // 1) parse file to mutate
             LOGGER.println("Parsing...");
-            net.ssehub.mutator.ast.File file = parse(input);
+            net.ssehub.mutator.ast.File file = parse(this.input);
             
             // write to execDir
             File inputOut = new File(execDir, "input." + inputSuffix);
@@ -188,173 +366,148 @@ public class Main {
             
         } catch (IOException | IllegalArgumentException e) {
             LOGGER.logException(e);
-            return 2;
+            return false;
         }
         
-        return 0;
+        return true;
     }
-    
-    private static int clean(String inputPath, String outpuPath) {
+
+    private boolean evaluate() {
         try {
-            File input = new File(inputPath);
+            BaseConfig config = new BaseConfig(this.properties);
+            FitnessComparatorFactory.init(config);
             
             // 1) parse file
             LOGGER.println("Parsing...");
-            net.ssehub.mutator.ast.File file = parse(input);
+            net.ssehub.mutator.ast.File file = parse(this.input);
+            PseudoMutant mutant = new PseudoMutant(file);
+            
+            // 2) set up temporary evaluation directory
+            File tmp = File.createTempFile("mutator_evaluation", null);
+            tmp.delete();
+            tmp.mkdir();
+            config.setExecDir(tmp);
+            tmp.deleteOnExit();
+            
+            config.getEvalDir().mkdir();
+            File newTestSrc = new File(config.getEvalDir(), config.getTestSrc().getName());
+            Files.copy(config.getTestSrc().toPath(), newTestSrc.toPath());
+            config.setTestSrc(newTestSrc);
+            File newFitnessSrc = new File(config.getEvalDir(), config.getFitnessSrc().getName());
+            Files.copy(config.getFitnessSrc().toPath(), newFitnessSrc.toPath());
+            config.setFitnessSrc(newFitnessSrc);
+            
+            // 3) evaluate
+            LOGGER.println("Evaluating...");
+            Evaluator evaluator = EvaluatorFactory.create(config);
+            TestResult result = evaluator.test(mutant);
+            LOGGER.println("Test result: " + result);
+            if (result == TestResult.PASS) {
+                Fitness fitness = evaluator.measureFitness(mutant);
+                LOGGER.println("Fitness: " + fitness);
+                LOGGER.println("  (= " + FitnessComparatorFactory.get().toSingleValue(fitness) + ")");
+            }
+            
+            // 4) clean up
+            Files.walkFileTree(tmp.toPath(), new SimpleFileVisitor<Path>() {
+                
+                @Override
+                public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                    Files.delete(file);
+                    return FileVisitResult.CONTINUE;
+                }
+                
+                @Override
+                public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+                    Files.delete(dir);
+                    return FileVisitResult.CONTINUE;
+                }
+                
+            });
+        } catch (IOException e) {
+            LOGGER.logException(e);
+            return false;
+        }
+        
+        return true;
+    }
+
+    private boolean clean() {
+        try {
+            // 1) parse file
+            LOGGER.println("Parsing...");
+            net.ssehub.mutator.ast.File file = parse(this.input);
             
             // 2) print out
             LOGGER.println("Writing...");
             
-            try (FileWriter out = new FileWriter(outpuPath)) {
+            try (FileWriter out = new FileWriter(this.output)) {
                 out.write(file.accept(new AstPrettyPrinter(false)));
             }
             
         } catch (IOException | IllegalArgumentException e) {
             LOGGER.logException(e);
-            return 2;
+            return false;
         }
         
-        return 0;
+        return false;
     }
-    
-    private static int render(String dotExe, String inputPath, String outputPath) {
+
+    private boolean render() {
         try {
-            if (!outputPath.endsWith(".png") && !outputPath.endsWith(".svg")
-                    && !outputPath.endsWith(".pdf") && !outputPath.endsWith(".dot")) {
-                LOGGER.println("Output must be either .png, .svg, .pdf, or .dot");
-                return 2;
-            }
-            
-            File input = new File(inputPath);
-            File ouput = new File(outputPath);
-            
             // 1) parse file
             LOGGER.println("Parsing...");
-            net.ssehub.mutator.ast.File file = parse(input);
+            net.ssehub.mutator.ast.File file = parse(this.input);
             
             // 2) print out
             LOGGER.println("Rendering...");
-            ControlFlowRenderer renderer = new ControlFlowRenderer(dotExe);
-            renderer.render(file, ouput);
+            ControlFlowRenderer renderer = new ControlFlowRenderer(this.dotExe);
+            renderer.render(file, this.output);
             
         } catch (IOException | IllegalArgumentException e) {
             LOGGER.logException(e);
-            return 2;
+            return false;
         }
         
-        return 0;
+        return true;
     }
 
-    private static int evaluate(String configPath, String inputPath) throws IOException {
-        File input = new File(inputPath);
+    private boolean help() {
+        System.out.println("Usage: mutator [OPTION]... COMMAND [ARGUMENT...]");
+        System.out.println();
+        System.out.println("Execute mutator with a given command (task).");
+        System.out.println();
+        System.out.println("Options:");
+        System.out.println("  -D KEY=VALUE");
+        System.out.println("        Set the given configuration key to the given value.");
+        System.out.println("        Overrides the supplied configuration file (if any).");
+        System.out.println();
+        System.out.println("Commands:");
+        System.out.println("  run CONFIGURATION INPUT");
+        System.out.println("        Run the main Mutator program based on the given");
+        System.out.println("        configuration.");
+        System.out.println("  evaluate CONFIGURATION INPUT");
+        System.out.println("        Evaluates the fitness of the given input file");
+        System.out.println("        according to the configuration.");
+        System.out.println("  clean INPUT OUTPUT");
+        System.out.println("        Pretty-print the given file.");
+        System.out.println("  render INPUT OUTPUT [DOT]");
+        System.out.println("        Renders the control-flow graph of the given source-");
+        System.out.println("        code file. DOT is the graphviz dot command to use.");
+        System.out.println("        OUTPUT must have a valid filename extension (svg,");
+        System.out.println("        png, pdf, or dot).");
+        System.out.println("  help");
+        System.out.println("        Display this help message.");
+        System.out.println();
+        System.out.println("Exit status:");
+        System.out.println("  " + SUCCESS);
+        System.out.println("        Execution was successful.");
+        System.out.println("  " + INVALID_USAGE);
+        System.out.println("        Invalid usage (e.g. wrong command-line arguments).");
+        System.out.println("  " + ERROR);
+        System.out.println("        Error during execution.");
         
-        File configFile = new File(configPath);
-        Properties props = new Properties();
-        props.load(new FileReader(configFile));
-        
-        BaseConfig config = new BaseConfig(props);
-        FitnessComparatorFactory.init(config);
-        
-        // 1) parse file
-        LOGGER.println("Parsing...");
-        net.ssehub.mutator.ast.File file = parse(input);
-        PseudoMutant mutant = new PseudoMutant(file);
-        
-        // 2) set up temporary evaluation directory
-        File tmp = File.createTempFile("mutator_evaluation", null);
-        tmp.delete();
-        tmp.mkdir();
-        config.setExecDir(tmp);
-        tmp.deleteOnExit();
-        
-        config.getEvalDir().mkdir();
-        File newTestSrc = new File(config.getEvalDir(), config.getTestSrc().getName());
-        Files.copy(config.getTestSrc().toPath(), newTestSrc.toPath());
-        config.setTestSrc(newTestSrc);
-        File newFitnessSrc = new File(config.getEvalDir(), config.getFitnessSrc().getName());
-        Files.copy(config.getFitnessSrc().toPath(), newFitnessSrc.toPath());
-        config.setFitnessSrc(newFitnessSrc);
-        
-        // 3) evaluate
-        LOGGER.println("Evaluating...");
-        Evaluator evaluator = EvaluatorFactory.create(config);
-        TestResult result = evaluator.test(mutant);
-        LOGGER.println("Test result: " + result);
-        if (result == TestResult.PASS) {
-            Fitness fitness = evaluator.measureFitness(mutant);
-            LOGGER.println("Fitness: " + fitness);
-            LOGGER.println("  (= " + FitnessComparatorFactory.get().toSingleValue(fitness) + ")");
-        }
-        
-        // 4) clean up
-        Files.walkFileTree(tmp.toPath(), new SimpleFileVisitor<Path>() {
-            
-            @Override
-            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-                Files.delete(file);
-                return FileVisitResult.CONTINUE;
-            }
-            
-            @Override
-            public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
-                Files.delete(dir);
-                return FileVisitResult.CONTINUE;
-            }
-            
-        });
-        
-        return 0;
-    }
-
-    public static void main(String[] args) throws IOException {
-        if (args.length < 1) {
-            help();
-            System.exit(1);
-        }
-        
-        int result = 1;
-        switch (args[0]) {
-        case "help":
-            result = help();
-            break;
-            
-        case "run":
-            if (args.length != 3) {
-                help();
-            } else {
-                result = run(args[1], args[2]);
-            }
-            break;
-            
-        case "clean":
-            if (args.length != 3) {
-                help();
-            } else {
-                result = clean(args[1], args[2]);
-            }
-            break;
-        case "render":
-            if (args.length != 4) {
-                help();
-            } else {
-                result = render(args[1], args[2], args[3]);
-            }
-            break;
-            
-        case "evaluate":
-            if (args.length != 3) {
-                help();
-            } else {
-                result = evaluate(args[1], args[2]);
-            }
-            break;
-            
-        default:
-            help();
-            break;
-        }
-        
-        System.exit(result);
+        return true;
     }
     
     private static net.ssehub.mutator.ast.File parse(File input) throws IOException {
@@ -374,6 +527,22 @@ public class Main {
         Converter converter = new Converter();
         net.ssehub.mutator.ast.File file = converter.convert(parser.file());
         return file;
+    }
+
+    public static void main(String[] args) throws IOException {
+        Main main = new Main();
+        
+        if (!main.parseOptions(args)) {
+            System.out.println();
+            main.help();
+            System.exit(INVALID_USAGE);
+        }
+        
+        if (!main.execute()) {
+            System.exit(ERROR);
+        }
+        
+        System.exit(SUCCESS);
     }
 
 }
