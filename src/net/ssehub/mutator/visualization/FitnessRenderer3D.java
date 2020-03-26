@@ -86,8 +86,8 @@ public class FitnessRenderer3D extends FitnessRenderer {
 
     @Override
     protected String getPosTooltipp(Fitness fitness) {
-        return String.format(Locale.ROOT, "\"%." + (xPrecision + 1) + "f, %." + (yPrecision + 1) + "f"
-                + ", %." + (zPrecision + 1) + "f\"",
+        return String.format(Locale.ROOT, "%." + (xPrecision + 1) + "f, %." + (yPrecision + 1) + "f"
+                + ", %." + (zPrecision + 1) + "f",
                 fitness.getValue(0), fitness.getValue(1), fitness.getValue(2));
     }
     
