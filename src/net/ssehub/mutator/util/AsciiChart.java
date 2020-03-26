@@ -45,11 +45,19 @@ public class AsciiChart {
     public String toString() {
         int width = this.maxX - this.minX + 1;
 
-        double ySteps = (this.maxY - this.minY) / (this.rows - 1);
+        double ySteps;
+        int rows = this.rows;
+        if (this.minY == this.maxY) {
+            rows = 1;
+            ySteps = 1;
+        } else {
+            ySteps = (this.maxY - this.minY) / (rows - 1);
+        }
         
-        boolean[][] dots = new boolean[width][this.rows];
+        
+        boolean[][] dots = new boolean[width][rows];
         for (Point p : this.points) {
-            int ry = this.rows - 1 - (int) Math.round((p.y - this.minY) / ySteps);
+            int ry = rows - 1 - (int) Math.round((p.y - this.minY) / ySteps);
             dots[p.x - this.minX][ry] = true;
         }
 
@@ -58,9 +66,9 @@ public class AsciiChart {
         
         StringBuilder result = new StringBuilder();
         
-        for (int row = 0; row < this.rows; row++) {
+        for (int row = 0; row < rows; row++) {
             
-            result.append(String.format(Locale.ROOT, "%10.2f | ", (this.rows - row - 1) * ySteps + this.minY));
+            result.append(String.format(Locale.ROOT, "%10.2f | ", (rows - row - 1) * ySteps + this.minY));
             
             for (int column = 0; column < width; column++) {
                 if (dots[column][row]) {
