@@ -155,7 +155,9 @@ public class GeneticMutator extends AbstractMutator {
             }
         }
 
-        cleanPopulation();
+        if ((this.generation - 1) % config.getCleanFrequency() != 0) {
+            cleanPopulation();
+        }
         
         return this.population.convertToList();
     }
