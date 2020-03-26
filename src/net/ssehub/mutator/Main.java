@@ -4,11 +4,8 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.file.FileVisitResult;
+import java.io.UncheckedIOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.SimpleFileVisitor;
-import java.nio.file.attribute.BasicFileAttributes;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
@@ -42,7 +39,9 @@ import net.ssehub.mutator.mutation.pattern_based.PatternBasedMutator;
 import net.ssehub.mutator.parsing.Converter;
 import net.ssehub.mutator.parsing.SimpleCLexer;
 import net.ssehub.mutator.parsing.SimpleCParser;
+import net.ssehub.mutator.util.AsciiTable;
 import net.ssehub.mutator.util.Logger;
+import net.ssehub.mutator.util.Util;
 import net.ssehub.mutator.visualization.AstRenderer;
 import net.ssehub.mutator.visualization.ControlFlowRenderer;
 
@@ -338,17 +337,11 @@ public class Main {
                 originalFitness = comparator.toSingleValue(mutator.getFitness(mutator.getUnmodifiedId()));
             }
             
-            LOGGER.print(" Rank |   Mutant   | Fitness |  Best  ");
+            AsciiTable table;
             if (originalFitness != null) {
-                LOGGER.println("| Original ");
+                table = new AsciiTable("Rank", "Mutant", "Fitness", "Best", "Original");
             } else {
-                LOGGER.println();
-            }
-            LOGGER.print("------+------------+---------+--------");
-            if (originalFitness != null) {
-                LOGGER.println("+----------");
-            } else {
-                LOGGER.println();
+                table = new AsciiTable("Rank", "Mutant", "Fitness", "Best");
             }
             
             for (int i = 0; i < mutants.size(); i++) {
@@ -356,15 +349,14 @@ public class Main {
                 
                 Fitness fitness = mutator.getFitness(mutant.getId());
                 double fd = comparator.toSingleValue(mutator.getFitness(mutant.getId()));
-                LOGGER.printf("  %2d  | %10s | %7s | %5.1f%%",
-                        i + 1,
-                        mutant.getId(),
-                        fitness,
-                        fd / bestFitness * 100);
+                
                 if (originalFitness != null) {
-                    LOGGER.printf(" | %6.1f%%\n", fd / originalFitness * 100);
+                    table.addRow(i + 1, mutant.getId(), fitness,
+                            String.format(Locale.ROOT, "%.1f %%", fd / bestFitness * 100),
+                            String.format(Locale.ROOT, "%.1f %%", fd / originalFitness * 100));
                 } else {
-                    LOGGER.println();
+                    table.addRow(i + 1, mutant.getId(), fitness,
+                            String.format(Locale.ROOT, "%.1f %%", fd / bestFitness * 100));
                 }
                 
                 File output = new File(execDir, "result_" + (i + 1) + "_"
@@ -372,7 +364,8 @@ public class Main {
                 mutant.write(output);
             }
             
-            LOGGER.println();
+            LOGGER.println(table.toString());
+            
             LOGGER.println("Statistics:");
             mutator.printStatistics();
             
@@ -421,21 +414,8 @@ public class Main {
             }
             
             // 4) clean up
-            Files.walkFileTree(tmp.toPath(), new SimpleFileVisitor<Path>() {
-                
-                @Override
-                public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-                    Files.delete(file);
-                    return FileVisitResult.CONTINUE;
-                }
-                
-                @Override
-                public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
-                    Files.delete(dir);
-                    return FileVisitResult.CONTINUE;
-                }
-                
-            });
+            Util.deleteDirecotry(tmp);
+            
         } catch (IOException e) {
             LOGGER.logException(e);
             return false;
@@ -545,14 +525,18 @@ public class Main {
             @Override
             public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol, int line,
                     int charPositionInLine, String msg, RecognitionException exc) {
-                throw new IllegalArgumentException("Parsing failed: in line " + line + ":" + charPositionInLine
-                        + " " + msg);
+                
+                throw new UncheckedIOException(new IOException(
+                        "Parsing failed: in line " + line + ":" + charPositionInLine + " " + msg));
             }
         });
         
         Converter converter = new Converter();
-        net.ssehub.mutator.ast.File file = converter.convert(parser.file());
-        return file;
+        try {
+            return converter.convert(parser.file());
+        } catch (UncheckedIOException e) {
+            throw e.getCause();
+        }
     }
 
     public static void main(String[] args) throws IOException {

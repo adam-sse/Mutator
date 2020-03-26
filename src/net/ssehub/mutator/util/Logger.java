@@ -27,12 +27,7 @@ public class Logger {
     private StringBuilder buffer;
     
     private Logger(String component) {
-        int numSpaces = COMPONENT_WIDTH - component.length();
-        if (numSpaces > 0) {
-            this.component = " ".repeat(numSpaces / 2) + component + " ".repeat((numSpaces + 1) / 2);
-        } else {
-            this.component = component;
-        }
+        this.component = Util.fillWithSpaces(component, COMPONENT_WIDTH);
         this.buffer = new StringBuilder(2048);
     }
     

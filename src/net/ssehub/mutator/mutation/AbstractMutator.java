@@ -15,6 +15,7 @@ import net.ssehub.mutator.evaluation.TestResult;
 import net.ssehub.mutator.mutation.fitness.Fitness;
 import net.ssehub.mutator.mutation.fitness.FitnessComparatorFactory;
 import net.ssehub.mutator.mutation.fitness.IFitnessComparator;
+import net.ssehub.mutator.util.AsciiChart;
 import net.ssehub.mutator.util.Logger;
 import net.ssehub.mutator.visualization.BestFitnessRenderer;
 import net.ssehub.mutator.visualization.FitnessRenderer;
@@ -151,45 +152,18 @@ public abstract class AbstractMutator implements IMutator {
             LOGGER.println();
             LOGGER.println("Best Fitness per Iteration:");
             
-            for (int oIter = 0; oIter < statBestInIteration.get(0).numValues(); oIter++) {
+            for (int objective = 0; objective < statBestInIteration.get(0).numValues(); objective++) {
                 LOGGER.println();
-                LOGGER.println("Objective " + (oIter + 1));
+                LOGGER.println("Objective " + (objective + 1));
                 
-                final int objective = oIter;
+                AsciiChart chart = new AsciiChart(20);
                 
-                double max = Collections.max(statBestInIteration,
-                        (f1, f2) -> Double.compare(f1.getValue(objective), f2.getValue(objective)))
-                        .getValue(objective);
-                double min = Collections.min(statBestInIteration,
-                        (f1, f2) -> Double.compare(f1.getValue(objective), f2.getValue(objective)))
-                        .getValue(objective);
-                
-                final int NUM_LINES = 20;
-                double range = (max - min) / NUM_LINES;
-                for (int line = 0; line < NUM_LINES; line++) {
-                    double upper = max - (line * range);
-                    double lower = upper - range;
-                    
-                    LOGGER.printf("%10.2f |", (upper + lower) / 2);
-                    
-                    for (int iteration = 0; iteration < statBestInIteration.size(); iteration++) {
-                        double fitness = statBestInIteration.get(iteration).getValue(objective);
-                        if (fitness <= upper  && fitness >= lower) {
-                            LOGGER.print(" *  ");
-                        } else {
-                            LOGGER.print("    ");
-                        }
-                    }
-                    
-                    LOGGER.println();
-                }
-                LOGGER.println("-----------+" + "----".repeat(statBestInIteration.size()));
-                LOGGER.print("           |");
                 for (int iteration = 0; iteration < statBestInIteration.size(); iteration++) {
-                    LOGGER.printf("%03d ", iteration + 1);
+                    double fitness = statBestInIteration.get(iteration).getValue(objective);
+                    chart.addPoint(iteration + 1, fitness);
                 }
-                LOGGER.println();
-                LOGGER.println();
+                
+                LOGGER.println(chart.toString());
             }
             
             if (config.getDotExe() != null) {
