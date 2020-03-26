@@ -174,7 +174,7 @@ public abstract class AbstractMutator implements IMutator {
                 if (dimension == 2) {
                     bestFitOutput = new File(config.getExecDir(), "fitness-evolution.svg");
                     bestFitRenderer = new BestFitnessRenderer(config.getDotExe(), false);
-                } else if (statBestInIteration.get(0).numValues() == 3) {
+                } else if (dimension == 3) {
                     bestFitOutput = new File(config.getExecDir(), "fitness-evolution.wrl");
                     bestFitRenderer = new BestFitnessRenderer(config.getDotExe(), true);
                 }
@@ -192,7 +192,10 @@ public abstract class AbstractMutator implements IMutator {
         }
         
         if (config.getDotExe() != null) {
-            int dimension = statBestInIteration.get(0).numValues();
+            int dimension = -1;
+            if (!fitnessStore.isEmpty()) {
+                dimension = fitnessStore.values().iterator().next().numValues();
+            }
             
             File allFitOutput = null;
             FitnessRenderer allFitRenderer = null;
@@ -200,7 +203,7 @@ public abstract class AbstractMutator implements IMutator {
             if (dimension == 2) {
                 allFitOutput = new File(config.getExecDir(), "fitness-all.svg");
                 allFitRenderer = new FitnessRenderer(config.getDotExe(), false, false);
-            } else if (statBestInIteration.get(0).numValues() == 3) {
+            } else if (dimension == 3) {
                 allFitOutput = new File(config.getExecDir(), "fitness-all.wrl");
                 allFitRenderer = new FitnessRenderer3D(config.getDotExe(), false, false);
             }
