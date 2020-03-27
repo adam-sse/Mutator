@@ -39,7 +39,6 @@ public class TypeGuesser {
             }
             typeFunctions.put(decl.name, decl.type.type);
         }
-        // TODO: handle FunctionDecls
         
         DeclTypeBuilder typeBuilder = new DeclTypeBuilder();
         func.accept(new FullVisitor(typeBuilder));
@@ -76,10 +75,59 @@ public class TypeGuesser {
 
         @Override
         public BasicType visitBinaryExpr(BinaryExpr expr) {
-            BasicType left = expr.left.accept(this);
-            BasicType right = expr.right.accept(this);
+            BasicType result;
             
-            return left.ordinal() > right.ordinal() ? left : right;
+            switch (expr.operator) {
+            case ADDITION:
+            case SUBTRACTION:
+            case MULTIPLICATION:
+            case DIVISION:
+            case MODULO:
+            case BIT_AND:
+            case BIT_OR:
+            case BIT_XOR:
+            {
+                BasicType left = expr.left.accept(this);
+                BasicType right = expr.right.accept(this);
+                result = left.ordinal() > right.ordinal() ? left : right;
+            } break;
+            
+            case CMP_EQUAL:
+            case CMP_NOT_EQUAL:
+            case CMP_GREATER:
+            case CMP_GREATER_EQUAL:
+            case CMP_LOWER:
+            case CMP_LOWER_EQUAL:
+            case AND:
+            case OR:
+                result = BasicType.INT;
+                break;
+
+            case ARRAY_ACCESS:
+            case SHIFT_LEFT:
+            case SHIFT_RIGHT:
+            case ASSIGNMENT:
+            case ASSIGNMENT_PLUS:
+            case ASSIGNMENT_MINUS:
+            case ASSIGNMENT_MULT:
+            case ASSIGNMENT_DIV:
+            case ASSIGNMENT_MOD:
+            case ASSIGNMENT_SHL:
+            case ASSIGNMENT_SHR:
+            case ASSIGNMENT_AND:
+            case ASSIGNMENT_OR:
+            case ASSIGNMENT_XOR:
+                result = expr.left.accept(this);
+                break;
+                
+            default: { // can't happen
+                BasicType left = expr.left.accept(this);
+                BasicType right = expr.right.accept(this);
+                result = left.ordinal() > right.ordinal() ? left : right;
+            }
+            }
+            
+            return result;
         }
 
         @Override
@@ -109,7 +157,27 @@ public class TypeGuesser {
         
         @Override
         public BasicType visitUnaryExpr(UnaryExpr expr) {
-            return expr.expr.accept(this);
+            BasicType result;
+            
+            switch (expr.operator) {
+            case MINUS:
+            case BIT_NEGATION:
+            case POST_DEC:
+            case POST_INC:
+            case PRE_DEC:
+            case PRE_INC:
+                result = expr.expr.accept(this);
+                break;
+                
+            case NEGATION:
+                result = BasicType.INT;
+                break;
+                
+            default: // can't happen
+                result = expr.expr.accept(this);
+            }
+            
+            return result;
         }
 
     }

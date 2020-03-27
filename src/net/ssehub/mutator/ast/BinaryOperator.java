@@ -2,46 +2,46 @@ package net.ssehub.mutator.ast;
 
 public enum BinaryOperator {
 
-    ARRAY_ACCESS("[]", 12),
+    ARRAY_ACCESS("[]", 12, false),
     
-    MULTIPLICATION("*", 9),
-    DIVISION("/", 9),
-    MODULO("%", 9),
+    MULTIPLICATION("*", 9, false),
+    DIVISION("/", 9, false),
+    MODULO("%", 9, false),
     
-    ADDITION("+", 8),
-    SUBTRACTION("-", 8),
+    ADDITION("+", 8, false),
+    SUBTRACTION("-", 8, false),
 
-    SHIFT_LEFT("<<", 7),
-    SHIFT_RIGHT(">>", 7),
+    SHIFT_LEFT("<<", 7, false),
+    SHIFT_RIGHT(">>", 7, false),
     
-    CMP_LOWER("<", 6),
-    CMP_LOWER_EQUAL("<=", 6),
-    CMP_GREATER(">", 6),
-    CMP_GREATER_EQUAL(">=", 6),
-    CMP_EQUAL("==", 6),
-    CMP_NOT_EQUAL("!=", 6),
+    CMP_LOWER("<", 6, false),
+    CMP_LOWER_EQUAL("<=", 6, false),
+    CMP_GREATER(">", 6, false),
+    CMP_GREATER_EQUAL(">=", 6, false),
+    CMP_EQUAL("==", 6, false),
+    CMP_NOT_EQUAL("!=", 6, false),
     
-    BIT_AND("&", 5),
+    BIT_AND("&", 5, false),
     
-    BIT_XOR("^", 4),
+    BIT_XOR("^", 4, false),
     
-    BIT_OR("|", 3),
+    BIT_OR("|", 3, false),
     
-    AND("&&", 2),
+    AND("&&", 2, false),
     
-    OR("||", 1),
+    OR("||", 1, false),
     
-    ASSIGNMENT("=", 0),
-    ASSIGNMENT_PLUS("+=", 0),
-    ASSIGNMENT_MINUS("-=", 0),
-    ASSIGNMENT_MULT("*=", 0),
-    ASSIGNMENT_DIV("/=", 0),
-    ASSIGNMENT_MOD("%=", 0),
-    ASSIGNMENT_SHL("<<=", 0),
-    ASSIGNMENT_SHR(">>=", 0),
-    ASSIGNMENT_AND("&=", 0),
-    ASSIGNMENT_XOR("^=", 0),
-    ASSIGNMENT_OR("|=", 0);
+    ASSIGNMENT("=", 0, true),
+    ASSIGNMENT_PLUS("+=", 0, true),
+    ASSIGNMENT_MINUS("-=", 0, true),
+    ASSIGNMENT_MULT("*=", 0, true),
+    ASSIGNMENT_DIV("/=", 0, true),
+    ASSIGNMENT_MOD("%=", 0, true),
+    ASSIGNMENT_SHL("<<=", 0, true),
+    ASSIGNMENT_SHR(">>=", 0, true),
+    ASSIGNMENT_AND("&=", 0, true),
+    ASSIGNMENT_XOR("^=", 0, true),
+    ASSIGNMENT_OR("|=", 0, true);
     
     public String str;
     
@@ -51,9 +51,16 @@ public enum BinaryOperator {
      */
     int precedence;
     
-    private BinaryOperator(String str, int precedence) {
+    private boolean isAssignment;
+    
+    private BinaryOperator(String str, int precedence, boolean isAssignment) {
         this.str = str;
         this.precedence = precedence;
+        this.isAssignment = isAssignment;
+    }
+    
+    public boolean isAssignment() {
+        return this.isAssignment;
     }
     
     public static BinaryOperator get(String op) {

@@ -1,14 +1,10 @@
 package net.ssehub.mutator.mutation.pattern_based.patterns;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.StringJoiner;
 import java.util.stream.Collectors;
 
 import net.ssehub.mutator.ast.AstElement;
@@ -19,6 +15,7 @@ import net.ssehub.mutator.ast.Block;
 import net.ssehub.mutator.ast.Declaration;
 import net.ssehub.mutator.ast.DeclarationStmt;
 import net.ssehub.mutator.ast.Expression;
+import net.ssehub.mutator.ast.ExpressionStmt;
 import net.ssehub.mutator.ast.File;
 import net.ssehub.mutator.ast.For;
 import net.ssehub.mutator.ast.FunctionCall;
@@ -39,16 +36,13 @@ public class CommonSubExpressionElimination implements IOpportunity {
 
     private long parentId;
     
-    private List<Long> expressionIds;
-    
-    private String exprTxt;
+    private Expression expression;
     
     private BasicType type;
     
-    private CommonSubExpressionElimination(long parentId, List<Long> expressionIds, String exprTxt, BasicType type) {
+    private CommonSubExpressionElimination(long parentId, Expression expression, BasicType type) {
         this.parentId = parentId;
-        this.expressionIds = expressionIds;
-        this.exprTxt = exprTxt;
+        this.expression = expression;
         this.type = type;
     }
     
@@ -75,79 +69,111 @@ public class CommonSubExpressionElimination implements IOpportunity {
             // 1) find all expressions & corresponding statements
             Block parent = (Block) ast.accept(new IdFinder(parentId));
             
-            List<Expression> expressions = new ArrayList<>(expressionIds.size());
-            List<Statement> statements = new ArrayList<>(expressionIds.size());
-            for (long id : expressionIds) {
-                Expression expr = (Expression) ast.accept(new IdFinder(id));
-                if (expr != null) {
-                    expressions.add(expr);
-                    
-                    Statement parentStatement = findParentStatement(expr);
-                    while (parentStatement.parent.id != parentId) {
-                        parentStatement = (Statement) parentStatement.parent;
-                    }
-                    statements.add(parentStatement);
+            List<Expression> expressions = new ArrayList<>(100);
+            List<Statement> statements = new ArrayList<>(100);
+            
+            EqualExpressionFinder finder = new EqualExpressionFinder(this.expression);
+            parent.accept(new FullExpressionVisitor(finder));
+            for (Expression expr : finder.found) {
+                expressions.add(expr);
+                
+                Statement parentStatement = Util.findParentStatement(expr);
+                while (parentStatement.parent.id != parentId) {
+                    parentStatement = (Statement) parentStatement.parent;
                 }
+                statements.add(parentStatement);
             }
             
             if (expressions.size() < 2) {
-                // due to previous modifications, a few expressions may be lost
+                // due to previous modifications, there may be less than 2 expressions left now
                 return;
             }
             
-            // 2) find the first statement that uses the expression
-            Statement reference = statements.get(0);
+            // 2) find the first and last statements that uses the expression
+            Statement first = null;
+            Statement last = null;
             for (Statement st : parent.statements) {
-                if (statements.contains(st)) {
-                    reference = st;
-                    break;
+                if (statements.stream().filter((statement) -> statement.id == st.id).findAny().isPresent()) {
+                    if (first == null) {
+                        first = st;
+                    }
+                    last = st;
                 }
             }
             
             // 3) create a declaration and insert before first statement
-            String tempVar = "mutator_tmp_" + (int) (Math.random() * Integer.MAX_VALUE);
+            String tempVarName = "mutator_tmp_" + (int) (Math.random() * Integer.MAX_VALUE);
             
-            DeclarationStmt declStmt = new DeclarationStmt(reference.parent);
+            DeclarationStmt declStmt = new DeclarationStmt(first.parent);
             Declaration decl = new Declaration(declStmt);
             Type type = new Type(decl);
             type.type = this.type;
             
             decl.type = type;
-            decl.identifier = tempVar;
-            decl.initExpr = (Expression) expressions.get(0).accept(new AstCloner(decl, false));
+            decl.identifier = tempVarName;
+            
+            // special case: don't add the initExpr if the first occurrence is an assignment to expr
+            if (!isAssignmentToExpr(expressions.get(0), true)) {
+                decl.initExpr = (Expression) expression.accept(new AstCloner(decl, false));
+            }
+            
             declStmt.decl = decl;
             
             StatementInserter inserter = new StatementInserter();
-            inserter.insert(reference, true, declStmt);
+            inserter.insert(first, true, declStmt);
             
-            // 4) replace all expression occurrences with the temporary variable 
+            // 4) replace all expression occurrences with the temporary variable
+            boolean containedAssignment = false;
             for (Expression expr : expressions) {
+                if (isAssignmentToExpr(expr, false)) {
+                    containedAssignment = true;
+                }
+                
                 ElementReplacer<Expression> replacer = new ElementReplacer<>();
                 
                 Identifier tempIdentifer = new Identifier(expr.parent);
-                tempIdentifer.identifier = tempVar;
+                tempIdentifer.identifier = tempVarName;
                 
                 replacer.replace(expr, tempIdentifer);
+            }
+            
+            // 5) special case: write a back-assignment (if at least one occurrence was an assignment)
+            // (e.g. useful for array accesses)
+            if (containedAssignment) {
+                ExpressionStmt backAssignmentStmt = new ExpressionStmt(last.parent);
+                
+                BinaryExpr backAssignment = new BinaryExpr(backAssignmentStmt);
+                backAssignment.operator = BinaryOperator.ASSIGNMENT;
+                backAssignmentStmt.expr = backAssignment;
+                
+                backAssignment.left = (Expression) expression.accept(new AstCloner(backAssignment, false));
+                
+                Identifier tempIdentifier = new Identifier(backAssignment);
+                tempIdentifier.identifier = tempVarName;
+                backAssignment.right = tempIdentifier;
+                
+                inserter.insert(last, false, backAssignmentStmt);
             }
         }
     }
     
-    private static Statement findParentStatement(Expression expr) {
-        AstElement parent = expr.parent;
-        while (!(parent instanceof Statement)) {
-            parent = parent.parent;
+    private static boolean isAssignmentToExpr(Expression child, boolean onlySimple) {
+        boolean result = false;
+        if (child.parent instanceof BinaryExpr) {
+            BinaryExpr parent = (BinaryExpr) child.parent;
+            if (onlySimple) {
+                result = parent.operator == BinaryOperator.ASSIGNMENT && child == parent.left;
+            } else {
+                result = parent.operator.isAssignment() && child == parent.left;
+            }
         }
-        return (Statement) parent;
+        return result;
     }
     
     @Override
     public String toString() {
-        StringJoiner sj = new StringJoiner(", #", "[#", "]");
-        for (Long id : expressionIds) {
-            sj.add(Long.toString(id));
-        }
-        return "CommonSubExpressionElimination(parent=#" + parentId + ", expr=\'" + exprTxt
-                + "\', type=" + type + " exprIds=" + sj + ")";
+        return "CommonSubExpressionElimination(parent=#" + parentId + ", expr=\'" + expression.getText()
+                + "\', type=" + type + ")";
     }
     
     public static List<CommonSubExpressionElimination> findOpportunities(File ast) {
@@ -167,82 +193,77 @@ public class CommonSubExpressionElimination implements IOpportunity {
         List<CommonSubExpressionElimination> result = new ArrayList<>(entries.size());
         
         for (Map.Entry<Expression, Integer> entry : entries) {
-            Expression key = entry.getKey();
+            Expression expr = entry.getKey();
             
-            List<Expression> expressions = counter.elements.get(key);
+            List<Expression> expressions = counter.elements.get(expr);
             
-            AstElement commonParent = findCommonParent(expressions.toArray(new AstElement[0]));
+            AstElement commonParent = Util.findCommonParent(expressions.toArray(new AstElement[0]));
             // we want a Block as the common parent, so that we can properly insert statements before the first expr
             while (!(commonParent instanceof Block)) {
                 commonParent = commonParent.parent;
             }
             
-            List<Long> exprIds = new ArrayList<>(expressions.size());
-            for (Expression expr : expressions) {
-                exprIds.add(expr.id);
-            }
+            BasicType type = new TypeGuesser().guessType(expr);
             
-            BasicType type = new TypeGuesser().guessType(key);
-            
-            result.add(new CommonSubExpressionElimination(commonParent.id, exprIds, key.getText(), type));
+            result.add(new CommonSubExpressionElimination(commonParent.id,
+                    (Expression) expr.accept(new AstCloner(null, true)), type));
         }
         
         return result;
     }
     
-    private static int depth(AstElement element) {
-        int depth = 0;
-        while (element != null) {
-            depth++;
-            element = element.parent;
-        }
-        return depth;
-    }
-    
-    private static boolean sameElements(AstElement... elements) {
-        for (int i = 1; i < elements.length; i++) {
-            if (elements[i].id != elements[0].id) {
-                return false;
-            }
-        }
-        return true;
-    }
-    
-    private static AstElement findCommonParent(AstElement... elements) {
+    private static class EqualExpressionFinder implements IExpressionVisitor<Void> {
 
-        int minDepth = Integer.MAX_VALUE;
-        for (AstElement element : elements) {
-            int depth = depth(element);
-            if (depth < minDepth) {
-                minDepth = depth;
+        private Expression toFind;
+        
+        private List<Expression> found;
+        
+        public EqualExpressionFinder(Expression toFind) {
+            this.toFind = toFind;
+            this.found = new LinkedList<>();
+        }
+
+        private void check(Expression e) {
+            if (toFind.equals(e)) {
+                found.add(e);
             }
         }
         
-        for (int i = 0; i < elements.length; i++) {
-            while (depth(elements[i]) > minDepth) {
-                elements[i] = elements[i].parent;
-            }
+        @Override
+        public Void visitBinaryExpr(BinaryExpr expr) {
+            check(expr);
+            return null;
+        }
+
+        @Override
+        public Void visitFunctionCall(FunctionCall expr) {
+            check(expr);
+            return null;
+        }
+
+        @Override
+        public Void visitIdentifier(Identifier expr) {
+            check(expr);
+            return null;
+        }
+
+        @Override
+        public Void visitLiteral(Literal expr) {
+            check(expr);
+            return null;
+        }
+
+        @Override
+        public Void visitUnaryExpr(UnaryExpr expr) {
+            check(expr);
+            return null;
         }
         
-        while (!sameElements(elements)) {
-            for (int i = 0; i < elements.length; i++) {
-                elements[i] = elements[i].parent;
-            }
-        }
-        
-        return elements[0];
     }
     
     private static class ExpressionCounter implements IExpressionVisitor<Void> {
 
-        private static final Set<BinaryOperator> ASSIGNMENTS = new HashSet<>(Arrays.asList(
-                BinaryOperator.ASSIGNMENT, BinaryOperator.ASSIGNMENT_AND, BinaryOperator.ASSIGNMENT_DIV,
-                BinaryOperator.ASSIGNMENT_MINUS, BinaryOperator.ASSIGNMENT_MOD, BinaryOperator.ASSIGNMENT_MULT,
-                BinaryOperator.ASSIGNMENT_OR, BinaryOperator.ASSIGNMENT_PLUS, BinaryOperator.ASSIGNMENT_SHL,
-                BinaryOperator.ASSIGNMENT_SHR, BinaryOperator.ASSIGNMENT_XOR));
-        
-        private static final Set<UnaryOperator> INC_OR_DEC = new HashSet<>(Arrays.asList(
-                UnaryOperator.POST_DEC, UnaryOperator.POST_INC, UnaryOperator.PRE_DEC, UnaryOperator.PRE_INC));
+        private SideEffectChecker checker = new SideEffectChecker();
         
         private Map<Expression, Integer> count = new HashMap<>(1024);
         
@@ -252,6 +273,11 @@ public class CommonSubExpressionElimination implements IOpportunity {
             // don't consider top-level expressions in for loops
             // (this commonly breaks loop-unrolling)
             if (expr.parent instanceof For) {
+                return;
+            }
+            
+            // don't consider expressions that have side-effects
+            if (checker.hasSideEffect(expr)) {
                 return;
             }
             
@@ -273,11 +299,7 @@ public class CommonSubExpressionElimination implements IOpportunity {
         
         @Override
         public Void visitBinaryExpr(BinaryExpr expr) {
-            // don't count assignments
-            if (!ASSIGNMENTS.contains(expr.operator)) {
-                addAndIncrement(expr);
-            }
-            
+            addAndIncrement(expr);
             return null;
         }
 
@@ -301,15 +323,70 @@ public class CommonSubExpressionElimination implements IOpportunity {
 
         @Override
         public Void visitUnaryExpr(UnaryExpr expr) {
-            // ignore -literal, don't allow ++ or --
-            if ((expr.operator != UnaryOperator.MINUS || !(expr.expr instanceof Literal))
-                    && !INC_OR_DEC.contains(expr.operator)) {
+            // ignore -literal
+            if ((expr.operator != UnaryOperator.MINUS || !(expr.expr instanceof Literal))) {
                 addAndIncrement(expr);
             }
             
             return null;
         }
 
+    }
+    
+    private static class SideEffectChecker implements IExpressionVisitor<Void> {
+
+        private boolean hasSideEffect;
+        
+        private FullExpressionVisitor visitor = new FullExpressionVisitor(this);
+        
+        public boolean hasSideEffect(Expression expr) {
+            this.hasSideEffect = false;
+            
+            expr.accept(visitor);
+            
+            return this.hasSideEffect;
+        }
+        
+        @Override
+        public Void visitBinaryExpr(BinaryExpr expr) {
+            if (expr.operator.isAssignment()) {
+                this.hasSideEffect = true;
+            }
+            return null;
+        }
+
+        @Override
+        public Void visitFunctionCall(FunctionCall expr) {
+            // we don't consider functions to have side-effects
+            return null;
+        }
+
+        @Override
+        public Void visitIdentifier(Identifier expr) {
+            return null;
+        }
+
+        @Override
+        public Void visitLiteral(Literal expr) {
+            return null;
+        }
+
+        @Override
+        public Void visitUnaryExpr(UnaryExpr expr) {
+            switch (expr.operator) {
+            case POST_DEC:
+            case POST_INC:
+            case PRE_DEC:
+            case PRE_INC:
+                this.hasSideEffect = true;
+                break;
+            default:
+                // do nothing
+            }
+            
+            return null;
+        }
+        
     }
     
     private static class ExpressionComplexityMeasuerer implements IExpressionVisitor<Integer> {
