@@ -12,11 +12,11 @@ public class FitnessComparatorFactory {
     public static void init(BaseConfig config) {
         switch (config.getFitnessComparison()) {
         case "weighted":
-            instance = new WeightedFitnessComparator(config.getFitnessWeights());
+            FitnessComparatorFactory.instance = new WeightedFitnessComparator(config.getFitnessWeights());
             break;
 
         case "pareto":
-            instance = new ParetoFitnessComparator();
+            FitnessComparatorFactory.instance = new ParetoFitnessComparator();
             break;
 
         default:
@@ -25,10 +25,9 @@ public class FitnessComparatorFactory {
     }
 
     public static IFitnessComparator get() {
-        if (instance == null) {
+        if (FitnessComparatorFactory.instance == null)
             throw new IllegalStateException("Not yet initialized");
-        }
-        return instance;
+        return FitnessComparatorFactory.instance;
     }
 
 }

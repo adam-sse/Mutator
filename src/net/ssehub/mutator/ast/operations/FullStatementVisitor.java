@@ -38,7 +38,7 @@ public class FullStatementVisitor implements IAstVisitor<Void> {
 
     @Override
     public Void visitBlock(Block stmt) {
-        other.visitBlock(stmt);
+        this.other.visitBlock(stmt);
 
         for (Statement child : stmt.statements) {
             child.accept(this);
@@ -54,14 +54,14 @@ public class FullStatementVisitor implements IAstVisitor<Void> {
 
     @Override
     public Void visitDeclarationStmt(DeclarationStmt stmt) {
-        other.visitDeclarationStmt(stmt);
+        this.other.visitDeclarationStmt(stmt);
 
         return null;
     }
 
     @Override
     public Void visitDoWhileLoop(DoWhileLoop stmt) {
-        other.visitDoWhileLoop(stmt);
+        this.other.visitDoWhileLoop(stmt);
 
         stmt.body.accept(this);
 
@@ -70,14 +70,14 @@ public class FullStatementVisitor implements IAstVisitor<Void> {
 
     @Override
     public Void visitEmptyStmt(EmptyStmt stmt) {
-        other.visitEmptyStmt(stmt);
+        this.other.visitEmptyStmt(stmt);
 
         return null;
     }
 
     @Override
     public Void visitExpressionStmt(ExpressionStmt stmt) {
-        other.visitExpressionStmt(stmt);
+        this.other.visitExpressionStmt(stmt);
 
         return null;
     }
@@ -93,7 +93,7 @@ public class FullStatementVisitor implements IAstVisitor<Void> {
 
     @Override
     public Void visitFor(For stmt) {
-        other.visitFor(stmt);
+        this.other.visitFor(stmt);
 
         stmt.body.accept(this);
 
@@ -124,7 +124,7 @@ public class FullStatementVisitor implements IAstVisitor<Void> {
 
     @Override
     public Void visitIf(If stmt) {
-        other.visitIf(stmt);
+        this.other.visitIf(stmt);
 
         stmt.thenBlock.accept(this);
         if (stmt.elseBlock != null) {
@@ -136,7 +136,7 @@ public class FullStatementVisitor implements IAstVisitor<Void> {
 
     @Override
     public Void visitJumpStmt(JumpStmt stmt) {
-        other.visitJumpStmt(stmt);
+        this.other.visitJumpStmt(stmt);
 
         return null;
     }
@@ -148,7 +148,7 @@ public class FullStatementVisitor implements IAstVisitor<Void> {
 
     @Override
     public Void visitReturn(Return stmt) {
-        other.visitReturn(stmt);
+        this.other.visitReturn(stmt);
 
         if (stmt.value != null) {
             stmt.value.accept(this);
@@ -169,7 +169,7 @@ public class FullStatementVisitor implements IAstVisitor<Void> {
 
     @Override
     public Void visitWhile(While stmt) {
-        other.visitWhile(stmt);
+        this.other.visitWhile(stmt);
 
         stmt.body.accept(this);
 

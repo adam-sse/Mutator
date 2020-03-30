@@ -20,9 +20,9 @@ public abstract class Loop extends Statement {
         boolean equals = false;
         if (super.equals(obj)) {
             Loop other = (Loop) obj;
-            equals = body.equals(other.body);
-            if (condition != null) {
-                equals &= condition.equals(other.condition);
+            equals = this.body.equals(other.body);
+            if (this.condition != null) {
+                equals &= this.condition.equals(other.condition);
             } else {
                 equals &= other.condition == null;
             }
@@ -32,7 +32,7 @@ public abstract class Loop extends Statement {
 
     @Override
     public int hashCode() {
-        return (condition != null ? 293 * condition.hashCode() : 13) + 509 * body.hashCode();
+        return (this.condition != null ? 293 * this.condition.hashCode() : 13) + 509 * this.body.hashCode();
     }
 
 }

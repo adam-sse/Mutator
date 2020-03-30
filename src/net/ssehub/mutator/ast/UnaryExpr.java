@@ -14,14 +14,14 @@ public class UnaryExpr extends Expression {
 
     @Override
     public int getPrecedence() {
-        return operator.precedence;
+        return this.operator.precedence;
     }
 
     @Override
     public AstElement getChild(int index) throws IndexOutOfBoundsException {
         switch (index) {
         case 0:
-            return expr;
+            return this.expr;
 
         default:
             throw new IndexOutOfBoundsException(index);
@@ -43,14 +43,14 @@ public class UnaryExpr extends Expression {
         boolean equals = false;
         if (super.equals(obj)) {
             UnaryExpr other = (UnaryExpr) obj;
-            equals = operator == other.operator && expr.equals(other.expr);
+            equals = this.operator == other.operator && this.expr.equals(other.expr);
         }
         return equals;
     }
 
     @Override
     public int hashCode() {
-        return 31 * operator.hashCode() + 233 * expr.hashCode();
+        return 31 * this.operator.hashCode() + 233 * this.expr.hashCode();
     }
 
 }

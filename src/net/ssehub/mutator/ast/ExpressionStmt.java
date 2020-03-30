@@ -14,7 +14,7 @@ public class ExpressionStmt extends Statement {
     public AstElement getChild(int index) throws IndexOutOfBoundsException {
         switch (index) {
         case 0:
-            return expr;
+            return this.expr;
 
         default:
             throw new IndexOutOfBoundsException(index);
@@ -36,14 +36,14 @@ public class ExpressionStmt extends Statement {
         boolean equals = false;
         if (super.equals(obj)) {
             ExpressionStmt other = (ExpressionStmt) obj;
-            equals = expr.equals(other.expr);
+            equals = this.expr.equals(other.expr);
         }
         return equals;
     }
 
     @Override
     public int hashCode() {
-        return 149 * expr.hashCode();
+        return 149 * this.expr.hashCode();
     }
 
 }

@@ -28,9 +28,8 @@ class Util {
 
     public static boolean sameElements(AstElement... elements) {
         for (int i = 1; i < elements.length; i++) {
-            if (elements[i].id != elements[0].id) {
+            if (elements[i].id != elements[0].id)
                 return false;
-            }
         }
         return true;
     }

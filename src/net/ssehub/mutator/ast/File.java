@@ -15,12 +15,12 @@ public class File extends AstElement {
 
     @Override
     public AstElement getChild(int index) throws IndexOutOfBoundsException {
-        return functions.get(index);
+        return this.functions.get(index);
     }
 
     @Override
     public int getNumChildren() {
-        return functions.size();
+        return this.functions.size();
     }
 
     @Override
@@ -33,14 +33,14 @@ public class File extends AstElement {
         boolean equals = false;
         if (super.equals(obj)) {
             File other = (File) obj;
-            equals = functions.equals(other.functions);
+            equals = this.functions.equals(other.functions);
         }
         return equals;
     }
 
     @Override
     public int hashCode() {
-        return functions.hashCode();
+        return this.functions.hashCode();
     }
 
 }

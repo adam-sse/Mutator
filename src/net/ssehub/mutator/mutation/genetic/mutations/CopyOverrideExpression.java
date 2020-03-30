@@ -26,15 +26,15 @@ public class CopyOverrideExpression extends Mutation {
 
     @Override
     public boolean apply(AstElement ast) {
-        AstElement sourceElem = sourceIdentifier.find(ast);
-        AstElement targetElem = target.find(ast);
+        AstElement sourceElem = this.sourceIdentifier.find(ast);
+        AstElement targetElem = this.target.find(ast);
 
         boolean success = false;
 
-        if (targetElem != null && sourceElem != null && sourceElem.equals(toInsert)) {
+        if (targetElem != null && sourceElem != null && sourceElem.equals(this.toInsert)) {
             String beforeReplacing = Util.getParentStatementText(targetElem);
 
-            AstElement toInsertClone = toInsert.accept(new AstCloner(targetElem.parent, true));
+            AstElement toInsertClone = this.toInsert.accept(new AstCloner(targetElem.parent, true));
 
             ElementReplacer<AstElement> replacer = new ElementReplacer<>();
             success = replacer.replace(targetElem, toInsertClone);
@@ -51,7 +51,8 @@ public class CopyOverrideExpression extends Mutation {
 
     @Override
     public String toString() {
-        return "CopyOverrideExpression(source=" + sourceIdentifier + ", target=" + target + ") -> #" + toInsert.id;
+        return "CopyOverrideExpression(source=" + this.sourceIdentifier + ", target=" + this.target + ") -> #"
+                + this.toInsert.id;
     }
 
     @Override
@@ -60,7 +61,7 @@ public class CopyOverrideExpression extends Mutation {
 
         if (obj instanceof CopyOverrideExpression) {
             CopyOverrideExpression other = (CopyOverrideExpression) obj;
-            equal = sourceIdentifier.equals(other.sourceIdentifier) && target.equals(other.target);
+            equal = this.sourceIdentifier.equals(other.sourceIdentifier) && this.target.equals(other.target);
         }
 
         return equal;
@@ -68,7 +69,7 @@ public class CopyOverrideExpression extends Mutation {
 
     @Override
     public int hashCode() {
-        return sourceIdentifier.hashCode() + 233 * target.hashCode();
+        return this.sourceIdentifier.hashCode() + 233 * this.target.hashCode();
     }
 
     public static CopyOverrideExpression find(File file, Random random) {

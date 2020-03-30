@@ -14,7 +14,7 @@ public class DeclarationStmt extends Statement {
     public AstElement getChild(int index) throws IndexOutOfBoundsException {
         switch (index) {
         case 0:
-            return decl;
+            return this.decl;
 
         default:
             throw new IndexOutOfBoundsException(index);
@@ -36,14 +36,14 @@ public class DeclarationStmt extends Statement {
         boolean equals = false;
         if (super.equals(obj)) {
             DeclarationStmt other = (DeclarationStmt) obj;
-            equals = decl.equals(other.decl);
+            equals = this.decl.equals(other.decl);
         }
         return equals;
     }
 
     @Override
     public int hashCode() {
-        return 349 * decl.hashCode();
+        return 349 * this.decl.hashCode();
     }
 
 }

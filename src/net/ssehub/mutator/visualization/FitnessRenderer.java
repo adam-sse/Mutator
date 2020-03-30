@@ -49,53 +49,52 @@ public class FitnessRenderer extends AbstractDotRenderer {
 
     protected boolean checkDimension(Collection<Fitness> bestFitnesses) {
         for (Fitness fitness : bestFitnesses) {
-            if (fitness.numValues() != 2) {
+            if (fitness.numValues() != 2)
                 return false;
-            }
         }
         return true;
     }
 
     protected void calcAxisScale(Collection<Fitness> bestFitnesses) {
-        xMin = Double.MAX_VALUE;
-        xMax = -Double.MAX_VALUE;
-        yMin = Double.MAX_VALUE;
-        yMax = -Double.MAX_VALUE;
+        this.xMin = Double.MAX_VALUE;
+        this.xMax = -Double.MAX_VALUE;
+        this.yMin = Double.MAX_VALUE;
+        this.yMax = -Double.MAX_VALUE;
 
         for (Fitness fitness : bestFitnesses) {
-            if (fitness.getValue(0) < xMin) {
-                xMin = fitness.getValue(0);
+            if (fitness.getValue(0) < this.xMin) {
+                this.xMin = fitness.getValue(0);
             }
-            if (fitness.getValue(0) > xMax) {
-                xMax = fitness.getValue(0);
+            if (fitness.getValue(0) > this.xMax) {
+                this.xMax = fitness.getValue(0);
             }
-            if (fitness.getValue(1) < yMin) {
-                yMin = fitness.getValue(1);
+            if (fitness.getValue(1) < this.yMin) {
+                this.yMin = fitness.getValue(1);
             }
-            if (fitness.getValue(1) > yMax) {
-                yMax = fitness.getValue(1);
+            if (fitness.getValue(1) > this.yMax) {
+                this.yMax = fitness.getValue(1);
             }
         }
 
-        xMax = ceilToMagnitude(xMax, magnitude(xMax - xMin));
-        yMax = ceilToMagnitude(yMax, magnitude(yMax - yMin));
-        xMin = floorToMagnitude(xMin, magnitude(xMax - xMin));
-        yMin = floorToMagnitude(yMin, magnitude(yMax - yMin));
+        this.xMax = ceilToMagnitude(this.xMax, magnitude(this.xMax - this.xMin));
+        this.yMax = ceilToMagnitude(this.yMax, magnitude(this.yMax - this.yMin));
+        this.xMin = floorToMagnitude(this.xMin, magnitude(this.xMax - this.xMin));
+        this.yMin = floorToMagnitude(this.yMin, magnitude(this.yMax - this.yMin));
 
-        if (xMax == xMin) {
-            xMax += 0.5;
-            xMin -= 0.5;
+        if (this.xMax == this.xMin) {
+            this.xMax += 0.5;
+            this.xMin -= 0.5;
         }
-        if (yMax == yMin) {
-            yMax += 0.5;
-            yMin -= 0.5;
+        if (this.yMax == this.yMin) {
+            this.yMax += 0.5;
+            this.yMin -= 0.5;
         }
 
-        xStep = (xMax - xMin) / 10.0;
-        yStep = (yMax - yMin) / 10.0;
+        this.xStep = (this.xMax - this.xMin) / 10.0;
+        this.yStep = (this.yMax - this.yMin) / 10.0;
 
-        xPrecision = Math.max(magnitude(xStep) * -1, 0);
-        yPrecision = Math.max(magnitude(yStep) * -1, 0);
+        this.xPrecision = Math.max(magnitude(this.xStep) * -1, 0);
+        this.yPrecision = Math.max(magnitude(this.yStep) * -1, 0);
     }
 
     protected String getGraphAttributes() {
@@ -115,20 +114,20 @@ public class FitnessRenderer extends AbstractDotRenderer {
     }
 
     protected String getPos(Fitness fitness) {
-        double x = (fitness.getValue(0) - xMin) / xStep;
-        double y = (fitness.getValue(1) - yMin) / yStep;
+        double x = (fitness.getValue(0) - this.xMin) / this.xStep;
+        double y = (fitness.getValue(1) - this.yMin) / this.yStep;
 
         return getPos(x, y);
     }
 
     protected String getPosTooltipp(Fitness fitness) {
-        return String.format(Locale.ROOT, "%." + (xPrecision + 1) + "f, %." + (yPrecision + 1) + "f",
+        return String.format(Locale.ROOT, "%." + (this.xPrecision + 1) + "f, %." + (this.yPrecision + 1) + "f",
                 fitness.getValue(0), fitness.getValue(1));
     }
 
     protected void createAxes(StringBuilder dot) {
-        double xZero = -xMin / xStep;
-        double yZero = -yMin / yStep;
+        double xZero = -this.xMin / this.xStep;
+        double yZero = -this.yMin / this.yStep;
 
         if (xZero < 0) {
             xZero = 0;
@@ -149,38 +148,38 @@ public class FitnessRenderer extends AbstractDotRenderer {
                 .append("\n");
 
         for (int i = 0; i <= 10; i++) {
-            double x = xMin + (i * xStep);
+            double x = this.xMin + (i * this.xStep);
             dot.append("        \"lx").append(i).append("\" [label=\"")
-                    .append(String.format(Locale.ROOT, "%." + xPrecision + "f", x)).append("\", tooltip=\"")
-                    .append(String.format(Locale.ROOT, "%." + (xPrecision + 1) + "f", x)).append("\", pos=")
+                    .append(String.format(Locale.ROOT, "%." + this.xPrecision + "f", x)).append("\", tooltip=\"")
+                    .append(String.format(Locale.ROOT, "%." + (this.xPrecision + 1) + "f", x)).append("\", pos=")
                     .append(getPos(i, yZero - 0.2)).append("];\n");
         }
         dot.append("\n");
         for (int i = 0; i <= 10; i++) {
-            double y = yMin + (i * yStep);
+            double y = this.yMin + (i * this.yStep);
             dot.append("        \"ly").append(i).append("\" [label=\"")
-                    .append(String.format(Locale.ROOT, "%." + yPrecision + "f", y)).append("\", tooltip=\"")
-                    .append(String.format(Locale.ROOT, "%." + (yPrecision + 1) + "f", y)).append("\", pos=")
+                    .append(String.format(Locale.ROOT, "%." + this.yPrecision + "f", y)).append("\", tooltip=\"")
+                    .append(String.format(Locale.ROOT, "%." + (this.yPrecision + 1) + "f", y)).append("\", pos=")
                     .append(getPos(xZero - 0.2, i)).append("];\n");
         }
     }
 
     protected boolean checkDistance(Fitness previous, Fitness current, double minDist) {
-        double x1 = (previous.getValue(0) - xMin) / xStep;
-        double y1 = (previous.getValue(1) - yMin) / yStep;
+        double x1 = (previous.getValue(0) - this.xMin) / this.xStep;
+        double y1 = (previous.getValue(1) - this.yMin) / this.yStep;
 
-        double x2 = (current.getValue(0) - xMin) / xStep;
-        double y2 = (current.getValue(1) - yMin) / yStep;
+        double x2 = (current.getValue(0) - this.xMin) / this.xStep;
+        double y2 = (current.getValue(1) - this.yMin) / this.yStep;
 
         return dist(x1, y1, x2, y2) > minDist;
     }
 
     protected String getSpecialNodeAttributes(boolean first, boolean last, double colorShade) {
-        if (first) {
+        if (first)
             return "style=filled, fillcolor=\"#fdc086\"";
-        } else if (last) {
+        else if (last)
             return "style=filled, fillcolor=\"#7fc97f\"";
-        } else {
+        else {
             Color color = Color.getHSBColor(0.737f, 0.179f, (float) colorShade * 0.5f + 0.5f);
             return String.format(Locale.ROOT, "style=filled, fillcolor=\"#%02x%02x%02x%02x\"", color.getRed(),
                     color.getGreen(), color.getBlue(), 127);
@@ -189,27 +188,27 @@ public class FitnessRenderer extends AbstractDotRenderer {
 
     public boolean init(Collection<Fitness> allFitnesses) {
         if (!checkDimension(allFitnesses)) {
-            LOGGER.println("Can only log two-dimensional fitnesses");
+            FitnessRenderer.LOGGER.println("Can only log two-dimensional fitnesses");
             return false;
         }
 
         calcAxisScale(allFitnesses);
 
-        dot = new StringBuilder();
+        this.dot = new StringBuilder();
 
         // preamble
-        dot.append("digraph \"Fitness Graph\" {\n").append("    " + getGraphAttributes() + "\n")
+        this.dot.append("digraph \"Fitness Graph\" {\n").append("    " + getGraphAttributes() + "\n")
                 .append("    node [shape=" + getNodeShape()
                         + ", margin=\"0.1\", width=0.4, height=0.4, fixedsize=true];\n")
                 .append("    edge [" + getArrowAttributes() + "];\n").append("\n");
 
         // axes
-        dot.append("    subgraph axes {\n")
+        this.dot.append("    subgraph axes {\n")
                 .append("        node [shape=none, width=1.0, height=1.0, fixedsize=true];\n");
 
-        createAxes(dot);
+        createAxes(this.dot);
 
-        dot.append("    }\n").append("\n");
+        this.dot.append("    }\n").append("\n");
 
         this.nodeIndex = 0;
         this.previousFitness = null;
@@ -219,43 +218,44 @@ public class FitnessRenderer extends AbstractDotRenderer {
     }
 
     public void addNode(Fitness fitness, String label, boolean first, boolean last, double colorShade) {
-        if (!preventOverlap || first || last || checkDistance(previousFitness, fitness, 0.4)) {
+        if (!this.preventOverlap || first || last || checkDistance(this.previousFitness, fitness, 0.4)) {
             // node
-            dot.append("    \"").append(String.format(Locale.ROOT, "%03d", nodeIndex)).append("\" [label=\"")
+            this.dot.append("    \"").append(String.format(Locale.ROOT, "%03d", this.nodeIndex)).append("\" [label=\"")
                     .append(label).append("\", pos=").append(getPos(fitness)).append(", tooltip=\"");
             if (!label.isBlank()) {
-                dot.append(label).append(": ");
+                this.dot.append(label).append(": ");
             }
-            dot.append(getPosTooltipp(fitness)).append("\"");
+            this.dot.append(getPosTooltipp(fitness)).append("\"");
 
             if (label.length() > 3) {
-                dot.append("fontsize=8");
+                this.dot.append("fontsize=8");
             }
 
             String specialAttr = getSpecialNodeAttributes(first, last, colorShade);
             if (specialAttr != null) {
-                dot.append(", ").append(specialAttr);
+                this.dot.append(", ").append(specialAttr);
             }
 
-            dot.append("];\n");
+            this.dot.append("];\n");
 
-            if (connectWithEdges && !first && (!preventOverlap || checkDistance(previousFitness, fitness, 0.45))) {
+            if (this.connectWithEdges && !first
+                    && (!this.preventOverlap || checkDistance(this.previousFitness, fitness, 0.45))) {
                 // edge
-                dot.append("    \"").append(String.format(Locale.ROOT, "%03d", previous)).append("\" -> \"")
-                        .append(String.format(Locale.ROOT, "%03d", nodeIndex)).append("\";\n");
+                this.dot.append("    \"").append(String.format(Locale.ROOT, "%03d", this.previous)).append("\" -> \"")
+                        .append(String.format(Locale.ROOT, "%03d", this.nodeIndex)).append("\";\n");
             }
 
-            previous = nodeIndex;
-            previousFitness = fitness;
+            this.previous = this.nodeIndex;
+            this.previousFitness = fitness;
 
-            nodeIndex++;
+            this.nodeIndex++;
         }
     }
 
     public void render(File output) throws IOException {
-        dot.append("}\n");
+        this.dot.append("}\n");
 
-        render(dot.toString(), "neato", output);
+        render(this.dot.toString(), "neato", output);
     }
 
     private static double dist(double x1, double y1, double x2, double y2) {
@@ -265,9 +265,8 @@ public class FitnessRenderer extends AbstractDotRenderer {
     }
 
     protected static int magnitude(double d) {
-        if (d == 0.0) {
+        if (d == 0.0)
             return 0;
-        }
 
         d = Math.abs(d);
         int magnitude = 0;

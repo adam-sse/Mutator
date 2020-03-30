@@ -26,24 +26,24 @@ public class ControlFlowFunction {
         this.start = new ControlFlowBlock(this.name + " bStart");
         this.end = new ControlFlowBlock(this.name + " bEnd");
 
-        this.allBlocks.add(start);
-        this.allBlocks.add(end);
+        this.allBlocks.add(this.start);
+        this.allBlocks.add(this.end);
     }
 
     public String getName() {
-        return name;
+        return this.name;
     }
 
     public String getHeader() {
-        return header;
+        return this.header;
     }
 
     public ControlFlowBlock getStartBlock() {
-        return start;
+        return this.start;
     }
 
     public ControlFlowBlock getEndBlock() {
-        return end;
+        return this.end;
     }
 
     private String createNewName() {
@@ -59,7 +59,7 @@ public class ControlFlowFunction {
     public void removeBlock(ControlFlowBlock block) {
         this.allBlocks.remove(block);
 
-        for (ControlFlowBlock other : allBlocks) {
+        for (ControlFlowBlock other : this.allBlocks) {
             other.removeIncoming(block);
         }
     }

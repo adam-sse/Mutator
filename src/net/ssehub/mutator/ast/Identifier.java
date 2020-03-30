@@ -35,14 +35,14 @@ public class Identifier extends Expression {
         boolean equals = false;
         if (super.equals(obj)) {
             Identifier other = (Identifier) obj;
-            equals = identifier.equals(other.identifier);
+            equals = this.identifier.equals(other.identifier);
         }
         return equals;
     }
 
     @Override
     public int hashCode() {
-        return 277 * identifier.hashCode();
+        return 277 * this.identifier.hashCode();
     }
 
 }

@@ -33,7 +33,7 @@ public class GeneticMutator extends AbstractMutator {
     public GeneticMutator(GeneticConfig config) {
         super(config);
         this.config = config;
-        random = new Random(config.getSeed());
+        this.random = new Random(config.getSeed());
     }
 
     @Override
@@ -43,105 +43,106 @@ public class GeneticMutator extends AbstractMutator {
         this.population = new MutantList();
         nextIteration();
 
-        LOGGER.println();
-        LOGGER.println("Initial Creation");
-        LOGGER.println("----------------");
+        GeneticMutator.LOGGER.println();
+        GeneticMutator.LOGGER.println("Initial Creation");
+        GeneticMutator.LOGGER.println("----------------");
         // add the default non-mutant
         Mutant nonMutant = new Mutant(generateMutantId(), this.originalAst);
         this.population.addMutant(nonMutant);
-        LOGGER.println(nonMutant.getId() + " is unmodified original");
-        while (population.getSize() < config.getPopulationSize()) {
+        GeneticMutator.LOGGER.println(nonMutant.getId() + " is unmodified original");
+        while (this.population.getSize() < this.config.getPopulationSize()) {
             Mutant mutant = generateInitialMutant();
-            if (population.addMutant(mutant)) {
-                LOGGER.println(mutant.getId() + " is new mutant");
+            if (this.population.addMutant(mutant)) {
+                GeneticMutator.LOGGER.println(mutant.getId() + " is new mutant");
             }
         }
 
-        while (getIteration() <= config.getGenerations()) {
-            if (config.getSaveIterations()) {
+        while (getIteration() <= this.config.getGenerations()) {
+            if (this.config.getSaveIterations()) {
                 saveGeneration();
             }
 
             // evaluate fitness
-            LOGGER.println();
-            LOGGER.println("Evaluation");
-            LOGGER.println("----------");
-            for (int i = 0; i < population.getSize(); i++) {
-                Mutant mutant = population.getMutant(i);
+            GeneticMutator.LOGGER.println();
+            GeneticMutator.LOGGER.println("Evaluation");
+            GeneticMutator.LOGGER.println("----------");
+            for (int i = 0; i < this.population.getSize(); i++) {
+                Mutant mutant = this.population.getMutant(i);
 
                 Fitness fitness = evaluate(mutant, true, true);
 
                 if (fitness == null) {
-                    population.removeMutant(i);
+                    this.population.removeMutant(i);
                     i--;
                 }
             }
 
-            population.sort(this);
+            this.population.sort(this);
 
-            if (getIteration() % config.getCleanFrequency() == 0) {
+            if (getIteration() % this.config.getCleanFrequency() == 0) {
                 cleanPopulation();
             }
 
-            if (population.getSize() > 0) {
-                setBestInIteration(population.getMutant(0));
+            if (this.population.getSize() > 0) {
+                setBestInIteration(this.population.getMutant(0));
             } else {
                 setBestInIteration(new Fitness(0.0));
             }
 
             nextIteration();
-            if (getIteration() <= config.getGenerations()) {
+            if (getIteration() <= this.config.getGenerations()) {
 
-                LOGGER.println();
-                LOGGER.println("Creation");
-                LOGGER.println("--------");
+                GeneticMutator.LOGGER.println();
+                GeneticMutator.LOGGER.println("Creation");
+                GeneticMutator.LOGGER.println("--------");
 
                 // create next generation
                 MutantList nextPopulation = new MutantList();
 
                 // elitism: keep best X unmodified mutants from previous generation
-                for (int i = 0; i < config.getElitism() && i < population.getSize(); i++) {
-                    if (nextPopulation.addMutant(population.getMutant(i))) {
-                        LOGGER.println(population.getMutant(i).getId() + " survived because of elitism");
+                for (int i = 0; i < this.config.getElitism() && i < this.population.getSize(); i++) {
+                    if (nextPopulation.addMutant(this.population.getMutant(i))) {
+                        GeneticMutator.LOGGER
+                                .println(this.population.getMutant(i).getId() + " survived because of elitism");
                     }
                 }
 
-                if (population.getSize() >= 2) {
+                if (this.population.getSize() >= 2) {
 
                     // create crossover mutants by recombination of survivors
-                    while (nextPopulation.getSize() < config.getPopulationSize()) {
+                    while (nextPopulation.getSize() < this.config.getPopulationSize()) {
                         Mutant m1;
                         Mutant m2;
                         do {
-                            m1 = randomlySelect(population);
-                            m2 = randomlySelect(population);
+                            m1 = randomlySelect(this.population);
+                            m2 = randomlySelect(this.population);
                         } while (m1.equals(m2));
 
                         Mutant cross = createCrossover(m1, m2);
                         if (cross != null) {
 
-                            boolean mutate = random.nextInt(2) == 0;
+                            boolean mutate = this.random.nextInt(2) == 0;
                             if (mutate) {
                                 addNewMutation(cross);
                             }
                             if (nextPopulation.addMutant(cross)) {
-                                LOGGER.println(cross.getId() + " is " + (mutate ? "mutated " : "") + "crossover of "
-                                        + m1.getId() + " & " + m2.getId());
+                                GeneticMutator.LOGGER.println(cross.getId() + " is " + (mutate ? "mutated " : "")
+                                        + "crossover of " + m1.getId() + " & " + m2.getId());
                             }
                         } else {
                             Mutant descendant = createDescendant(m1);
                             if (nextPopulation.addMutant(descendant)) {
-                                LOGGER.println(descendant.getId() + " is direct descendant of " + m1.getId()
-                                        + " (crossover with " + m2.getId() + " failed)");
+                                GeneticMutator.LOGGER.println(descendant.getId() + " is direct descendant of "
+                                        + m1.getId() + " (crossover with " + m2.getId() + " failed)");
                             }
                         }
                     }
                 } else {
-                    LOGGER.println("Not enough mutants survived, creating new initial mutants");
-                    while (nextPopulation.getSize() < config.getPopulationSize()) {
+                    GeneticMutator.LOGGER.println("Not enough mutants survived, creating new initial mutants");
+                    while (nextPopulation.getSize() < this.config.getPopulationSize()) {
                         Mutant mutant = generateInitialMutant();
                         if (nextPopulation.addMutant(mutant)) {
-                            LOGGER.println(mutant.getId() + " is new mutant");
+                            GeneticMutator.LOGGER.println(mutant.getId() + " is new mutant");
                         }
                     }
                 }
@@ -150,7 +151,7 @@ public class GeneticMutator extends AbstractMutator {
             }
         }
 
-        if ((getIteration() - 1) % config.getCleanFrequency() != 0) {
+        if ((getIteration() - 1) % this.config.getCleanFrequency() != 0) {
             cleanPopulation();
         }
 
@@ -158,14 +159,14 @@ public class GeneticMutator extends AbstractMutator {
     }
 
     private void cleanPopulation() {
-        if (config.getCleanThreshold() > 0) {
-            LOGGER.println();
-            LOGGER.println("Cleaning");
-            LOGGER.println("--------");
+        if (this.config.getCleanThreshold() > 0) {
+            GeneticMutator.LOGGER.println();
+            GeneticMutator.LOGGER.println("Cleaning");
+            GeneticMutator.LOGGER.println("--------");
             MutantList cleaned = new MutantList();
-            for (Mutant mutant : population) {
+            for (Mutant mutant : this.population) {
                 if (!cleaned.addMutant(cleanMutations(mutant))) {
-                    LOGGER.println(mutant.getId() + " is redundant after cleaning");
+                    GeneticMutator.LOGGER.println(mutant.getId() + " is redundant after cleaning");
                 }
             }
 
@@ -190,9 +191,8 @@ public class GeneticMutator extends AbstractMutator {
         int range = population.getSize() - 1;
         int start = 0;
         for (Mutant mutant : population) {
-            if (random <= start + range) {
+            if (random <= start + range)
                 return mutant;
-            }
 
             start += range + 1;
             range--;
@@ -207,19 +207,19 @@ public class GeneticMutator extends AbstractMutator {
         super.nextIteration();
         this.nextMutantId = 1;
 
-        if (getIteration() <= config.getGenerations()) {
-            LOGGER.println();
-            LOGGER.printf("Generation %03d\n", getIteration());
-            LOGGER.println("==============");
+        if (getIteration() <= this.config.getGenerations()) {
+            GeneticMutator.LOGGER.println();
+            GeneticMutator.LOGGER.printf("Generation %03d\n", getIteration());
+            GeneticMutator.LOGGER.println("==============");
         }
     }
 
     private void saveGeneration() {
-        java.io.File folder = new java.io.File(config.getExecDir(),
+        java.io.File folder = new java.io.File(this.config.getExecDir(),
                 String.format(Locale.ROOT, "generation_%03d", getIteration()));
         folder.mkdir();
 
-        for (Mutant mutant : population) {
+        for (Mutant mutant : this.population) {
             java.io.File output = new java.io.File(folder, "mutant_" + mutant.getId() + ".c");
             try {
                 mutant.write(output);
@@ -232,7 +232,7 @@ public class GeneticMutator extends AbstractMutator {
     private Mutant generateInitialMutant() {
         Mutant mutant = new Mutant(generateMutantId(), this.originalAst);
 
-        for (int i = 0; i < config.getInitialMutations(); i++) {
+        for (int i = 0; i < this.config.getInitialMutations(); i++) {
             addNewMutation(mutant);
         }
 
@@ -259,34 +259,31 @@ public class GeneticMutator extends AbstractMutator {
     }
 
     private void addNewMutation(Mutant mutant) {
-        MutationFactory factory = new MutationFactory(config.getMutations());
+        MutationFactory factory = new MutationFactory(this.config.getMutations());
 
         boolean added;
         do {
-            Mutation mutation = factory.createRandomMutation(mutant.getAst(), random);
+            Mutation mutation = factory.createRandomMutation(mutant.getAst(), this.random);
             added = mutant.addMutation(mutation);
         } while (!added);
     }
 
     private boolean isWithinThreshold(Fitness originalFitness, Fitness newFitness, double threshold) {
-        if (originalFitness.numValues() != newFitness.numValues()) {
+        if (originalFitness.numValues() != newFitness.numValues())
             throw new IllegalArgumentException("Fitness values have different number of objectives");
-        }
 
         for (int i = 0; i < originalFitness.numValues(); i++) {
             double o = originalFitness.getValue(i);
             double n = newFitness.getValue(i);
-            if ((o - n) / o > threshold) {
+            if ((o - n) / o > threshold)
                 return false;
-            }
         }
         return true;
     }
 
     private Mutant cleanMutations(Mutant original) {
-        if (original.getId().endsWith("c")) {
+        if (original.getId().endsWith("c"))
             return original;
-        }
 
         String cleanedId = original.getId() + "c";
         Fitness originalFitness = getFitness(original.getId());
@@ -294,7 +291,7 @@ public class GeneticMutator extends AbstractMutator {
 
         IFitnessComparator comparator = FitnessComparatorFactory.get();
 
-        LOGGER.println("Cleaning " + original.getId());
+        GeneticMutator.LOGGER.println("Cleaning " + original.getId());
         boolean changed;
         do {
             changed = false;
@@ -311,10 +308,10 @@ public class GeneticMutator extends AbstractMutator {
                 // evaluate
                 Fitness tempFitness = evaluate(temp, false, false);
                 if (tempFitness != null) {
-                    if (isWithinThreshold(originalFitness, tempFitness, config.getCleanThreshold())) {
-                        LOGGER.println(" * Mutation " + mutations.get(i) + " is not required");
-                        LOGGER.println("   (original fitness: " + originalFitness + "; w/o this mutation: "
-                                + tempFitness + ")");
+                    if (isWithinThreshold(originalFitness, tempFitness, this.config.getCleanThreshold())) {
+                        GeneticMutator.LOGGER.println(" * Mutation " + mutations.get(i) + " is not required");
+                        GeneticMutator.LOGGER.println("   (original fitness: " + originalFitness
+                                + "; w/o this mutation: " + tempFitness + ")");
 
                         setFitness(cleanedId, tempFitness);
                         if (comparator.isLower(originalFitness, tempFitness)) {
@@ -337,13 +334,13 @@ public class GeneticMutator extends AbstractMutator {
 
             return replacement;
         } else {
-            LOGGER.println(" * All mutations required");
+            GeneticMutator.LOGGER.println(" * All mutations required");
             return original;
         }
     }
 
     private String generateMutantId() {
-        return String.format(Locale.ROOT, "G%03d_M%03d", getIteration(), nextMutantId++);
+        return String.format(Locale.ROOT, "G%03d_M%03d", getIteration(), this.nextMutantId++);
     }
 
     @Override

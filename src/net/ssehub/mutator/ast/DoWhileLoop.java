@@ -12,10 +12,10 @@ public class DoWhileLoop extends Loop {
     public AstElement getChild(int index) throws IndexOutOfBoundsException {
         switch (index) {
         case 0:
-            return body;
+            return this.body;
 
         case 1:
-            return condition;
+            return this.condition;
 
         default:
             throw new IndexOutOfBoundsException(index);

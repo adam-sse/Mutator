@@ -22,7 +22,7 @@ public class PseudoMutant implements IMutant {
     @Override
     public void write(java.io.File destination) throws IOException {
         try (FileWriter out = new FileWriter(destination)) {
-            out.write(ast.accept(new AstPrettyPrinter(true)));
+            out.write(this.ast.accept(new AstPrettyPrinter(true)));
         }
     }
 

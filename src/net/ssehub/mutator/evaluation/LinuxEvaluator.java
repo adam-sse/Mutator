@@ -28,10 +28,10 @@ public class LinuxEvaluator extends Evaluator {
         TestResult result;
 
         try {
-            mutant.write(new File(config.getEvalDir(), config.getDropin()));
-            boolean compilationSuccess = compile(config.getTestSrc(), getExe(config.getTestSrc()));
+            mutant.write(new File(this.config.getEvalDir(), this.config.getDropin()));
+            boolean compilationSuccess = compile(this.config.getTestSrc(), getExe(this.config.getTestSrc()));
             if (compilationSuccess) {
-                List<String> stdout = run(getExe(config.getTestSrc()));
+                List<String> stdout = run(getExe(this.config.getTestSrc()));
 
                 if (stdout.size() == 1 && stdout.get(0).equals("timeout")) {
                     result = TestResult.TIMEOUT;
@@ -54,22 +54,22 @@ public class LinuxEvaluator extends Evaluator {
     @Override
     public Fitness measureFitness(IMutant mutant) {
         IFitnessComparator comparator = FitnessComparatorFactory.get();
-        Fitness fitness = RUNTIME_ERROR;
+        Fitness fitness = Evaluator.RUNTIME_ERROR;
 
         try {
-            mutant.write(new File(config.getEvalDir(), config.getDropin()));
-            boolean compilationSuccess = compile(config.getFitnessSrc(), getExe(config.getFitnessSrc()));
+            mutant.write(new File(this.config.getEvalDir(), this.config.getDropin()));
+            boolean compilationSuccess = compile(this.config.getFitnessSrc(), getExe(this.config.getFitnessSrc()));
             if (compilationSuccess) {
 
-                Fitness[] measures = new Fitness[config.getFitnessMeasures()];
+                Fitness[] measures = new Fitness[this.config.getFitnessMeasures()];
                 for (int i = 0; i < measures.length; i++) {
                     // sleep a bit so that we can cool down before performance measures take place
                     try {
-                        Thread.sleep(config.getSleepBeforeFitness());
+                        Thread.sleep(this.config.getSleepBeforeFitness());
                     } catch (InterruptedException e) {
                     }
 
-                    List<String> stdout = run(getExe(config.getFitnessSrc()));
+                    List<String> stdout = run(getExe(this.config.getFitnessSrc()));
                     double[] values = new double[stdout.size()];
                     int j = 0;
                     for (String line : stdout) {
@@ -93,7 +93,7 @@ public class LinuxEvaluator extends Evaluator {
 
     private boolean compile(File src, File target) throws IOException {
         List<String> command = new LinkedList<>();
-        command.addAll(config.getCompilerArgs());
+        command.addAll(this.config.getCompilerArgs());
         command.add("-o");
         command.add(target.getPath());
         command.add(src.getPath());
@@ -137,7 +137,7 @@ public class LinuxEvaluator extends Evaluator {
         int ret = -1;
         boolean timeout = false;
         try {
-            boolean exited = p.waitFor(config.getTimeout(), TimeUnit.MILLISECONDS);
+            boolean exited = p.waitFor(this.config.getTimeout(), TimeUnit.MILLISECONDS);
             if (exited) {
                 ret = p.exitValue();
             } else {
@@ -154,13 +154,12 @@ public class LinuxEvaluator extends Evaluator {
             throw new IOException(e);
         }
 
-        if (timeout) {
+        if (timeout)
             return Arrays.asList("timeout");
-        } else if (ret == 0) {
+        else if (ret == 0)
             return lines;
-        } else {
+        else
             return Arrays.asList("error");
-        }
     }
 
     private static File getExe(File src) {

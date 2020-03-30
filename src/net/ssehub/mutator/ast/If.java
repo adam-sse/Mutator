@@ -18,17 +18,16 @@ public class If extends Statement {
     public AstElement getChild(int index) throws IndexOutOfBoundsException {
         switch (index) {
         case 0:
-            return condition;
+            return this.condition;
 
         case 1:
-            return thenBlock;
+            return this.thenBlock;
 
         case 2:
-            if (elseBlock != null) {
-                return elseBlock;
-            } else {
+            if (this.elseBlock != null)
+                return this.elseBlock;
+            else
                 throw new IndexOutOfBoundsException(index);
-            }
         default:
             throw new IndexOutOfBoundsException(index);
         }
@@ -36,7 +35,7 @@ public class If extends Statement {
 
     @Override
     public int getNumChildren() {
-        return elseBlock != null ? 3 : 2;
+        return this.elseBlock != null ? 3 : 2;
     }
 
     @Override
@@ -49,11 +48,11 @@ public class If extends Statement {
         boolean equals = false;
         if (super.equals(obj)) {
             If other = (If) obj;
-            equals = condition.equals(other.condition) && thenBlock.equals(other.thenBlock);
+            equals = this.condition.equals(other.condition) && this.thenBlock.equals(other.thenBlock);
             if (this.elseBlock == null) {
                 equals &= other.thenBlock == null;
             } else {
-                equals &= thenBlock.equals(other.thenBlock);
+                equals &= this.thenBlock.equals(other.thenBlock);
             }
         }
         return equals;
@@ -61,8 +60,8 @@ public class If extends Statement {
 
     @Override
     public int hashCode() {
-        return 401 * condition.hashCode() + 353 * thenBlock.hashCode()
-                + (elseBlock != null ? 373 * elseBlock.hashCode() : 13);
+        return 401 * this.condition.hashCode() + 353 * this.thenBlock.hashCode()
+                + (this.elseBlock != null ? 373 * this.elseBlock.hashCode() : 13);
     }
 
 }

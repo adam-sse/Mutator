@@ -18,7 +18,7 @@ class Collector<T> extends SingleOperationVisitor<Void> {
     }
 
     public List<T> getFoundElements() {
-        return foundElements;
+        return this.foundElements;
     }
 
     public void collect(AstElement element) {
@@ -29,8 +29,8 @@ class Collector<T> extends SingleOperationVisitor<Void> {
     @Override
     @SuppressWarnings("unchecked")
     protected Void visit(AstElement element) {
-        if (type.isAssignableFrom(element.getClass())) {
-            foundElements.add((T) element);
+        if (this.type.isAssignableFrom(element.getClass())) {
+            this.foundElements.add((T) element);
         }
         return null;
     }

@@ -18,11 +18,11 @@ public class Declaration extends AstElement {
     public AstElement getChild(int index) throws IndexOutOfBoundsException {
         switch (index) {
         case 0:
-            return type;
+            return this.type;
 
         case 1:
-            if (initExpr != null)
-                return initExpr;
+            if (this.initExpr != null)
+                return this.initExpr;
             else
                 throw new IndexOutOfBoundsException(index);
         default:
@@ -32,7 +32,7 @@ public class Declaration extends AstElement {
 
     @Override
     public int getNumChildren() {
-        return initExpr != null ? 2 : 1;
+        return this.initExpr != null ? 2 : 1;
     }
 
     @Override
@@ -45,9 +45,9 @@ public class Declaration extends AstElement {
         boolean equals = false;
         if (super.equals(obj)) {
             Declaration other = (Declaration) obj;
-            equals = type.equals(other.type) && identifier.equals(other.identifier);
-            if (initExpr != null) {
-                equals &= initExpr.equals(other.initExpr);
+            equals = this.type.equals(other.type) && this.identifier.equals(other.identifier);
+            if (this.initExpr != null) {
+                equals &= this.initExpr.equals(other.initExpr);
             } else {
                 equals &= other.initExpr == null;
             }
@@ -57,7 +57,8 @@ public class Declaration extends AstElement {
 
     @Override
     public int hashCode() {
-        return 397 * type.hashCode() + 173 * identifier.hashCode() + (initExpr != null ? 107 * initExpr.hashCode() : 0);
+        return 397 * this.type.hashCode() + 173 * this.identifier.hashCode()
+                + (this.initExpr != null ? 107 * this.initExpr.hashCode() : 0);
     }
 
 }

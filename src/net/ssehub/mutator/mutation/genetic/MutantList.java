@@ -19,23 +19,23 @@ public class MutantList implements Iterable<Mutant> {
     }
 
     public Mutant getMutant(int index) {
-        return mutants.get(index);
+        return this.mutants.get(index);
     }
 
     public boolean addMutant(Mutant mutant) {
-        if (!mutants.contains(mutant)) {
-            mutants.add(mutant);
+        if (!this.mutants.contains(mutant)) {
+            this.mutants.add(mutant);
             return true;
         }
         return false;
     }
 
     public void removeMutant(int index) {
-        mutants.remove(index);
+        this.mutants.remove(index);
     }
 
     public int getSize() {
-        return mutants.size();
+        return this.mutants.size();
     }
 
     public void sort(IFitnessStore fitness) {
@@ -46,12 +46,12 @@ public class MutantList implements Iterable<Mutant> {
         do {
             changed = false;
 
-            for (int i = 0; i < mutants.size() - 1; i++) {
-                Mutant mi = mutants.get(i);
-                Mutant mi1 = mutants.get(i + 1);
+            for (int i = 0; i < this.mutants.size() - 1; i++) {
+                Mutant mi = this.mutants.get(i);
+                Mutant mi1 = this.mutants.get(i + 1);
                 if (comparator.isLower(fitness.getFitness(mi.getId()), fitness.getFitness(mi1.getId()))) {
-                    mutants.set(i, mi1);
-                    mutants.set(i + 1, mi);
+                    this.mutants.set(i, mi1);
+                    this.mutants.set(i + 1, mi);
 
                     changed = true;
                 }
@@ -65,7 +65,7 @@ public class MutantList implements Iterable<Mutant> {
 
     @Override
     public Iterator<Mutant> iterator() {
-        return mutants.iterator();
+        return this.mutants.iterator();
     }
 
 }

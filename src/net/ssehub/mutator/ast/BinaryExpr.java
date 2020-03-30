@@ -16,17 +16,17 @@ public class BinaryExpr extends Expression {
 
     @Override
     public int getPrecedence() {
-        return operator.precedence;
+        return this.operator.precedence;
     }
 
     @Override
     public AstElement getChild(int index) throws IndexOutOfBoundsException {
         switch (index) {
         case 0:
-            return left;
+            return this.left;
 
         case 1:
-            return right;
+            return this.right;
 
         default:
             throw new IndexOutOfBoundsException(index);
@@ -48,14 +48,14 @@ public class BinaryExpr extends Expression {
         boolean equals = false;
         if (super.equals(obj)) {
             BinaryExpr other = (BinaryExpr) obj;
-            equals = operator == other.operator && left.equals(other.left) && right.equals(other.right);
+            equals = this.operator == other.operator && this.left.equals(other.left) && this.right.equals(other.right);
         }
         return equals;
     }
 
     @Override
     public int hashCode() {
-        return operator.hashCode() + 179 * left.hashCode() + 59 * right.hashCode();
+        return this.operator.hashCode() + 179 * this.left.hashCode() + 59 * this.right.hashCode();
     }
 
 }

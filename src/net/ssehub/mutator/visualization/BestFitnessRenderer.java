@@ -21,14 +21,13 @@ public class BestFitnessRenderer {
     public void render(List<Fitness> bestFitnesses, File output) throws IOException {
         FitnessRenderer renderer;
         if (this.threeD) {
-            renderer = new FitnessRenderer3D(dotExe, true, true);
+            renderer = new FitnessRenderer3D(this.dotExe, true, true);
         } else {
-            renderer = new FitnessRenderer(dotExe, true, true);
+            renderer = new FitnessRenderer(this.dotExe, true, true);
         }
 
-        if (!renderer.init(bestFitnesses)) {
+        if (!renderer.init(bestFitnesses))
             return;
-        }
 
         for (int i = 0; i < bestFitnesses.size(); i++) {
             renderer.addNode(bestFitnesses.get(i), String.format(Locale.ROOT, "%03d", i + 1), i == 0,

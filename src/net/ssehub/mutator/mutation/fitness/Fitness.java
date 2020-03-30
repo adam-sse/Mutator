@@ -12,21 +12,21 @@ public class Fitness {
     }
 
     public double getValue(int index) {
-        return values[index];
+        return this.values[index];
     }
 
     public int numValues() {
-        return values.length;
+        return this.values.length;
     }
 
     public double[] getValues() {
-        return values;
+        return this.values;
     }
 
     @Override
     public String toString() {
         StringJoiner sj = new StringJoiner(";");
-        for (double d : values) {
+        for (double d : this.values) {
             sj.add(String.format(Locale.ROOT, "%4.2f", d));
         }
         return sj.toString();

@@ -10,13 +10,12 @@ class WeightedFitnessComparator implements IFitnessComparator {
 
     @Override
     public double toSingleValue(Fitness fitness) {
-        if (fitness.numValues() != weights.length) {
+        if (fitness.numValues() != this.weights.length)
             throw new IllegalArgumentException("Fitness objectives don't match weights");
-        }
 
         double sum = 0.0;
-        for (int i = 0; i < weights.length; i++) {
-            sum += weights[i] * fitness.getValue(i);
+        for (int i = 0; i < this.weights.length; i++) {
+            sum += this.weights[i] * fitness.getValue(i);
         }
         return sum;
     }

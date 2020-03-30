@@ -26,13 +26,13 @@ public class CopyOverrideStatement extends Mutation {
 
     @Override
     public boolean apply(AstElement ast) {
-        AstElement sourceElem = sourceIdentifier.find(ast);
-        AstElement targetElem = target.find(ast);
+        AstElement sourceElem = this.sourceIdentifier.find(ast);
+        AstElement targetElem = this.target.find(ast);
 
         boolean success = false;
 
-        if (targetElem != null && sourceElem != null && sourceElem.equals(toInsert)) {
-            AstElement toInsertClone = toInsert.accept(new AstCloner(targetElem.parent, true));
+        if (targetElem != null && sourceElem != null && sourceElem.equals(this.toInsert)) {
+            AstElement toInsertClone = this.toInsert.accept(new AstCloner(targetElem.parent, true));
 
             ElementReplacer<AstElement> replacer = new ElementReplacer<>();
             success = replacer.replace(targetElem, toInsertClone);
@@ -49,7 +49,8 @@ public class CopyOverrideStatement extends Mutation {
 
     @Override
     public String toString() {
-        return "CopyOverrideStatement(source=" + sourceIdentifier + ", target=" + target + ") -> #" + toInsert.id;
+        return "CopyOverrideStatement(source=" + this.sourceIdentifier + ", target=" + this.target + ") -> #"
+                + this.toInsert.id;
     }
 
     @Override
@@ -58,7 +59,7 @@ public class CopyOverrideStatement extends Mutation {
 
         if (obj instanceof CopyOverrideStatement) {
             CopyOverrideStatement other = (CopyOverrideStatement) obj;
-            equal = sourceIdentifier.equals(other.sourceIdentifier) && target.equals(other.target);
+            equal = this.sourceIdentifier.equals(other.sourceIdentifier) && this.target.equals(other.target);
         }
 
         return equal;
@@ -66,7 +67,7 @@ public class CopyOverrideStatement extends Mutation {
 
     @Override
     public int hashCode() {
-        return sourceIdentifier.hashCode() + 401 * target.hashCode();
+        return this.sourceIdentifier.hashCode() + 401 * this.target.hashCode();
     }
 
     public static CopyOverrideStatement find(File file, Random random) {

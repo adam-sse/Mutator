@@ -92,10 +92,10 @@ public class AstRenderer extends AbstractDotRenderer {
         @Override
         protected Void visit(AstElement element) {
             int rank = getRank(element);
-            List<AstElement> list = ranks.get(rank);
+            List<AstElement> list = this.ranks.get(rank);
             if (list == null) {
                 list = new LinkedList<>();
-                ranks.put(rank, list);
+                this.ranks.put(rank, list);
             }
             list.add(element);
             return null;

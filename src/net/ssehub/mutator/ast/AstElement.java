@@ -22,7 +22,7 @@ public abstract class AstElement {
 
         @Override
         public String toString() {
-            return line + ":" + column;
+            return this.line + ":" + this.column;
         }
 
         @Override
@@ -37,7 +37,7 @@ public abstract class AstElement {
 
         @Override
         public int hashCode() {
-            return Integer.hashCode(line) + 23 * Integer.hashCode(column);
+            return Integer.hashCode(this.line) + 23 * Integer.hashCode(this.column);
         }
 
     }
@@ -54,7 +54,7 @@ public abstract class AstElement {
 
     public AstElement(AstElement parent) {
         this.parent = parent;
-        this.id = nextId.getAndIncrement();
+        this.id = AstElement.nextId.getAndIncrement();
     }
 
     public void initLocation(Token start, Token end) {
@@ -77,7 +77,7 @@ public abstract class AstElement {
 
     @Override
     public String toString() {
-        return getClass().getSimpleName() + "(#" + id + ")";
+        return getClass().getSimpleName() + "(#" + this.id + ")";
     }
 
     /**

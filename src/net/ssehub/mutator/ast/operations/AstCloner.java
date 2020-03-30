@@ -43,7 +43,7 @@ public class AstCloner implements IAstVisitor<AstElement> {
     private <T extends AstElement> T initBasics(T source, T clone) {
         clone.start = source.start;
         clone.end = source.end;
-        if (keepIds) {
+        if (this.keepIds) {
             clone.id = source.id;
         }
         return clone;
@@ -59,40 +59,40 @@ public class AstCloner implements IAstVisitor<AstElement> {
 
     @Override
     public BinaryExpr visitBinaryExpr(BinaryExpr expr) {
-        BinaryExpr clone = new BinaryExpr(parents.peek());
+        BinaryExpr clone = new BinaryExpr(this.parents.peek());
         initBasics(expr, clone);
 
-        parents.push(clone);
+        this.parents.push(clone);
 
         clone.operator = expr.operator;
         clone.left = cloneExpression(expr.left);
         clone.right = cloneExpression(expr.right);
 
-        parents.pop();
+        this.parents.pop();
         return clone;
     }
 
     @Override
     public Block visitBlock(Block stmt) {
-        Block clone = new Block(parents.peek());
+        Block clone = new Block(this.parents.peek());
         initBasics(stmt, clone);
 
-        parents.push(clone);
+        this.parents.push(clone);
 
         for (Statement st : stmt.statements) {
             clone.statements.add(cloneStatement(st));
         }
 
-        parents.pop();
+        this.parents.pop();
         return clone;
     }
 
     @Override
     public Declaration visitDeclaration(Declaration decl) {
-        Declaration clone = new Declaration(parents.peek());
+        Declaration clone = new Declaration(this.parents.peek());
         initBasics(decl, clone);
 
-        parents.push(clone);
+        this.parents.push(clone);
 
         clone.type = visitType(decl.type);
         clone.identifier = decl.identifier;
@@ -100,40 +100,40 @@ public class AstCloner implements IAstVisitor<AstElement> {
             clone.initExpr = cloneExpression(decl.initExpr);
         }
 
-        parents.pop();
+        this.parents.pop();
         return clone;
     }
 
     @Override
     public DeclarationStmt visitDeclarationStmt(DeclarationStmt stmt) {
-        DeclarationStmt clone = new DeclarationStmt(parents.peek());
+        DeclarationStmt clone = new DeclarationStmt(this.parents.peek());
         initBasics(stmt, clone);
 
-        parents.push(clone);
+        this.parents.push(clone);
 
         clone.decl = visitDeclaration(stmt.decl);
 
-        parents.pop();
+        this.parents.pop();
         return clone;
     }
 
     @Override
     public DoWhileLoop visitDoWhileLoop(DoWhileLoop stmt) {
-        DoWhileLoop clone = new DoWhileLoop(parents.peek());
+        DoWhileLoop clone = new DoWhileLoop(this.parents.peek());
         initBasics(stmt, clone);
 
-        parents.push(clone);
+        this.parents.push(clone);
 
         clone.condition = cloneExpression(stmt.condition);
         clone.body = cloneStatement(stmt.body);
 
-        parents.pop();
+        this.parents.pop();
         return clone;
     }
 
     @Override
     public EmptyStmt visitEmptyStmt(EmptyStmt stmt) {
-        EmptyStmt clone = new EmptyStmt(parents.peek());
+        EmptyStmt clone = new EmptyStmt(this.parents.peek());
         initBasics(stmt, clone);
 
         return clone;
@@ -141,38 +141,38 @@ public class AstCloner implements IAstVisitor<AstElement> {
 
     @Override
     public ExpressionStmt visitExpressionStmt(ExpressionStmt stmt) {
-        ExpressionStmt clone = new ExpressionStmt(parents.peek());
+        ExpressionStmt clone = new ExpressionStmt(this.parents.peek());
         initBasics(stmt, clone);
 
-        parents.push(clone);
+        this.parents.push(clone);
 
         clone.expr = cloneExpression(stmt.expr);
 
-        parents.pop();
+        this.parents.pop();
         return clone;
     }
 
     @Override
     public File visitFile(File file) {
-        File clone = new File(parents.peek());
+        File clone = new File(this.parents.peek());
         initBasics(file, clone);
 
-        parents.push(clone);
+        this.parents.push(clone);
 
         for (AstElement func : file.functions) {
             clone.functions.add(func.accept(this));
         }
 
-        parents.pop();
+        this.parents.pop();
         return clone;
     }
 
     @Override
     public For visitFor(For stmt) {
-        For clone = new For(parents.peek());
+        For clone = new For(this.parents.peek());
         initBasics(stmt, clone);
 
-        parents.push(clone);
+        this.parents.push(clone);
 
         if (stmt.init != null) {
             clone.init = visitDeclaration(stmt.init);
@@ -186,30 +186,30 @@ public class AstCloner implements IAstVisitor<AstElement> {
 
         clone.body = cloneStatement(stmt.body);
 
-        parents.pop();
+        this.parents.pop();
         return clone;
     }
 
     @Override
     public Function visitFunction(Function func) {
-        Function clone = new Function(parents.peek());
+        Function clone = new Function(this.parents.peek());
         initBasics(func, clone);
 
-        parents.push(clone);
+        this.parents.push(clone);
 
         clone.header = visitFunctionDecl(func.header);
         clone.body = visitBlock(func.body);
 
-        parents.pop();
+        this.parents.pop();
         return clone;
     }
 
     @Override
     public FunctionCall visitFunctionCall(FunctionCall expr) {
-        FunctionCall clone = new FunctionCall(parents.peek());
+        FunctionCall clone = new FunctionCall(this.parents.peek());
         initBasics(expr, clone);
 
-        parents.push(clone);
+        this.parents.push(clone);
 
         clone.function = expr.function;
 
@@ -217,16 +217,16 @@ public class AstCloner implements IAstVisitor<AstElement> {
             clone.params.add(cloneExpression(param));
         }
 
-        parents.pop();
+        this.parents.pop();
         return clone;
     }
 
     @Override
     public FunctionDecl visitFunctionDecl(FunctionDecl decl) {
-        FunctionDecl clone = new FunctionDecl(parents.peek());
+        FunctionDecl clone = new FunctionDecl(this.parents.peek());
         initBasics(decl, clone);
 
-        parents.push(clone);
+        this.parents.push(clone);
 
         clone.type = visitType(decl.type);
         clone.name = decl.name;
@@ -234,13 +234,13 @@ public class AstCloner implements IAstVisitor<AstElement> {
             clone.parameters.add(visitDeclaration(param));
         }
 
-        parents.pop();
+        this.parents.pop();
         return clone;
     }
 
     @Override
     public Identifier visitIdentifier(Identifier expr) {
-        Identifier clone = new Identifier(parents.peek());
+        Identifier clone = new Identifier(this.parents.peek());
         initBasics(expr, clone);
 
         clone.identifier = expr.identifier;
@@ -250,10 +250,10 @@ public class AstCloner implements IAstVisitor<AstElement> {
 
     @Override
     public If visitIf(If stmt) {
-        If clone = new If(parents.peek());
+        If clone = new If(this.parents.peek());
         initBasics(stmt, clone);
 
-        parents.push(clone);
+        this.parents.push(clone);
 
         clone.condition = cloneExpression(stmt.condition);
         clone.thenBlock = cloneStatement(stmt.thenBlock);
@@ -261,26 +261,26 @@ public class AstCloner implements IAstVisitor<AstElement> {
             clone.elseBlock = cloneStatement(stmt.elseBlock);
         }
 
-        parents.pop();
+        this.parents.pop();
         return clone;
     }
 
     @Override
     public JumpStmt visitJumpStmt(JumpStmt stmt) {
-        JumpStmt clone = new JumpStmt(parents.peek());
+        JumpStmt clone = new JumpStmt(this.parents.peek());
         initBasics(stmt, clone);
 
-        parents.push(clone);
+        this.parents.push(clone);
 
         clone.type = stmt.type;
 
-        parents.pop();
+        this.parents.pop();
         return clone;
     }
 
     @Override
     public Literal visitLiteral(Literal expr) {
-        Literal clone = new Literal(parents.peek());
+        Literal clone = new Literal(this.parents.peek());
         initBasics(expr, clone);
 
         clone.value = expr.value;
@@ -290,22 +290,22 @@ public class AstCloner implements IAstVisitor<AstElement> {
 
     @Override
     public Return visitReturn(Return stmt) {
-        Return clone = new Return(parents.peek());
+        Return clone = new Return(this.parents.peek());
         initBasics(stmt, clone);
 
-        parents.push(clone);
+        this.parents.push(clone);
 
         if (stmt.value != null) {
             clone.value = cloneExpression(stmt.value);
         }
 
-        parents.pop();
+        this.parents.pop();
         return clone;
     }
 
     @Override
     public Type visitType(Type type) {
-        Type clone = new Type(parents.peek());
+        Type clone = new Type(this.parents.peek());
         initBasics(type, clone);
 
         clone.modifier = type.modifier;
@@ -317,29 +317,29 @@ public class AstCloner implements IAstVisitor<AstElement> {
 
     @Override
     public UnaryExpr visitUnaryExpr(UnaryExpr expr) {
-        UnaryExpr clone = new UnaryExpr(parents.peek());
+        UnaryExpr clone = new UnaryExpr(this.parents.peek());
         initBasics(expr, clone);
 
-        parents.push(clone);
+        this.parents.push(clone);
 
         clone.operator = expr.operator;
         clone.expr = cloneExpression(expr.expr);
 
-        parents.pop();
+        this.parents.pop();
         return clone;
     }
 
     @Override
     public While visitWhile(While stmt) {
-        While clone = new While(parents.peek());
+        While clone = new While(this.parents.peek());
         initBasics(stmt, clone);
 
-        parents.push(clone);
+        this.parents.push(clone);
 
         clone.condition = cloneExpression(stmt.condition);
         clone.body = cloneStatement(stmt.body);
 
-        parents.pop();
+        this.parents.pop();
         return clone;
     }
 

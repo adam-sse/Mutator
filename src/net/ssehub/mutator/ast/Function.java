@@ -14,13 +14,12 @@ public class Function extends AstElement {
 
     @Override
     public AstElement getChild(int index) throws IndexOutOfBoundsException {
-        if (index == 0) {
-            return header;
-        } else if (index == 1) {
-            return body;
-        } else {
+        if (index == 0)
+            return this.header;
+        else if (index == 1)
+            return this.body;
+        else
             throw new IndexOutOfBoundsException(index);
-        }
     }
 
     @Override
@@ -38,14 +37,14 @@ public class Function extends AstElement {
         boolean equals = false;
         if (super.equals(obj)) {
             Function other = (Function) obj;
-            equals = header.equals(other.header) && body.equals(other.body);
+            equals = this.header.equals(other.header) && this.body.equals(other.body);
         }
         return equals;
     }
 
     @Override
     public int hashCode() {
-        return 389 * header.hashCode() + 541 * body.hashCode();
+        return 389 * this.header.hashCode() + 541 * this.body.hashCode();
     }
 
 }

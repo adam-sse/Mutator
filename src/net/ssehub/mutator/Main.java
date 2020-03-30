@@ -108,48 +108,39 @@ public class Main {
         switch (this.argCommand) {
 
         case "run":
-            if ((this.propertiesFile = getFileArgument(arguments, "CONFIGURATION", true)) == null) {
+            if ((this.propertiesFile = getFileArgument(arguments, "CONFIGURATION", true)) == null)
                 return false;
-            }
-            if ((this.input = getFileArgument(arguments, "INPUT", true)) == null) {
+            if ((this.input = getFileArgument(arguments, "INPUT", true)) == null)
                 return false;
-            }
             break;
 
         case "evaluate":
-            if ((this.propertiesFile = getFileArgument(arguments, "CONFIGURATION", true)) == null) {
+            if ((this.propertiesFile = getFileArgument(arguments, "CONFIGURATION", true)) == null)
                 return false;
-            }
-            if ((this.input = getFileArgument(arguments, "INPUT", true)) == null) {
+            if ((this.input = getFileArgument(arguments, "INPUT", true)) == null)
                 return false;
-            }
             break;
 
         case "clean":
-            if ((this.input = getFileArgument(arguments, "INPUT", true)) == null) {
+            if ((this.input = getFileArgument(arguments, "INPUT", true)) == null)
                 return false;
-            }
-            if ((this.output = getFileArgument(arguments, "OUTPUT", false)) == null) {
+            if ((this.output = getFileArgument(arguments, "OUTPUT", false)) == null)
                 return false;
-            }
             break;
 
         case "render":
-            if ((this.renderType = getArgument(arguments, "render type")) == null) {
+            if ((this.renderType = getArgument(arguments, "render type")) == null)
                 return false;
-            }
             if (!this.renderType.equals("control-flow") && !this.renderType.equals("ast")) {
                 System.out.println("Invalid render type " + this.renderType);
                 this.renderType = null;
                 return false;
             }
 
-            if ((this.input = getFileArgument(arguments, "INPUT", true)) == null) {
+            if ((this.input = getFileArgument(arguments, "INPUT", true)) == null)
                 return false;
-            }
-            if ((this.output = getFileArgument(arguments, "OUTPUT", false)) == null) {
+            if ((this.output = getFileArgument(arguments, "OUTPUT", false)) == null)
                 return false;
-            }
             if (!arguments.isEmpty()) {
                 this.dotExe = arguments.remove();
             } else {
@@ -269,9 +260,9 @@ public class Main {
             // create an execution directory
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss", Locale.ROOT);
             File execDir = new File(inputBase + '_' + mutatorType + '_' + formatter.format(LocalDateTime.now()));
-            LOGGER.println("Execution directory is at " + execDir.getAbsolutePath());
+            Main.LOGGER.println("Execution directory is at " + execDir.getAbsolutePath());
             if (execDir.exists()) {
-                LOGGER.println(execDir + " already exists");
+                Main.LOGGER.println(execDir + " already exists");
                 return false;
             }
             execDir.mkdir();
@@ -300,7 +291,7 @@ public class Main {
                 break;
 
             default:
-                LOGGER.println("Invalid mutator setting: " + mutatorType);
+                Main.LOGGER.println("Invalid mutator setting: " + mutatorType);
                 return false;
             }
 
@@ -314,7 +305,7 @@ public class Main {
             config.setFitnessSrc(newFitnessSrc);
 
             // 1) parse file to mutate
-            LOGGER.println("Parsing...");
+            Main.LOGGER.println("Parsing...");
             net.ssehub.mutator.ast.File file = parse(this.input);
 
             // write to execDir
@@ -324,13 +315,13 @@ public class Main {
             }
 
             // 2) mutate file
-            LOGGER.println("Mutating...");
+            Main.LOGGER.println("Mutating...");
             List<IMutant> mutants = mutator.run(file);
 
             // 3) print out
             // TODO: multi-objective fitness
-            LOGGER.println();
-            LOGGER.println("Writing " + mutants.size() + " mutants...");
+            Main.LOGGER.println();
+            Main.LOGGER.println("Writing " + mutants.size() + " mutants...");
             IFitnessComparator comparator = FitnessComparatorFactory.get();
 
             double bestFitness = mutants.size() > 0
@@ -367,12 +358,12 @@ public class Main {
                 mutant.write(output);
             }
 
-            LOGGER.println(table.toString());
+            Main.LOGGER.println(table.toString());
 
-            LOGGER.println("Statistics:");
+            Main.LOGGER.println("Statistics:");
             mutator.printStatistics();
         } catch (IOException | IllegalArgumentException e) {
-            LOGGER.logException(e);
+            Main.LOGGER.logException(e);
             return false;
         }
 
@@ -385,7 +376,7 @@ public class Main {
             FitnessComparatorFactory.init(config);
 
             // 1) parse file
-            LOGGER.println("Parsing...");
+            Main.LOGGER.println("Parsing...");
             net.ssehub.mutator.ast.File file = parse(this.input);
             PseudoMutant mutant = new PseudoMutant(file);
 
@@ -405,20 +396,20 @@ public class Main {
             config.setFitnessSrc(newFitnessSrc);
 
             // 3) evaluate
-            LOGGER.println("Evaluating...");
+            Main.LOGGER.println("Evaluating...");
             Evaluator evaluator = EvaluatorFactory.create(config);
             TestResult result = evaluator.test(mutant);
-            LOGGER.println("Test result: " + result);
+            Main.LOGGER.println("Test result: " + result);
             if (result == TestResult.PASS) {
                 Fitness fitness = evaluator.measureFitness(mutant);
-                LOGGER.println("Fitness: " + fitness);
-                LOGGER.println("  (= " + FitnessComparatorFactory.get().toSingleValue(fitness) + ")");
+                Main.LOGGER.println("Fitness: " + fitness);
+                Main.LOGGER.println("  (= " + FitnessComparatorFactory.get().toSingleValue(fitness) + ")");
             }
 
             // 4) clean up
             Util.deleteDirecotry(tmp);
         } catch (IOException e) {
-            LOGGER.logException(e);
+            Main.LOGGER.logException(e);
             return false;
         }
 
@@ -428,17 +419,17 @@ public class Main {
     private boolean clean() {
         try {
             // 1) parse file
-            LOGGER.println("Parsing...");
+            Main.LOGGER.println("Parsing...");
             net.ssehub.mutator.ast.File file = parse(this.input);
 
             // 2) print out
-            LOGGER.println("Writing...");
+            Main.LOGGER.println("Writing...");
 
             try (FileWriter out = new FileWriter(this.output)) {
                 out.write(file.accept(new AstPrettyPrinter(false)));
             }
         } catch (IOException | IllegalArgumentException e) {
-            LOGGER.logException(e);
+            Main.LOGGER.logException(e);
             return false;
         }
 
@@ -448,12 +439,12 @@ public class Main {
     private boolean render() {
         try {
             // 1) parse file
-            LOGGER.println("Parsing...");
+            Main.LOGGER.println("Parsing...");
             net.ssehub.mutator.ast.File file = parse(this.input);
 
             // 2) print out
-            LOGGER.println("Rendering...");
-            switch (renderType) {
+            Main.LOGGER.println("Rendering...");
+            switch (this.renderType) {
             case "control-flow": {
                 ControlFlowRenderer renderer = new ControlFlowRenderer(this.dotExe);
                 renderer.render(file, this.output);
@@ -467,7 +458,7 @@ public class Main {
                 break;
             }
         } catch (IOException e) {
-            LOGGER.logException(e);
+            Main.LOGGER.logException(e);
             return false;
         }
 
@@ -507,11 +498,11 @@ public class Main {
         System.out.println("        Display this help message.");
         System.out.println();
         System.out.println("Exit status:");
-        System.out.println("  " + SUCCESS);
+        System.out.println("  " + Main.SUCCESS);
         System.out.println("        Execution was successful.");
-        System.out.println("  " + INVALID_USAGE);
+        System.out.println("  " + Main.INVALID_USAGE);
         System.out.println("        Invalid usage (e.g. wrong command-line arguments).");
-        System.out.println("  " + ERROR);
+        System.out.println("  " + Main.ERROR);
         System.out.println("        Error during execution.");
 
         return true;
@@ -547,14 +538,14 @@ public class Main {
         if (!main.parseOptions(args)) {
             System.out.println();
             main.help();
-            System.exit(INVALID_USAGE);
+            System.exit(Main.INVALID_USAGE);
         }
 
         if (!main.execute()) {
-            System.exit(ERROR);
+            System.exit(Main.ERROR);
         }
 
-        System.exit(SUCCESS);
+        System.exit(Main.SUCCESS);
     }
 
 }

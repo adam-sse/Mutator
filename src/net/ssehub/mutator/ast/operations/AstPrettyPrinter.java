@@ -50,11 +50,11 @@ public class AstPrettyPrinter extends AbstractPrinter {
         StringBuilder sb = new StringBuilder();
         sb.append(indentation(stmt.id)).append("{\n");
 
-        indentation++;
+        this.indentation++;
         for (Statement st : stmt.statements) {
             sb.append(st.accept(this));
         }
-        indentation--;
+        this.indentation--;
 
         sb.append(indentation(null)).append("}\n");
 
@@ -78,9 +78,9 @@ public class AstPrettyPrinter extends AbstractPrinter {
             sb.delete(sb.length() - 1, sb.length());
             sb.append(" ");
         } else {
-            indentation++;
+            this.indentation++;
             sb.append(stmt.body.accept(this));
-            indentation--;
+            this.indentation--;
             sb.append(indentation(null));
         }
 
@@ -134,9 +134,9 @@ public class AstPrettyPrinter extends AbstractPrinter {
         if (stmt.body instanceof Block) {
             sb.append(stmt.body.accept(this));
         } else {
-            indentation++;
+            this.indentation++;
             sb.append(stmt.body.accept(this));
-            indentation--;
+            this.indentation--;
         }
 
         return sb.toString();
@@ -150,11 +150,10 @@ public class AstPrettyPrinter extends AbstractPrinter {
     @Override
     public String visitFunctionDecl(FunctionDecl decl) {
         String line = super.visitFunctionDecl(decl);
-        if (decl.parent instanceof Function) {
+        if (decl.parent instanceof Function)
             return line;
-        } else {
+        else
             return indentation(decl.id) + line + "\n";
-        }
     }
 
     @Override
@@ -166,9 +165,9 @@ public class AstPrettyPrinter extends AbstractPrinter {
         if (stmt.thenBlock instanceof Block) {
             sb.append(stmt.thenBlock.accept(this));
         } else {
-            indentation++;
+            this.indentation++;
             sb.append(stmt.thenBlock.accept(this));
-            indentation--;
+            this.indentation--;
         }
 
         if (stmt.elseBlock != null) {
@@ -177,9 +176,9 @@ public class AstPrettyPrinter extends AbstractPrinter {
             if (stmt.elseBlock instanceof Block) {
                 sb.append(stmt.elseBlock.accept(this));
             } else {
-                indentation++;
+                this.indentation++;
                 sb.append(stmt.elseBlock.accept(this));
-                indentation--;
+                this.indentation--;
             }
         }
 
@@ -205,9 +204,9 @@ public class AstPrettyPrinter extends AbstractPrinter {
         if (stmt.body instanceof Block) {
             sb.append(stmt.body.accept(this));
         } else {
-            indentation++;
+            this.indentation++;
             sb.append(stmt.body.accept(this));
-            indentation--;
+            this.indentation--;
         }
 
         return sb.toString();

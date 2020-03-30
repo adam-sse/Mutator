@@ -10,13 +10,12 @@ public interface IFitnessComparator extends Comparator<Fitness> {
 
     @Override
     default int compare(Fitness o1, Fitness o2) {
-        if (isLower(o1, o2)) {
+        if (isLower(o1, o2))
             return -1;
-        } else if (isLower(o2, o1)) {
+        else if (isLower(o2, o1))
             return 1;
-        } else {
+        else
             return 0;
-        }
     }
 
 }

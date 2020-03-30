@@ -38,15 +38,15 @@ public class Type extends AstElement {
         boolean equals = false;
         if (super.equals(obj)) {
             Type other = (Type) obj;
-            equals = type == other.type && pointer == other.pointer && modifier == other.modifier;
+            equals = this.type == other.type && this.pointer == other.pointer && this.modifier == other.modifier;
         }
         return equals;
     }
 
     @Override
     public int hashCode() {
-        return 367 * type.hashCode() + 191 * Boolean.hashCode(pointer)
-                + (modifier != null ? 67 * modifier.hashCode() : 0);
+        return 367 * this.type.hashCode() + 191 * Boolean.hashCode(this.pointer)
+                + (this.modifier != null ? 67 * this.modifier.hashCode() : 0);
     }
 
 }

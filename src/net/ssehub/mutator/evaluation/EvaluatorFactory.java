@@ -10,11 +10,10 @@ public class EvaluatorFactory {
     public static Evaluator create(BaseConfig config) {
         String os = System.getProperty("os.name", "generic").toLowerCase();
         if (os.startsWith("win")) {
-            LOGGER.println("WARNING: using DummyEvaluator on Windows");
+            EvaluatorFactory.LOGGER.println("WARNING: using DummyEvaluator on Windows");
             return new DummyEvaluator(config);
-        } else {
+        } else
             return new LinuxEvaluator(config);
-        }
     }
 
 }

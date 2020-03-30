@@ -19,7 +19,7 @@ public class DeleteStatement extends Mutation {
 
     @Override
     public boolean apply(AstElement ast) {
-        Statement targetElem = (Statement) target.find(ast);
+        Statement targetElem = (Statement) this.target.find(ast);
 
         boolean success = false;
 
@@ -38,7 +38,7 @@ public class DeleteStatement extends Mutation {
 
     @Override
     public String toString() {
-        return "DeleteStatement(target=" + target + ")";
+        return "DeleteStatement(target=" + this.target + ")";
     }
 
     @Override
@@ -47,7 +47,7 @@ public class DeleteStatement extends Mutation {
 
         if (obj instanceof DeleteStatement) {
             DeleteStatement other = (DeleteStatement) obj;
-            equal = target.equals(other.target);
+            equal = this.target.equals(other.target);
         }
 
         return equal;
@@ -55,7 +55,7 @@ public class DeleteStatement extends Mutation {
 
     @Override
     public int hashCode() {
-        return target.hashCode();
+        return this.target.hashCode();
     }
 
     public static DeleteStatement find(File file, Random random) {

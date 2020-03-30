@@ -67,7 +67,7 @@ public class CommonSubExpressionElimination implements IOpportunity {
         if (param == 1) {
 
             // 1) find all expressions & corresponding statements
-            Block parent = (Block) ast.accept(new IdFinder(parentId));
+            Block parent = (Block) ast.accept(new IdFinder(this.parentId));
 
             List<Expression> expressions = new ArrayList<>(100);
             List<Statement> statements = new ArrayList<>(100);
@@ -78,16 +78,15 @@ public class CommonSubExpressionElimination implements IOpportunity {
                 expressions.add(expr);
 
                 Statement parentStatement = Util.findParentStatement(expr);
-                while (parentStatement.parent.id != parentId) {
+                while (parentStatement.parent.id != this.parentId) {
                     parentStatement = (Statement) parentStatement.parent;
                 }
                 statements.add(parentStatement);
             }
 
-            if (expressions.size() < 2) {
+            if (expressions.size() < 2)
                 // due to previous modifications, there may be less than 2 expressions left now
                 return;
-            }
 
             // 2) find the first and last statements that uses the expression
             Statement first = null;
@@ -115,7 +114,7 @@ public class CommonSubExpressionElimination implements IOpportunity {
             // special case: don't add the initExpr if the first occurrence is an assignment
             // to expr
             if (!isAssignmentToExpr(expressions.get(0), true)) {
-                decl.initExpr = (Expression) expression.accept(new AstCloner(decl, false));
+                decl.initExpr = (Expression) this.expression.accept(new AstCloner(decl, false));
             }
 
             declStmt.decl = decl;
@@ -148,7 +147,7 @@ public class CommonSubExpressionElimination implements IOpportunity {
                 backAssignment.operator = BinaryOperator.ASSIGNMENT;
                 backAssignmentStmt.expr = backAssignment;
 
-                backAssignment.left = (Expression) expression.accept(new AstCloner(backAssignment, false));
+                backAssignment.left = (Expression) this.expression.accept(new AstCloner(backAssignment, false));
 
                 Identifier tempIdentifier = new Identifier(backAssignment);
                 tempIdentifier.identifier = tempVarName;
@@ -174,8 +173,8 @@ public class CommonSubExpressionElimination implements IOpportunity {
 
     @Override
     public String toString() {
-        return "CommonSubExpressionElimination(parent=#" + parentId + ", expr=\'" + expression.getText() + "\', type="
-                + type + ")";
+        return "CommonSubExpressionElimination(parent=#" + this.parentId + ", expr=\'" + this.expression.getText()
+                + "\', type=" + this.type + ")";
     }
 
     public static List<CommonSubExpressionElimination> findOpportunities(File ast) {
@@ -224,8 +223,8 @@ public class CommonSubExpressionElimination implements IOpportunity {
         }
 
         private void check(Expression e) {
-            if (toFind.equals(e)) {
-                found.add(e);
+            if (this.toFind.equals(e)) {
+                this.found.add(e);
             }
         }
 
@@ -272,14 +271,12 @@ public class CommonSubExpressionElimination implements IOpportunity {
         private void addAndIncrement(Expression expr) {
             // don't consider top-level expressions in for loops
             // (this commonly breaks loop-unrolling)
-            if (expr.parent instanceof For) {
+            if (expr.parent instanceof For)
                 return;
-            }
 
             // don't consider expressions that have side-effects
-            if (checker.hasSideEffect(expr)) {
+            if (this.checker.hasSideEffect(expr))
                 return;
-            }
 
             Integer count = this.count.get(expr);
             if (count != null) {
@@ -339,7 +336,7 @@ public class CommonSubExpressionElimination implements IOpportunity {
         public boolean hasSideEffect(Expression expr) {
             this.hasSideEffect = false;
 
-            expr.accept(visitor);
+            expr.accept(this.visitor);
 
             return this.hasSideEffect;
         }

@@ -17,7 +17,7 @@ public class MutationIdentifier {
 
     @Override
     public String toString() {
-        return "#" + id;
+        return "#" + this.id;
     }
 
     @Override
@@ -34,7 +34,7 @@ public class MutationIdentifier {
 
     @Override
     public int hashCode() {
-        return Long.hashCode(id);
+        return Long.hashCode(this.id);
     }
 
     public AstElement find(AstElement ast) {

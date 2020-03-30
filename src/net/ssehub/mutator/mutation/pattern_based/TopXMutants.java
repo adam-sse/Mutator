@@ -29,7 +29,7 @@ public class TopXMutants {
     public void insertMutant(Mutant mutant, Fitness fitness) {
         boolean inserted = false;
         for (int i = 0; i < this.mutants.size(); i++) {
-            if (comparator.isLower(this.fitness.get(i), fitness)) {
+            if (this.comparator.isLower(this.fitness.get(i), fitness)) {
                 this.mutants.add(i, mutant);
                 this.fitness.add(i, fitness);
                 inserted = true;
@@ -54,11 +54,11 @@ public class TopXMutants {
     }
 
     public Mutant getTopMutant() {
-        return mutants.get(0);
+        return this.mutants.get(0);
     }
 
     public Fitness getTopFitness() {
-        return fitness.get(0);
+        return this.fitness.get(0);
     }
 
     public List<IMutant> toList() {

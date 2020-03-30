@@ -12,16 +12,15 @@ public class Return extends Statement {
 
     @Override
     public AstElement getChild(int index) throws IndexOutOfBoundsException {
-        if (index == 0 && value != null) {
-            return value;
-        } else {
+        if (index == 0 && this.value != null)
+            return this.value;
+        else
             throw new IndexOutOfBoundsException(index);
-        }
     }
 
     @Override
     public int getNumChildren() {
-        return value != null ? 1 : 0;
+        return this.value != null ? 1 : 0;
     }
 
     @Override
@@ -35,7 +34,7 @@ public class Return extends Statement {
         if (super.equals(obj)) {
             Return other = (Return) obj;
             if (this.value != null) {
-                equals = value.equals(other.value);
+                equals = this.value.equals(other.value);
             } else {
                 equals = other.value == null;
             }
@@ -45,7 +44,7 @@ public class Return extends Statement {
 
     @Override
     public int hashCode() {
-        return 509 + (value != null ? 457 * value.hashCode() : 523);
+        return 509 + (this.value != null ? 457 * this.value.hashCode() : 523);
     }
 
 }

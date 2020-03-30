@@ -29,18 +29,19 @@ public class SwapStatementOrder extends Mutation {
 
     @Override
     public boolean apply(AstElement ast) {
-        Block block = (Block) blockIdentifier.find(ast);
+        Block block = (Block) this.blockIdentifier.find(ast);
 
         boolean applied = false;
 
-        if (block != null && block.statements.size() > index + 1 && e1Id == block.statements.get(index).id
-                && e2Id == block.statements.get(index + 1).id) {
+        if (block != null && block.statements.size() > this.index + 1
+                && this.e1Id == block.statements.get(this.index).id
+                && this.e2Id == block.statements.get(this.index + 1).id) {
 
-            Statement e1 = block.statements.get(index);
-            Statement e2 = block.statements.get(index + 1);
+            Statement e1 = block.statements.get(this.index);
+            Statement e2 = block.statements.get(this.index + 1);
 
-            block.statements.set(index, e2);
-            block.statements.set(index + 1, e1);
+            block.statements.set(this.index, e2);
+            block.statements.set(this.index + 1, e1);
 
             applied = true;
             this.diff = new ArrayList<>(2);
@@ -55,7 +56,7 @@ public class SwapStatementOrder extends Mutation {
 
     @Override
     public String toString() {
-        return "SwapStatementOrder(block=" + blockIdentifier + ", index=" + index + ")";
+        return "SwapStatementOrder(block=" + this.blockIdentifier + ", index=" + this.index + ")";
     }
 
     @Override
@@ -64,8 +65,8 @@ public class SwapStatementOrder extends Mutation {
 
         if (obj instanceof SwapStatementOrder) {
             SwapStatementOrder other = (SwapStatementOrder) obj;
-            equal = blockIdentifier.equals(other.blockIdentifier) && index == other.index && e1Id == other.e1Id
-                    && e2Id == other.e2Id;
+            equal = this.blockIdentifier.equals(other.blockIdentifier) && this.index == other.index
+                    && this.e1Id == other.e1Id && this.e2Id == other.e2Id;
         }
 
         return equal;
@@ -73,8 +74,8 @@ public class SwapStatementOrder extends Mutation {
 
     @Override
     public int hashCode() {
-        return 17 * this.blockIdentifier.hashCode() + 281 * Long.hashCode(e1Id) + 29 * Long.hashCode(e2Id)
-                + Integer.hashCode(index);
+        return 17 * this.blockIdentifier.hashCode() + 281 * Long.hashCode(this.e1Id) + 29 * Long.hashCode(this.e2Id)
+                + Integer.hashCode(this.index);
     }
 
     public static SwapStatementOrder find(File file, Random random) {

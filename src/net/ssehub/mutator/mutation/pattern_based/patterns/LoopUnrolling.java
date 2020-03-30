@@ -94,7 +94,7 @@ public class LoopUnrolling implements IOpportunity {
                 // remove the increment, as we inserted the increment statements
                 loop.increment = null;
 
-                int newIncrement = increment * param;
+                int newIncrement = this.increment * param;
 
                 // decrease the bound
                 // the remainder loop will take care of all remaining elements that don't fit
@@ -162,7 +162,7 @@ public class LoopUnrolling implements IOpportunity {
         left.identifier = countVarId;
 
         Identifier right = new Identifier(expr);
-        right.identifier = var;
+        right.identifier = this.var;
 
         expr.left = left;
         expr.right = right;
@@ -191,13 +191,13 @@ public class LoopUnrolling implements IOpportunity {
 
 //    private void setNewIncrement(For loop, int increment) {
 //        BinaryExpr newIncrementOp = new BinaryExpr(loop);
-//        
+//
 //        Literal newIncrementStep = new Literal(newIncrementOp);
 //        newIncrementStep.value = Integer.toString(Math.abs(increment));
-//        
+//
 //        Identifier newIncrementVar = new Identifier(newIncrementOp);
 //        newIncrementVar.identifier = var;
-//        
+//
 //        if (increment >= 0) {
 //            newIncrementOp.operator = BinaryOperator.ASSIGNMENT_PLUS;
 //        } else {
@@ -205,7 +205,7 @@ public class LoopUnrolling implements IOpportunity {
 //        }
 //        newIncrementOp.left = newIncrementVar;
 //        newIncrementOp.right = newIncrementStep;
-//        
+//
 //        loop.increment = newIncrementOp;
 //    }
 
@@ -221,7 +221,7 @@ public class LoopUnrolling implements IOpportunity {
 
         private Expression checkAndConvert(Expression expr) {
             Expression result = expr;
-            if (expr instanceof Identifier && ((Identifier) expr).identifier.equals(toReplace)) {
+            if (expr instanceof Identifier && ((Identifier) expr).identifier.equals(this.toReplace)) {
                 result = convert((Identifier) expr);
                 if (result == null) {
                     result = expr;
@@ -355,20 +355,20 @@ public class LoopUnrolling implements IOpportunity {
 //    private class WithLiteralReplacer extends AbstractIdentifierReplacer {
 //
 //        private int varAddition;
-//        
+//
 //        private Set<Long> converted;
-//        
+//
 //        public WithLiteralReplacer(int varAddition) {
 //            super(LoopUnrolling.this.var);
 //            this.varAddition = varAddition;
 //            this.converted = new HashSet<>();
 //        }
-//        
+//
 //        @Override
 //        protected Expression convert(Identifier identifier) {
 //            if (!converted.contains(identifier.id)) {
 //                BinaryExpr addition = new BinaryExpr(identifier.parent);
-//                
+//
 //                Literal lit = new Literal(addition);
 //                lit.value = Integer.toString(Math.abs(varAddition));
 //                if (varAddition >= 0) {
@@ -376,14 +376,14 @@ public class LoopUnrolling implements IOpportunity {
 //                } else {
 //                    addition.operator = BinaryOperator.SUBTRACTION;
 //                }
-//                
+//
 //                addition.left = identifier;
 //                addition.right = lit;
-//                
+//
 //                identifier.parent = addition;
-//                
+//
 //                converted.add(identifier.id);
-//                
+//
 //                return addition;
 //            }
 //            return null;
@@ -410,7 +410,7 @@ public class LoopUnrolling implements IOpportunity {
 
     @Override
     public String toString() {
-        return "LoopUnrolling(loop=#" + loopId + "; var=" + var + "; increment=" + increment + ")";
+        return "LoopUnrolling(loop=#" + this.loopId + "; var=" + this.var + "; increment=" + this.increment + ")";
     }
 
     public static List<LoopUnrolling> findOpportunities(File ast) {
@@ -461,9 +461,8 @@ public class LoopUnrolling implements IOpportunity {
         }
 
         private String getVariable(Expression expr) {
-            if (expr instanceof Identifier) {
+            if (expr instanceof Identifier)
                 return ((Identifier) expr).identifier;
-            }
             return null;
         }
 
@@ -486,9 +485,8 @@ public class LoopUnrolling implements IOpportunity {
             // check init
             String var = null;
             if (stmt.init != null) {
-                if (!isIntType(stmt.init.type)) {
+                if (!isIntType(stmt.init.type))
                     return null;
-                }
                 var = stmt.init.identifier;
             }
 
@@ -499,9 +497,8 @@ public class LoopUnrolling implements IOpportunity {
                     BinaryExpr op = (BinaryExpr) stmt.condition;
 
                     if (var != null) {
-                        if (!isVariable(op.left, var)) {
+                        if (!isVariable(op.left, var))
                             return null;
-                        }
                     } else {
                         var = getVariable(op.left);
                     }
@@ -526,9 +523,8 @@ public class LoopUnrolling implements IOpportunity {
                     }
 
                     if (var != null) {
-                        if (!isVariable(op.expr, var)) {
+                        if (!isVariable(op.expr, var))
                             return null;
-                        }
                     } else {
                         var = getVariable(op.expr);
                     }
@@ -541,9 +537,8 @@ public class LoopUnrolling implements IOpportunity {
                     }
 
                     if (var != null) {
-                        if (!isVariable(op.left, var)) {
+                        if (!isVariable(op.left, var))
                             return null;
-                        }
                     } else {
                         var = getVariable(op.left);
                     }
@@ -551,7 +546,7 @@ public class LoopUnrolling implements IOpportunity {
             }
 
             if (var != null && conditionFits && increment != null) {
-                opportunities.add(new LoopUnrolling(stmt.id, var, increment));
+                this.opportunities.add(new LoopUnrolling(stmt.id, var, increment));
             }
 
             return null;

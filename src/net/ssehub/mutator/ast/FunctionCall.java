@@ -22,12 +22,12 @@ public class FunctionCall extends Expression {
 
     @Override
     public AstElement getChild(int index) throws IndexOutOfBoundsException {
-        return params.get(index);
+        return this.params.get(index);
     }
 
     @Override
     public int getNumChildren() {
-        return params.size();
+        return this.params.size();
     }
 
     @Override
@@ -40,14 +40,14 @@ public class FunctionCall extends Expression {
         boolean equals = false;
         if (super.equals(obj)) {
             FunctionCall other = (FunctionCall) obj;
-            equals = function.equals(other.function) && params.equals(other.params);
+            equals = this.function.equals(other.function) && this.params.equals(other.params);
         }
         return equals;
     }
 
     @Override
     public int hashCode() {
-        return 281 * function.hashCode() + 521 * params.hashCode();
+        return 281 * this.function.hashCode() + 521 * this.params.hashCode();
     }
 
 }

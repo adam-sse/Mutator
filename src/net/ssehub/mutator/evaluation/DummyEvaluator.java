@@ -30,15 +30,15 @@ public class DummyEvaluator extends Evaluator {
             this.numObjectives = 2;
         }
 
-        bias = 0.0;
+        this.bias = 0.0;
     }
 
     @Override
     public TestResult test(IMutant mutant) {
-        TestResult result = testResults.get(mutant.getId());
+        TestResult result = this.testResults.get(mutant.getId());
 
         if (result == null) {
-            double rand = random.nextDouble();
+            double rand = this.random.nextDouble();
 
             if (rand < 0.01) {
                 result = TestResult.ERROR;
@@ -52,7 +52,7 @@ public class DummyEvaluator extends Evaluator {
                 result = TestResult.PASS;
             }
 
-            testResults.put(mutant.getId(), result);
+            this.testResults.put(mutant.getId(), result);
         }
 
         return result;
@@ -60,12 +60,12 @@ public class DummyEvaluator extends Evaluator {
 
     @Override
     public Fitness measureFitness(IMutant mutant) {
-        Fitness result = fitnessResults.get(mutant.getId());
+        Fitness result = this.fitnessResults.get(mutant.getId());
 
         if (result == null) {
             double[] values = new double[this.numObjectives];
             for (int i = 0; i < values.length; i++) {
-                values[i] = random.nextDouble() * (1.0 + this.bias);
+                values[i] = this.random.nextDouble() * (1.0 + this.bias);
             }
             this.bias += 0.05;
 

@@ -9,11 +9,10 @@ class Util {
     }
 
     public static String getParentStatementText(AstElement element) {
-        if (element instanceof Statement) {
+        if (element instanceof Statement)
             return element.getText();
-        } else {
+        else
             return getParentStatementText(element.parent);
-        }
     }
 
 }

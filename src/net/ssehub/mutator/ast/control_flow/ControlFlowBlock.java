@@ -33,7 +33,7 @@ public class ControlFlowBlock {
     }
 
     public String getName() {
-        return name;
+        return this.name;
     }
 
     public void addStatement(Statement statement) {
@@ -54,7 +54,7 @@ public class ControlFlowBlock {
     }
 
     public ControlFlowBlock getOutTrue() {
-        return outTrue;
+        return this.outTrue;
     }
 
     public void setOutFalse(ControlFlowBlock other) {
@@ -67,7 +67,7 @@ public class ControlFlowBlock {
     }
 
     public ControlFlowBlock getOutFalse() {
-        return outFalse;
+        return this.outFalse;
     }
 
     public void setOutCondition(Expression outCondition) {
@@ -75,11 +75,11 @@ public class ControlFlowBlock {
     }
 
     public Expression getOutCondition() {
-        return outCondition;
+        return this.outCondition;
     }
 
     public Set<ControlFlowBlock> getIncoming() {
-        return Collections.unmodifiableSet(incoming);
+        return Collections.unmodifiableSet(this.incoming);
     }
 
     void removeIncoming(ControlFlowBlock previousIn) {
@@ -91,7 +91,7 @@ public class ControlFlowBlock {
     }
 
     public Set<String> getCalledFunctions() {
-        return Collections.unmodifiableSet(calledFunctions);
+        return Collections.unmodifiableSet(this.calledFunctions);
     }
 
     @Override
@@ -106,7 +106,7 @@ public class ControlFlowBlock {
 
     @Override
     public int hashCode() {
-        return name.hashCode();
+        return this.name.hashCode();
     }
 
 }

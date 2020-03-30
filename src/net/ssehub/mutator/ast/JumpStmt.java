@@ -18,7 +18,7 @@ public class JumpStmt extends Statement {
 
         @Override
         public String toString() {
-            return str;
+            return this.str;
         }
 
     }
@@ -49,14 +49,14 @@ public class JumpStmt extends Statement {
         boolean equals = false;
         if (super.equals(obj)) {
             JumpStmt other = (JumpStmt) obj;
-            equals = type.equals(other.type);
+            equals = this.type.equals(other.type);
         }
         return equals;
     }
 
     @Override
     public int hashCode() {
-        return 149 * type.hashCode();
+        return 149 * this.type.hashCode();
     }
 
 }

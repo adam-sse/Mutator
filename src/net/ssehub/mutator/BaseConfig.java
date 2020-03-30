@@ -47,11 +47,11 @@ public class BaseConfig {
         this.timeout = Integer.parseInt(props.getProperty("evaluator.timeout"));
         this.dropin = props.getProperty("evaluator.dropin");
 
-        compilerArgs = new LinkedList<>();
+        this.compilerArgs = new LinkedList<>();
         for (String arg : props.getProperty("evaluator.compiler").split(" ")) {
-            compilerArgs.add(arg);
+            this.compilerArgs.add(arg);
         }
-        this.compilerArgs = Collections.unmodifiableList(compilerArgs);
+        this.compilerArgs = Collections.unmodifiableList(this.compilerArgs);
 
         this.testSrc = new File(props.getProperty("evaluator.test.src"));
 
@@ -63,7 +63,7 @@ public class BaseConfig {
     }
 
     public File getExecDir() {
-        return execDir;
+        return this.execDir;
     }
 
     void setExecDir(File execDir) {
@@ -75,31 +75,31 @@ public class BaseConfig {
     }
 
     public boolean getSaveIterations() {
-        return saveIterations;
+        return this.saveIterations;
     }
 
     public String getFitnessComparison() {
-        return fitnessComparison;
+        return this.fitnessComparison;
     }
 
     public double[] getFitnessWeights() {
-        return fitnessWeights;
+        return this.fitnessWeights;
     }
 
     public int getTimeout() {
-        return timeout;
+        return this.timeout;
     }
 
     public String getDropin() {
-        return dropin;
+        return this.dropin;
     }
 
     public List<String> getCompilerArgs() {
-        return compilerArgs;
+        return this.compilerArgs;
     }
 
     public File getTestSrc() {
-        return testSrc;
+        return this.testSrc;
     }
 
     void setTestSrc(File testSrc) {
@@ -107,7 +107,7 @@ public class BaseConfig {
     }
 
     public File getFitnessSrc() {
-        return fitnessSrc;
+        return this.fitnessSrc;
     }
 
     void setFitnessSrc(File fitnessSrc) {
@@ -115,15 +115,15 @@ public class BaseConfig {
     }
 
     public int getFitnessMeasures() {
-        return fitnessMeasures;
+        return this.fitnessMeasures;
     }
 
     public long getSleepBeforeFitness() {
-        return sleepBeforeFitness;
+        return this.sleepBeforeFitness;
     }
 
     public String getDotExe() {
-        return dotExe;
+        return this.dotExe;
     }
 
 }

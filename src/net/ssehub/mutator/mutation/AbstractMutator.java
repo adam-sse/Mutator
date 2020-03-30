@@ -66,7 +66,7 @@ public abstract class AbstractMutator implements IMutator {
     }
 
     protected int getIteration() {
-        return iteration;
+        return this.iteration;
     }
 
     protected void nextIteration() {
@@ -92,35 +92,35 @@ public abstract class AbstractMutator implements IMutator {
         if (useCache && hasFitness(mutant.getId())) {
             fitness = getFitness(mutant.getId());
             if (printAndStats) {
-                LOGGER.println(mutant.getId() + ": " + fitness + " (cached)");
+                AbstractMutator.LOGGER.println(mutant.getId() + ": " + fitness + " (cached)");
             }
             return fitness;
         }
 
         if (printAndStats) {
-            statNumEvaluated++;
+            this.statNumEvaluated++;
         }
 
         TestResult testResult = this.evaluator.test(mutant);
         if (testResult != TestResult.PASS) {
             if (printAndStats) {
-                LOGGER.println(mutant.getId() + " " + testResult);
+                AbstractMutator.LOGGER.println(mutant.getId() + " " + testResult);
 
                 switch (testResult) {
                 case COMPILATION_FAILED:
-                    statNumCompileError++;
+                    this.statNumCompileError++;
                     break;
 
                 case ERROR:
-                    statNumError++;
+                    this.statNumError++;
                     break;
 
                 case TEST_FAILED:
-                    statNumFailed++;
+                    this.statNumFailed++;
                     break;
 
                 case TIMEOUT:
-                    statNumTimeout++;
+                    this.statNumTimeout++;
                     break;
 
                 default:
@@ -130,13 +130,13 @@ public abstract class AbstractMutator implements IMutator {
             fitness = this.evaluator.measureFitness(mutant);
             if (fitness == Evaluator.RUNTIME_ERROR) {
                 if (printAndStats) {
-                    LOGGER.println(mutant.getId() + " had a runtime error during fitness evaluation");
-                    statNumRuntimeError++;
+                    AbstractMutator.LOGGER.println(mutant.getId() + " had a runtime error during fitness evaluation");
+                    this.statNumRuntimeError++;
                 }
                 fitness = null;
             } else {
                 if (printAndStats) {
-                    LOGGER.println(mutant.getId() + ": " + fitness);
+                    AbstractMutator.LOGGER.println(mutant.getId() + ": " + fitness);
                 }
                 setFitness(mutant.getId(), fitness);
             }
@@ -150,7 +150,7 @@ public abstract class AbstractMutator implements IMutator {
     }
 
     protected void setBestInIteration(Fitness bestFitness) {
-        if (iteration - 1 < this.statBestInIteration.size()) {
+        if (this.iteration - 1 < this.statBestInIteration.size()) {
             this.statBestInIteration.set(this.iteration - 1, bestFitness);
         } else {
             this.statBestInIteration.add(this.iteration - 1, bestFitness);
@@ -159,91 +159,92 @@ public abstract class AbstractMutator implements IMutator {
 
     @Override
     public void printStatistics() {
-        LOGGER.println("Evaluated: " + statNumEvaluated);
-        LOGGER.printf("    failed compilation: %d (%.2f %%)", statNumCompileError,
-                (double) statNumCompileError / statNumEvaluated * 100.0);
-        LOGGER.println();
-        LOGGER.printf("    timed-out: %d (%.2f %%)", statNumTimeout,
-                (double) statNumTimeout / statNumEvaluated * 100.0);
-        LOGGER.println();
-        LOGGER.printf("    failed tests: %d (%.2f %%)", statNumFailed,
-                (double) statNumFailed / statNumEvaluated * 100.0);
-        LOGGER.println();
-        LOGGER.printf("    runtime error: %d (%.2f %%)", statNumRuntimeError,
-                (double) statNumRuntimeError / statNumEvaluated * 100.0);
-        LOGGER.println();
-        LOGGER.printf("    error: %d (%.2f %%)", statNumError, (double) statNumError / statNumEvaluated * 100.0);
-        LOGGER.println();
+        AbstractMutator.LOGGER.println("Evaluated: " + this.statNumEvaluated);
+        AbstractMutator.LOGGER.printf("    failed compilation: %d (%.2f %%)", this.statNumCompileError,
+                (double) this.statNumCompileError / this.statNumEvaluated * 100.0);
+        AbstractMutator.LOGGER.println();
+        AbstractMutator.LOGGER.printf("    timed-out: %d (%.2f %%)", this.statNumTimeout,
+                (double) this.statNumTimeout / this.statNumEvaluated * 100.0);
+        AbstractMutator.LOGGER.println();
+        AbstractMutator.LOGGER.printf("    failed tests: %d (%.2f %%)", this.statNumFailed,
+                (double) this.statNumFailed / this.statNumEvaluated * 100.0);
+        AbstractMutator.LOGGER.println();
+        AbstractMutator.LOGGER.printf("    runtime error: %d (%.2f %%)", this.statNumRuntimeError,
+                (double) this.statNumRuntimeError / this.statNumEvaluated * 100.0);
+        AbstractMutator.LOGGER.println();
+        AbstractMutator.LOGGER.printf("    error: %d (%.2f %%)", this.statNumError,
+                (double) this.statNumError / this.statNumEvaluated * 100.0);
+        AbstractMutator.LOGGER.println();
 
-        if (statBestInIteration.size() >= 2) {
-            LOGGER.println();
-            LOGGER.println("Best Fitness per Iteration:");
+        if (this.statBestInIteration.size() >= 2) {
+            AbstractMutator.LOGGER.println();
+            AbstractMutator.LOGGER.println("Best Fitness per Iteration:");
 
-            for (int objective = 0; objective < statBestInIteration.get(0).numValues(); objective++) {
-                LOGGER.println();
-                LOGGER.println("Objective " + (objective + 1));
+            for (int objective = 0; objective < this.statBestInIteration.get(0).numValues(); objective++) {
+                AbstractMutator.LOGGER.println();
+                AbstractMutator.LOGGER.println("Objective " + (objective + 1));
 
                 AsciiChart chart = new AsciiChart(20);
 
-                for (int iteration = 0; iteration < statBestInIteration.size(); iteration++) {
-                    double fitness = statBestInIteration.get(iteration).getValue(objective);
+                for (int iteration = 0; iteration < this.statBestInIteration.size(); iteration++) {
+                    double fitness = this.statBestInIteration.get(iteration).getValue(objective);
                     chart.addPoint(iteration + 1, fitness);
                 }
 
-                LOGGER.println(chart.toString());
+                AbstractMutator.LOGGER.println(chart.toString());
             }
 
-            if (config.getDotExe() != null) {
-                int dimension = statBestInIteration.get(0).numValues();
+            if (this.config.getDotExe() != null) {
+                int dimension = this.statBestInIteration.get(0).numValues();
                 File bestFitOutput = null;
                 BestFitnessRenderer bestFitRenderer = null;
 
                 if (dimension == 2) {
-                    bestFitOutput = new File(config.getExecDir(), "fitness-evolution.svg");
-                    bestFitRenderer = new BestFitnessRenderer(config.getDotExe(), false);
+                    bestFitOutput = new File(this.config.getExecDir(), "fitness-evolution.svg");
+                    bestFitRenderer = new BestFitnessRenderer(this.config.getDotExe(), false);
                 } else if (dimension == 3) {
-                    bestFitOutput = new File(config.getExecDir(), "fitness-evolution.wrl");
-                    bestFitRenderer = new BestFitnessRenderer(config.getDotExe(), true);
+                    bestFitOutput = new File(this.config.getExecDir(), "fitness-evolution.wrl");
+                    bestFitRenderer = new BestFitnessRenderer(this.config.getDotExe(), true);
                 }
 
                 if (bestFitRenderer != null) {
-                    LOGGER.println("Rendering fitness evolution to " + bestFitOutput.getName());
+                    AbstractMutator.LOGGER.println("Rendering fitness evolution to " + bestFitOutput.getName());
                     try {
-                        bestFitRenderer.render(statBestInIteration, bestFitOutput);
+                        bestFitRenderer.render(this.statBestInIteration, bestFitOutput);
                     } catch (IOException e) {
-                        LOGGER.logException(e);
+                        AbstractMutator.LOGGER.logException(e);
                     }
                 }
             }
         }
 
-        if (config.getDotExe() != null) {
+        if (this.config.getDotExe() != null) {
             int dimension = -1;
-            if (!fitnessStore.isEmpty()) {
-                dimension = fitnessStore.values().iterator().next().numValues();
+            if (!this.fitnessStore.isEmpty()) {
+                dimension = this.fitnessStore.values().iterator().next().numValues();
             }
 
             File allFitOutput = null;
             FitnessRenderer allFitRenderer = null;
 
             if (dimension == 2) {
-                allFitOutput = new File(config.getExecDir(), "fitness-all.svg");
-                allFitRenderer = new FitnessRenderer(config.getDotExe(), false, false);
+                allFitOutput = new File(this.config.getExecDir(), "fitness-all.svg");
+                allFitRenderer = new FitnessRenderer(this.config.getDotExe(), false, false);
             } else if (dimension == 3) {
-                allFitOutput = new File(config.getExecDir(), "fitness-all.wrl");
-                allFitRenderer = new FitnessRenderer3D(config.getDotExe(), false, false);
+                allFitOutput = new File(this.config.getExecDir(), "fitness-all.wrl");
+                allFitRenderer = new FitnessRenderer3D(this.config.getDotExe(), false, false);
             }
 
             if (allFitRenderer != null) {
-                LOGGER.println("Rendering all fitness values to " + allFitOutput.getName());
+                AbstractMutator.LOGGER.println("Rendering all fitness values to " + allFitOutput.getName());
 
                 try {
-                    if (allFitRenderer.init(fitnessStore.values())) {
+                    if (allFitRenderer.init(this.fitnessStore.values())) {
                         // find best seen fitness
                         IFitnessComparator comparator = FitnessComparatorFactory.get();
-                        Fitness best = Collections.max(fitnessStore.values(), comparator);
+                        Fitness best = Collections.max(this.fitnessStore.values(), comparator);
 
-                        for (Map.Entry<String, Fitness> entry : fitnessStore.entrySet()) {
+                        for (Map.Entry<String, Fitness> entry : this.fitnessStore.entrySet()) {
                             FitnessStoreEntry fitness = (FitnessStoreEntry) entry.getValue();
 
                             boolean isInit = entry.getKey().equals(getUnmodifiedId());
@@ -256,7 +257,7 @@ public abstract class AbstractMutator implements IMutator {
                         allFitRenderer.render(allFitOutput);
                     }
                 } catch (IOException e) {
-                    LOGGER.logException(e);
+                    AbstractMutator.LOGGER.logException(e);
                 }
             }
         }

@@ -20,7 +20,7 @@ public enum TestResult {
 
     @Override
     public String toString() {
-        return msg;
+        return this.msg;
     }
 
 }

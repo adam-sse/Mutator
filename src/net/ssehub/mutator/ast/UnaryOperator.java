@@ -56,7 +56,7 @@ public enum UnaryOperator {
 
     @Override
     public String toString() {
-        return str;
+        return this.str;
     }
 
 }

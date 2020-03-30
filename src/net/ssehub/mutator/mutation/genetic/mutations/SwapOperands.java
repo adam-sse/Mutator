@@ -26,11 +26,11 @@ public class SwapOperands extends Mutation {
 
     @Override
     public boolean apply(AstElement ast) {
-        BinaryExpr targetElem = (BinaryExpr) targetIdentifier.find(ast);
+        BinaryExpr targetElem = (BinaryExpr) this.targetIdentifier.find(ast);
 
         boolean applied = false;
 
-        if (targetElem != null && leftId == targetElem.left.id && rightId == targetElem.right.id) {
+        if (targetElem != null && this.leftId == targetElem.left.id && this.rightId == targetElem.right.id) {
 
             String before = Util.getParentStatementText(targetElem);
 
@@ -51,7 +51,7 @@ public class SwapOperands extends Mutation {
 
     @Override
     public String toString() {
-        return "SwapOperands(target=" + targetIdentifier + ")";
+        return "SwapOperands(target=" + this.targetIdentifier + ")";
     }
 
     @Override
@@ -60,8 +60,8 @@ public class SwapOperands extends Mutation {
 
         if (obj instanceof SwapOperands) {
             SwapOperands other = (SwapOperands) obj;
-            equal = targetIdentifier.equals(other.targetIdentifier) && leftId == other.leftId
-                    && rightId == other.rightId;
+            equal = this.targetIdentifier.equals(other.targetIdentifier) && this.leftId == other.leftId
+                    && this.rightId == other.rightId;
         }
 
         return equal;
@@ -69,7 +69,8 @@ public class SwapOperands extends Mutation {
 
     @Override
     public int hashCode() {
-        return 17 * this.targetIdentifier.hashCode() + 281 * Long.hashCode(leftId) + 29 * Long.hashCode(rightId);
+        return 17 * this.targetIdentifier.hashCode() + 281 * Long.hashCode(this.leftId)
+                + 29 * Long.hashCode(this.rightId);
     }
 
     public static SwapOperands find(File file, Random random) {

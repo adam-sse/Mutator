@@ -12,10 +12,10 @@ public class While extends Loop {
     public AstElement getChild(int index) throws IndexOutOfBoundsException {
         switch (index) {
         case 0:
-            return condition;
+            return this.condition;
 
         case 1:
-            return body;
+            return this.body;
 
         default:
             throw new IndexOutOfBoundsException(index);

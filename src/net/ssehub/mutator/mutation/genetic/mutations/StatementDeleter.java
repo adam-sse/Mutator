@@ -36,7 +36,7 @@ class StatementDeleter implements IAstVisitor<Boolean> {
     }
 
     private Boolean visitLoop(Loop stmt) {
-        if (target == stmt.body) {
+        if (this.target == stmt.body) {
             EmptyStmt replacement = new EmptyStmt(stmt);
             replacement.start = stmt.body.start;
             replacement.end = stmt.body.end;
@@ -54,7 +54,7 @@ class StatementDeleter implements IAstVisitor<Boolean> {
 
     @Override
     public Boolean visitBlock(Block stmt) {
-        int i = Util.findIndex(stmt.statements, target);
+        int i = Util.findIndex(stmt.statements, this.target);
         if (i != -1) {
             stmt.statements.remove(i);
             return true;
@@ -100,7 +100,7 @@ class StatementDeleter implements IAstVisitor<Boolean> {
 
     @Override
     public Boolean visitFunction(Function func) {
-        if (target == func.body) {
+        if (this.target == func.body) {
             Block replacement = new Block(func);
             replacement.start = func.body.start;
             replacement.end = func.body.end;
@@ -129,7 +129,7 @@ class StatementDeleter implements IAstVisitor<Boolean> {
 
     @Override
     public Boolean visitIf(If stmt) {
-        if (target == stmt.thenBlock) {
+        if (this.target == stmt.thenBlock) {
             EmptyStmt replacement = new EmptyStmt(stmt);
             replacement.start = stmt.thenBlock.start;
             replacement.end = stmt.thenBlock.end;
@@ -137,7 +137,7 @@ class StatementDeleter implements IAstVisitor<Boolean> {
             return true;
         }
 
-        if (target == stmt.elseBlock) {
+        if (this.target == stmt.elseBlock) {
             EmptyStmt replacement = new EmptyStmt(stmt);
             replacement.start = stmt.elseBlock.start;
             replacement.end = stmt.elseBlock.end;

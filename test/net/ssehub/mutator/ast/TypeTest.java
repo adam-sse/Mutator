@@ -46,12 +46,10 @@ public class TypeTest extends AbstractAstElementTest {
 
     @Override
     protected boolean equal(int element1, int elemen2) {
-        if (element1 == elemen2) {
+        if (element1 == elemen2)
             return true;
-        }
-        if (element1 == 0 && elemen2 == 1 || element1 == 1 && elemen2 == 0) {
+        if (element1 == 0 && elemen2 == 1 || element1 == 1 && elemen2 == 0)
             return true;
-        }
         return false;
     }
 

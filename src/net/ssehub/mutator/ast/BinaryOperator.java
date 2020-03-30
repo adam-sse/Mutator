@@ -144,7 +144,7 @@ public enum BinaryOperator {
 
     @Override
     public String toString() {
-        return str;
+        return this.str;
     }
 
 }

@@ -27,7 +27,7 @@ public class Logger {
     private StringBuilder buffer;
 
     private Logger(String component) {
-        this.component = Util.fillWithSpaces(component, COMPONENT_WIDTH);
+        this.component = Util.fillWithSpaces(component, Logger.COMPONENT_WIDTH);
         this.buffer = new StringBuilder(2048);
     }
 
@@ -36,38 +36,38 @@ public class Logger {
     }
 
     public static synchronized void setFileOut(File file) throws IOException {
-        fileOut = new BufferedWriter(new FileWriter(file));
-        for (String bufferedLine : fileOutBuffer) {
-            fileOut.write(bufferedLine);
-            fileOut.write('\n');
+        Logger.fileOut = new BufferedWriter(new FileWriter(file));
+        for (String bufferedLine : Logger.fileOutBuffer) {
+            Logger.fileOut.write(bufferedLine);
+            Logger.fileOut.write('\n');
         }
-        fileOut.flush();
-        fileOutBuffer = null;
+        Logger.fileOut.flush();
+        Logger.fileOutBuffer = null;
     }
 
     private static synchronized void printlnImpl(String component, String line) {
-        String message = "[" + TIME_FORMAT.format(LocalDateTime.now()) + "] [" + component + "]  " + line;
+        String message = "[" + Logger.TIME_FORMAT.format(LocalDateTime.now()) + "] [" + component + "]  " + line;
         System.out.println(message);
 
-        if (fileOut != null) {
+        if (Logger.fileOut != null) {
             try {
-                fileOut.write(message);
-                fileOut.write('\n');
-                fileOut.flush();
+                Logger.fileOut.write(message);
+                Logger.fileOut.write('\n');
+                Logger.fileOut.flush();
             } catch (IOException e) {
-                LOGGER.logException(e);
+                Logger.LOGGER.logException(e);
             }
         } else {
-            fileOutBuffer.add(message);
+            Logger.fileOutBuffer.add(message);
         }
     }
 
     private void checkWrite() {
         int eolIndex;
-        while ((eolIndex = buffer.indexOf("\n")) != -1) {
-            String line = buffer.substring(0, eolIndex);
-            printlnImpl(component, line);
-            buffer.delete(0, eolIndex + 1);
+        while ((eolIndex = this.buffer.indexOf("\n")) != -1) {
+            String line = this.buffer.substring(0, eolIndex);
+            printlnImpl(this.component, line);
+            this.buffer.delete(0, eolIndex + 1);
         }
     }
 

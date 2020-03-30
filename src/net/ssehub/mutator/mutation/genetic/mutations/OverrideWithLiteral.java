@@ -26,14 +26,14 @@ public class OverrideWithLiteral extends Mutation {
 
     @Override
     public boolean apply(AstElement ast) {
-        AstElement targetElem = target.find(ast);
+        AstElement targetElem = this.target.find(ast);
 
         boolean success = false;
 
         if (targetElem != null) {
             String beforeReplacing = Util.getParentStatementText(targetElem);
 
-            AstElement literalClone = literal.accept(new AstCloner(targetElem.parent, true));
+            AstElement literalClone = this.literal.accept(new AstCloner(targetElem.parent, true));
 
             ElementReplacer<AstElement> replacer = new ElementReplacer<>();
             success = replacer.replace(targetElem, literalClone);
@@ -50,7 +50,8 @@ public class OverrideWithLiteral extends Mutation {
 
     @Override
     public String toString() {
-        return "OverrideWithLiteral(target=" + target + ", literal=" + literal.getText() + ") -> #" + literal.id;
+        return "OverrideWithLiteral(target=" + this.target + ", literal=" + this.literal.getText() + ") -> #"
+                + this.literal.id;
     }
 
     @Override
@@ -59,7 +60,7 @@ public class OverrideWithLiteral extends Mutation {
 
         if (obj instanceof OverrideWithLiteral) {
             OverrideWithLiteral other = (OverrideWithLiteral) obj;
-            equal = target.equals(other.target) && literal.equals(other.literal);
+            equal = this.target.equals(other.target) && this.literal.equals(other.literal);
         }
 
         return equal;
@@ -67,7 +68,7 @@ public class OverrideWithLiteral extends Mutation {
 
     @Override
     public int hashCode() {
-        return 193 * target.hashCode() + 479 * literal.hashCode();
+        return 193 * this.target.hashCode() + 479 * this.literal.hashCode();
     }
 
     public static OverrideWithLiteral find(File file, Random random) {

@@ -47,19 +47,17 @@ public class TypeGuesser {
     }
 
     private Function getParentFunction(AstElement element) {
-        if (element instanceof Function) {
+        if (element instanceof Function)
             return (Function) element;
-        } else {
+        else
             return getParentFunction(element.parent);
-        }
     }
 
     private File getParentFile(AstElement element) {
-        if (element instanceof File) {
+        if (element instanceof File)
             return (File) element;
-        } else {
+        else
             return getParentFile(element.parent);
-        }
     }
 
     private static class TypeEvaluator implements IExpressionVisitor<BasicType> {
@@ -132,9 +130,10 @@ public class TypeGuesser {
 
         @Override
         public BasicType visitFunctionCall(FunctionCall expr) {
-            BasicType type = funcTypes.get(expr.function);
+            BasicType type = this.funcTypes.get(expr.function);
             if (type == null) {
-                LOGGER.println("Warning: found function with unknown type: " + expr.function + "; assuming double");
+                TypeGuesser.LOGGER
+                        .println("Warning: found function with unknown type: " + expr.function + "; assuming double");
                 type = BasicType.DOUBLE;
             }
             return type;
@@ -142,9 +141,10 @@ public class TypeGuesser {
 
         @Override
         public BasicType visitIdentifier(Identifier expr) {
-            BasicType type = varTypes.get(expr.identifier);
+            BasicType type = this.varTypes.get(expr.identifier);
             if (type == null) {
-                LOGGER.println("Warning: found variable with unknown type: " + expr.identifier + "; assuming int");
+                TypeGuesser.LOGGER
+                        .println("Warning: found variable with unknown type: " + expr.identifier + "; assuming int");
                 type = BasicType.INT;
             }
             return type;
@@ -190,15 +190,15 @@ public class TypeGuesser {
         protected Void visit(AstElement element) {
             if (element instanceof Declaration) {
                 Declaration decl = (Declaration) element;
-                BasicType previous = types.get(decl.identifier);
+                BasicType previous = this.types.get(decl.identifier);
                 if (previous == null) {
-                    types.put(decl.identifier, decl.type.type);
+                    this.types.put(decl.identifier, decl.type.type);
                 } else if (previous != decl.type.type) {
-                    LOGGER.println("Warning: conflicting types for variable " + decl.identifier + ": " + previous
-                            + " and " + decl.type.type);
+                    TypeGuesser.LOGGER.println("Warning: conflicting types for variable " + decl.identifier + ": "
+                            + previous + " and " + decl.type.type);
 
                     // use double over int
-                    types.put(decl.identifier,
+                    this.types.put(decl.identifier,
                             previous.ordinal() > decl.type.type.ordinal() ? previous : decl.type.type);
                 }
             }

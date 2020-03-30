@@ -36,15 +36,12 @@ public class ReturnTest extends AbstractAstElementTest {
 
     @Override
     protected boolean equal(int element1, int elemen2) {
-        if (element1 == elemen2) {
+        if (element1 == elemen2)
             return true;
-        }
-        if (element1 == 0 && elemen2 == 1 || element1 == 1 && elemen2 == 0) {
+        if (element1 == 0 && elemen2 == 1 || element1 == 1 && elemen2 == 0)
             return true;
-        }
-        if (element1 == 3 && elemen2 == 4 || element1 == 4 && elemen2 == 3) {
+        if (element1 == 3 && elemen2 == 4 || element1 == 4 && elemen2 == 3)
             return true;
-        }
         return false;
     }
 

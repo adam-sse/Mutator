@@ -44,35 +44,35 @@ public class GeneticConfig extends BaseConfig {
     }
 
     public long getSeed() {
-        return seed;
+        return this.seed;
     }
 
     public int getGenerations() {
-        return generations;
+        return this.generations;
     }
 
     public int getPopulationSize() {
-        return populationSize;
+        return this.populationSize;
     }
 
     public int getElitism() {
-        return elitism;
+        return this.elitism;
     }
 
     public int getInitialMutations() {
-        return initialMutations;
+        return this.initialMutations;
     }
 
     public List<String> getMutations() {
-        return mutations;
+        return this.mutations;
     }
 
     public int getCleanFrequency() {
-        return cleanFrequency;
+        return this.cleanFrequency;
     }
 
     public double getCleanThreshold() {
-        return cleanThreshold;
+        return this.cleanThreshold;
     }
 
 }

@@ -30,27 +30,27 @@ public class CopyInsertStatement extends Mutation {
 
     @Override
     public boolean apply(AstElement ast) {
-        Statement sourceElem = (Statement) sourceIdentifier.find(ast);
-        Statement referenceElem = (Statement) reference.find(ast);
+        Statement sourceElem = (Statement) this.sourceIdentifier.find(ast);
+        Statement referenceElem = (Statement) this.reference.find(ast);
 
         boolean success = false;
 
-        if (referenceElem != null && sourceElem != null && new MutationIdentifier(toInsert).find(ast) == null
-                && sourceElem.equals(toInsert)) {
+        if (referenceElem != null && sourceElem != null && new MutationIdentifier(this.toInsert).find(ast) == null
+                && sourceElem.equals(this.toInsert)) {
             StatementInserter inserter = new StatementInserter();
 
-            Statement toInsertClone = (Statement) toInsert.accept(new AstCloner(referenceElem.parent, true));
+            Statement toInsertClone = (Statement) this.toInsert.accept(new AstCloner(referenceElem.parent, true));
 
             success = inserter.insert(referenceElem, this.before, toInsertClone);
 
             if (success) {
                 this.diff = new ArrayList<>(2);
                 if (this.before) {
-                    this.diff.add("+" + toInsert.getText());
+                    this.diff.add("+" + this.toInsert.getText());
                     this.diff.add(" " + referenceElem.getText());
                 } else {
                     this.diff.add(" " + referenceElem.getText());
-                    this.diff.add("+" + toInsert.getText());
+                    this.diff.add("+" + this.toInsert.getText());
                 }
             }
         }
@@ -60,8 +60,8 @@ public class CopyInsertStatement extends Mutation {
 
     @Override
     public String toString() {
-        return "CopyInsertStatement(source=" + sourceIdentifier + ", reference=" + reference + ", before=" + before
-                + ") -> #" + toInsert.id;
+        return "CopyInsertStatement(source=" + this.sourceIdentifier + ", reference=" + this.reference + ", before="
+                + this.before + ") -> #" + this.toInsert.id;
     }
 
     @Override
@@ -70,8 +70,8 @@ public class CopyInsertStatement extends Mutation {
 
         if (obj instanceof CopyInsertStatement) {
             CopyInsertStatement other = (CopyInsertStatement) obj;
-            equal = sourceIdentifier.equals(other.sourceIdentifier) && reference.equals(other.reference)
-                    && before == other.before;
+            equal = this.sourceIdentifier.equals(other.sourceIdentifier) && this.reference.equals(other.reference)
+                    && this.before == other.before;
         }
 
         return equal;
@@ -79,7 +79,7 @@ public class CopyInsertStatement extends Mutation {
 
     @Override
     public int hashCode() {
-        return sourceIdentifier.hashCode() + 137 * reference.hashCode() + 211 * Boolean.hashCode(before);
+        return this.sourceIdentifier.hashCode() + 137 * this.reference.hashCode() + 211 * Boolean.hashCode(this.before);
     }
 
     public static CopyInsertStatement find(File file, Random random) {

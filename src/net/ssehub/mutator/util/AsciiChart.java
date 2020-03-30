@@ -24,7 +24,7 @@ public class AsciiChart {
     }
 
     public void addPoint(int x, double y) {
-        if (points.isEmpty()) {
+        if (this.points.isEmpty()) {
             this.minX = x;
             this.maxX = x;
             this.minY = y;

@@ -99,8 +99,8 @@ public class ControlFlowCreator {
         }
 
         public void finish() {
-            if (currentBlock != null) {
-                currentBlock.setOutTrue(func.getEndBlock());
+            if (this.currentBlock != null) {
+                this.currentBlock.setOutTrue(this.func.getEndBlock());
             }
         }
 
@@ -109,8 +109,8 @@ public class ControlFlowCreator {
          * incoming) to ensure that {@link #currentBlock} is not <code>null</code>.
          */
         private void requireCurrent() {
-            if (currentBlock == null) {
-                currentBlock = func.createBlock();
+            if (this.currentBlock == null) {
+                this.currentBlock = this.func.createBlock();
             }
         }
 
@@ -142,7 +142,7 @@ public class ControlFlowCreator {
         @Override
         public Void visitDeclarationStmt(DeclarationStmt stmt) {
             requireCurrent();
-            currentBlock.addStatement(stmt);
+            this.currentBlock.addStatement(stmt);
 
             stmt.decl.accept(this);
 
@@ -154,24 +154,24 @@ public class ControlFlowCreator {
             requireCurrent();
             ControlFlowBlock prev = this.currentBlock;
 
-            ControlFlowBlock cond = func.createBlock();
+            ControlFlowBlock cond = this.func.createBlock();
 
             cond.setOutCondition(stmt.condition);
             this.currentBlock = cond;
             stmt.condition.accept(this);
 
-            ControlFlowBlock bodyStart = func.createBlock();
+            ControlFlowBlock bodyStart = this.func.createBlock();
             this.currentBlock = bodyStart;
 
-            ControlFlowBlock after = func.createBlock();
+            ControlFlowBlock after = this.func.createBlock();
 
-            loopNextIter.push(cond);
-            loopAfter.push(after);
+            this.loopNextIter.push(cond);
+            this.loopAfter.push(after);
 
             stmt.body.accept(this);
 
-            loopNextIter.pop();
-            loopAfter.pop();
+            this.loopNextIter.pop();
+            this.loopAfter.pop();
 
             ControlFlowBlock bodyEnd = this.currentBlock;
 
@@ -183,7 +183,7 @@ public class ControlFlowCreator {
                 cond.setOutTrue(bodyStart);
                 cond.setOutFalse(after);
             } else if (cond.getIncoming().isEmpty()) {
-                func.removeBlock(cond);
+                this.func.removeBlock(cond);
             }
 
             if (after.getIncoming().isEmpty()) {
@@ -198,14 +198,14 @@ public class ControlFlowCreator {
         @Override
         public Void visitEmptyStmt(EmptyStmt stmt) {
             requireCurrent();
-            currentBlock.addStatement(stmt);
+            this.currentBlock.addStatement(stmt);
             return null;
         }
 
         @Override
         public Void visitExpressionStmt(ExpressionStmt stmt) {
             requireCurrent();
-            currentBlock.addStatement(stmt);
+            this.currentBlock.addStatement(stmt);
 
             stmt.expr.accept(this);
             return null;
@@ -230,7 +230,7 @@ public class ControlFlowCreator {
 
             ControlFlowBlock condBlock = null;
             if (stmt.condition != null) {
-                condBlock = func.createBlock();
+                condBlock = this.func.createBlock();
                 condBlock.setOutCondition(stmt.condition);
 
                 this.currentBlock = condBlock;
@@ -239,7 +239,7 @@ public class ControlFlowCreator {
 
             ControlFlowBlock incrBlock = null;
             if (stmt.increment != null) {
-                incrBlock = func.createBlock();
+                incrBlock = this.func.createBlock();
                 this.currentBlock = incrBlock;
                 stmt.increment.accept(this);
 
@@ -248,18 +248,18 @@ public class ControlFlowCreator {
                 incrBlock.addStatement(incrStmt);
             }
 
-            ControlFlowBlock after = func.createBlock();
-            loopAfter.push(after);
+            ControlFlowBlock after = this.func.createBlock();
+            this.loopAfter.push(after);
 
-            ControlFlowBlock bodyStart = func.createBlock();
+            ControlFlowBlock bodyStart = this.func.createBlock();
             this.currentBlock = bodyStart;
 
             if (incrBlock != null) {
-                loopNextIter.push(incrBlock);
+                this.loopNextIter.push(incrBlock);
             } else if (condBlock != null) {
-                loopNextIter.push(condBlock);
+                this.loopNextIter.push(condBlock);
             } else {
-                loopNextIter.push(bodyStart);
+                this.loopNextIter.push(bodyStart);
             }
 
             stmt.body.accept(this);
@@ -267,11 +267,11 @@ public class ControlFlowCreator {
             ControlFlowBlock bodyEnd = this.currentBlock;
 
             if (bodyEnd == null && incrBlock != null && incrBlock.getIncoming().isEmpty()) {
-                func.removeBlock(incrBlock);
+                this.func.removeBlock(incrBlock);
             }
 
-            loopAfter.pop();
-            loopNextIter.pop();
+            this.loopAfter.pop();
+            this.loopNextIter.pop();
 
             if (condBlock != null) {
 
@@ -351,7 +351,7 @@ public class ControlFlowCreator {
             prev.setOutCondition(stmt.condition);
             stmt.condition.accept(this);
 
-            ControlFlowBlock thenStart = func.createBlock();
+            ControlFlowBlock thenStart = this.func.createBlock();
             this.currentBlock = thenStart;
 
             stmt.thenBlock.accept(this);
@@ -363,7 +363,7 @@ public class ControlFlowCreator {
             ControlFlowBlock elseStart = null;
             ControlFlowBlock elseEnd = null;
             if (hasElse) {
-                elseStart = func.createBlock();
+                elseStart = this.func.createBlock();
                 this.currentBlock = elseStart;
 
                 stmt.elseBlock.accept(this);
@@ -373,7 +373,7 @@ public class ControlFlowCreator {
 
             ControlFlowBlock after = null;
             if (thenEnd != null || !hasElse || elseEnd != null) {
-                after = func.createBlock();
+                after = this.func.createBlock();
             }
 
             prev.setOutTrue(thenStart);
@@ -402,12 +402,11 @@ public class ControlFlowCreator {
 
             ControlFlowBlock next;
             if (stmt.type == net.ssehub.mutator.ast.JumpStmt.Type.CONTINUE) {
-                next = loopNextIter.peek();
+                next = this.loopNextIter.peek();
             } else if (stmt.type == net.ssehub.mutator.ast.JumpStmt.Type.BREAK) {
-                next = loopAfter.peek();
-            } else {
+                next = this.loopAfter.peek();
+            } else
                 throw new IllegalArgumentException(stmt.type.toString());
-            }
 
             this.currentBlock.setOutTrue(next);
             this.currentBlock = null;
@@ -423,14 +422,14 @@ public class ControlFlowCreator {
         @Override
         public Void visitReturn(Return stmt) {
             requireCurrent();
-            currentBlock.addStatement(stmt);
+            this.currentBlock.addStatement(stmt);
 
             if (stmt.value != null) {
                 stmt.value.accept(this);
             }
 
-            currentBlock.setOutTrue(func.getEndBlock());
-            currentBlock = null;
+            this.currentBlock.setOutTrue(this.func.getEndBlock());
+            this.currentBlock = null;
 
             return null;
         }
@@ -451,24 +450,24 @@ public class ControlFlowCreator {
             requireCurrent();
             ControlFlowBlock prev = this.currentBlock;
 
-            ControlFlowBlock cond = func.createBlock();
+            ControlFlowBlock cond = this.func.createBlock();
 
             cond.setOutCondition(stmt.condition);
             this.currentBlock = cond;
             stmt.condition.accept(this);
 
-            ControlFlowBlock bodyStart = func.createBlock();
+            ControlFlowBlock bodyStart = this.func.createBlock();
             this.currentBlock = bodyStart;
 
-            ControlFlowBlock after = func.createBlock();
+            ControlFlowBlock after = this.func.createBlock();
 
-            loopNextIter.push(cond);
-            loopAfter.push(after);
+            this.loopNextIter.push(cond);
+            this.loopAfter.push(after);
 
             stmt.body.accept(this);
 
-            loopNextIter.pop();
-            loopAfter.pop();
+            this.loopNextIter.pop();
+            this.loopAfter.pop();
 
             ControlFlowBlock bodyEnd = this.currentBlock;
 

@@ -27,13 +27,12 @@ public class Mutant implements IMutant {
     }
 
     public File getAst() {
-        return ast;
+        return this.ast;
     }
 
     public boolean addMutation(Mutation mutation) {
-        if (mutations.contains(mutation)) {
+        if (this.mutations.contains(mutation))
             return false;
-        }
 
         boolean applies = mutation.apply(this.ast);
 
@@ -45,19 +44,19 @@ public class Mutant implements IMutant {
     }
 
     public List<Mutation> getMutations() {
-        return mutations;
+        return this.mutations;
     }
 
     @Override
     public String getId() {
-        return id;
+        return this.id;
     }
 
     @Override
     public void write(java.io.File destination) throws IOException {
         try (FileWriter out = new FileWriter(destination)) {
-            out.write("/*\n * Mutant " + id + "\n");
-            for (Mutation mutation : mutations) {
+            out.write("/*\n * Mutant " + this.id + "\n");
+            for (Mutation mutation : this.mutations) {
                 out.write(" *   " + mutation.toString() + "\n");
                 if (mutation.getDiff() != null) {
                     for (String line : mutation.getDiff()) {
@@ -66,7 +65,7 @@ public class Mutant implements IMutant {
                 }
             }
             out.write(" */\n\n");
-            out.write(ast.accept(new AstPrettyPrinter(true)));
+            out.write(this.ast.accept(new AstPrettyPrinter(true)));
         }
     }
 
@@ -80,7 +79,7 @@ public class Mutant implements IMutant {
     @Override
     public String toString() {
         StringJoiner sj = new StringJoiner(", ");
-        for (Mutation m : mutations) {
+        for (Mutation m : this.mutations) {
             sj.add(m.toString());
         }
         return "Mutant " + getId() + " [" + sj.toString() + "]";
@@ -92,7 +91,7 @@ public class Mutant implements IMutant {
 
         if (obj instanceof Mutant) {
             Mutant other = (Mutant) obj;
-            equal = mutations.equals(other.mutations);
+            equal = this.mutations.equals(other.mutations);
         }
 
         return equal;
@@ -100,7 +99,7 @@ public class Mutant implements IMutant {
 
     @Override
     public int hashCode() {
-        return 223 * mutations.hashCode();
+        return 223 * this.mutations.hashCode();
     }
 
 }

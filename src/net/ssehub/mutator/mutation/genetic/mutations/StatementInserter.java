@@ -42,21 +42,21 @@ public class StatementInserter implements IAstVisitor<Boolean> {
     }
 
     private Boolean visitLoop(Loop stmt) {
-        if (stmt.body == reference) {
+        if (stmt.body == this.reference) {
             Block block = new Block(stmt);
             block.start = stmt.body.start;
             block.end = stmt.body.end;
             stmt.body = block;
 
-            if (before) {
-                block.statements.add(toInsert);
-                block.statements.add(reference);
+            if (this.before) {
+                block.statements.add(this.toInsert);
+                block.statements.add(this.reference);
             } else {
-                block.statements.add(reference);
-                block.statements.add(toInsert);
+                block.statements.add(this.reference);
+                block.statements.add(this.toInsert);
             }
-            reference.parent = block;
-            toInsert.parent = block;
+            this.reference.parent = block;
+            this.toInsert.parent = block;
 
             return true;
         }
@@ -71,9 +71,9 @@ public class StatementInserter implements IAstVisitor<Boolean> {
 
     @Override
     public Boolean visitBlock(Block stmt) {
-        int refI = Util.findIndex(stmt.statements, reference);
+        int refI = Util.findIndex(stmt.statements, this.reference);
         if (refI != -1) {
-            stmt.statements.add(refI + (before ? 0 : 1), toInsert);
+            stmt.statements.add(refI + (this.before ? 0 : 1), this.toInsert);
             return true;
         }
 
@@ -117,21 +117,21 @@ public class StatementInserter implements IAstVisitor<Boolean> {
 
     @Override
     public Boolean visitFunction(Function func) {
-        if (func.body == reference) {
+        if (func.body == this.reference) {
             Block block = new Block(func);
             block.start = func.body.start;
             block.end = func.body.end;
             func.body = block;
 
-            if (before) {
-                block.statements.add(toInsert);
-                block.statements.add(reference);
+            if (this.before) {
+                block.statements.add(this.toInsert);
+                block.statements.add(this.reference);
             } else {
-                block.statements.add(reference);
-                block.statements.add(toInsert);
+                block.statements.add(this.reference);
+                block.statements.add(this.toInsert);
             }
-            reference.parent = block;
-            toInsert.parent = block;
+            this.reference.parent = block;
+            this.toInsert.parent = block;
 
             return true;
         }
@@ -156,40 +156,40 @@ public class StatementInserter implements IAstVisitor<Boolean> {
 
     @Override
     public Boolean visitIf(If stmt) {
-        if (stmt.thenBlock == reference) {
+        if (stmt.thenBlock == this.reference) {
             Block block = new Block(stmt);
             block.start = stmt.thenBlock.start;
             block.end = stmt.thenBlock.end;
             stmt.thenBlock = block;
 
-            if (before) {
-                block.statements.add(toInsert);
-                block.statements.add(reference);
+            if (this.before) {
+                block.statements.add(this.toInsert);
+                block.statements.add(this.reference);
             } else {
-                block.statements.add(reference);
-                block.statements.add(toInsert);
+                block.statements.add(this.reference);
+                block.statements.add(this.toInsert);
             }
-            reference.parent = block;
-            toInsert.parent = block;
+            this.reference.parent = block;
+            this.toInsert.parent = block;
 
             return true;
         }
 
-        if (stmt.elseBlock == reference) {
+        if (stmt.elseBlock == this.reference) {
             Block block = new Block(stmt);
             block.start = stmt.elseBlock.start;
             block.end = stmt.elseBlock.end;
             stmt.elseBlock = block;
 
-            if (before) {
-                block.statements.add(toInsert);
-                block.statements.add(reference);
+            if (this.before) {
+                block.statements.add(this.toInsert);
+                block.statements.add(this.reference);
             } else {
-                block.statements.add(reference);
-                block.statements.add(toInsert);
+                block.statements.add(this.reference);
+                block.statements.add(this.toInsert);
             }
-            reference.parent = block;
-            toInsert.parent = block;
+            this.reference.parent = block;
+            this.toInsert.parent = block;
 
             return true;
         }

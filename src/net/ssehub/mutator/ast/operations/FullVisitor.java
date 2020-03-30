@@ -34,7 +34,7 @@ public class FullVisitor implements IAstVisitor<Void> {
 
     @Override
     public Void visitBinaryExpr(BinaryExpr expr) {
-        other.visitBinaryExpr(expr);
+        this.other.visitBinaryExpr(expr);
 
         expr.left.accept(this);
         expr.right.accept(this);
@@ -44,7 +44,7 @@ public class FullVisitor implements IAstVisitor<Void> {
 
     @Override
     public Void visitBlock(Block stmt) {
-        other.visitBlock(stmt);
+        this.other.visitBlock(stmt);
 
         for (Statement child : stmt.statements) {
             child.accept(this);
@@ -55,7 +55,7 @@ public class FullVisitor implements IAstVisitor<Void> {
 
     @Override
     public Void visitDeclaration(Declaration decl) {
-        other.visitDeclaration(decl);
+        this.other.visitDeclaration(decl);
 
         decl.type.accept(this);
         if (decl.initExpr != null) {
@@ -67,7 +67,7 @@ public class FullVisitor implements IAstVisitor<Void> {
 
     @Override
     public Void visitDeclarationStmt(DeclarationStmt stmt) {
-        other.visitDeclarationStmt(stmt);
+        this.other.visitDeclarationStmt(stmt);
 
         stmt.decl.accept(this);
 
@@ -76,7 +76,7 @@ public class FullVisitor implements IAstVisitor<Void> {
 
     @Override
     public Void visitDoWhileLoop(DoWhileLoop stmt) {
-        other.visitDoWhileLoop(stmt);
+        this.other.visitDoWhileLoop(stmt);
 
         stmt.condition.accept(this);
         stmt.body.accept(this);
@@ -86,14 +86,14 @@ public class FullVisitor implements IAstVisitor<Void> {
 
     @Override
     public Void visitEmptyStmt(EmptyStmt stmt) {
-        other.visitEmptyStmt(stmt);
+        this.other.visitEmptyStmt(stmt);
 
         return null;
     }
 
     @Override
     public Void visitExpressionStmt(ExpressionStmt stmt) {
-        other.visitExpressionStmt(stmt);
+        this.other.visitExpressionStmt(stmt);
 
         stmt.expr.accept(this);
 
@@ -102,7 +102,7 @@ public class FullVisitor implements IAstVisitor<Void> {
 
     @Override
     public Void visitFile(File file) {
-        other.visitFile(file);
+        this.other.visitFile(file);
 
         for (AstElement f : file.functions) {
             f.accept(this);
@@ -113,7 +113,7 @@ public class FullVisitor implements IAstVisitor<Void> {
 
     @Override
     public Void visitFor(For stmt) {
-        other.visitFor(stmt);
+        this.other.visitFor(stmt);
 
         if (stmt.init != null) {
             stmt.init.accept(this);
@@ -132,7 +132,7 @@ public class FullVisitor implements IAstVisitor<Void> {
 
     @Override
     public Void visitFunction(Function func) {
-        other.visitFunction(func);
+        this.other.visitFunction(func);
 
         func.header.accept(this);
         func.body.accept(this);
@@ -142,7 +142,7 @@ public class FullVisitor implements IAstVisitor<Void> {
 
     @Override
     public Void visitFunctionCall(FunctionCall expr) {
-        other.visitFunctionCall(expr);
+        this.other.visitFunctionCall(expr);
 
         for (Expression param : expr.params) {
             param.accept(this);
@@ -153,7 +153,7 @@ public class FullVisitor implements IAstVisitor<Void> {
 
     @Override
     public Void visitFunctionDecl(FunctionDecl decl) {
-        other.visitFunctionDecl(decl);
+        this.other.visitFunctionDecl(decl);
 
         decl.type.accept(this);
         for (Declaration param : decl.parameters) {
@@ -165,14 +165,14 @@ public class FullVisitor implements IAstVisitor<Void> {
 
     @Override
     public Void visitIdentifier(Identifier expr) {
-        other.visitIdentifier(expr);
+        this.other.visitIdentifier(expr);
 
         return null;
     }
 
     @Override
     public Void visitIf(If stmt) {
-        other.visitIf(stmt);
+        this.other.visitIf(stmt);
 
         stmt.condition.accept(this);
         stmt.thenBlock.accept(this);
@@ -185,21 +185,21 @@ public class FullVisitor implements IAstVisitor<Void> {
 
     @Override
     public Void visitJumpStmt(JumpStmt stmt) {
-        other.visitJumpStmt(stmt);
+        this.other.visitJumpStmt(stmt);
 
         return null;
     }
 
     @Override
     public Void visitLiteral(Literal expr) {
-        other.visitLiteral(expr);
+        this.other.visitLiteral(expr);
 
         return null;
     }
 
     @Override
     public Void visitReturn(Return stmt) {
-        other.visitReturn(stmt);
+        this.other.visitReturn(stmt);
 
         if (stmt.value != null) {
             stmt.value.accept(this);
@@ -210,14 +210,14 @@ public class FullVisitor implements IAstVisitor<Void> {
 
     @Override
     public Void visitType(Type type) {
-        other.visitType(type);
+        this.other.visitType(type);
 
         return null;
     }
 
     @Override
     public Void visitUnaryExpr(UnaryExpr expr) {
-        other.visitUnaryExpr(expr);
+        this.other.visitUnaryExpr(expr);
 
         expr.expr.accept(this);
 
@@ -226,7 +226,7 @@ public class FullVisitor implements IAstVisitor<Void> {
 
     @Override
     public Void visitWhile(While stmt) {
-        other.visitWhile(stmt);
+        this.other.visitWhile(stmt);
 
         stmt.condition.accept(this);
         stmt.body.accept(this);

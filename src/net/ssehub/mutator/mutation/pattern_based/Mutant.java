@@ -38,21 +38,21 @@ public class Mutant implements IMutant {
     }
 
     public int getParams(int index) {
-        return params.get(index);
+        return this.params.get(index);
     }
 
     public void apply(File originalAst) {
         this.ast = new AstCloner(null, true).visitFile(originalAst);
 
         for (int i = 0; i < this.opportunities.size(); i++) {
-            this.opportunities.get(i).apply(params.get(i), ast);
+            this.opportunities.get(i).apply(this.params.get(i), this.ast);
         }
     }
 
     @Override
     public String getId() {
         StringJoiner sj = new StringJoiner(".");
-        for (Integer param : params) {
+        for (Integer param : this.params) {
             sj.add(param.toString());
         }
         return sj.toString();
@@ -75,7 +75,7 @@ public class Mutant implements IMutant {
                 }
             }
             out.write(" */\n\n");
-            out.write(ast.accept(new AstPrettyPrinter(true)));
+            out.write(this.ast.accept(new AstPrettyPrinter(true)));
         }
     }
 

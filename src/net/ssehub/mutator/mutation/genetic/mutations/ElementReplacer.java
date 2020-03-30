@@ -40,13 +40,13 @@ public class ElementReplacer<T extends AstElement> implements IAstVisitor<Boolea
 
     @Override
     public Boolean visitBinaryExpr(BinaryExpr expr) {
-        if (toReplace == expr.left) {
-            expr.left = (Expression) replacement;
+        if (this.toReplace == expr.left) {
+            expr.left = (Expression) this.replacement;
             return true;
         }
 
-        if (toReplace == expr.right) {
-            expr.right = (Expression) replacement;
+        if (this.toReplace == expr.right) {
+            expr.right = (Expression) this.replacement;
             return true;
         }
 
@@ -55,9 +55,9 @@ public class ElementReplacer<T extends AstElement> implements IAstVisitor<Boolea
 
     @Override
     public Boolean visitBlock(Block stmt) {
-        int i = Util.findIndex(stmt.statements, (Statement) toReplace);
+        int i = Util.findIndex(stmt.statements, (Statement) this.toReplace);
         if (i != -1) {
-            stmt.statements.set(i, (Statement) replacement);
+            stmt.statements.set(i, (Statement) this.replacement);
             return true;
         }
 
@@ -66,11 +66,11 @@ public class ElementReplacer<T extends AstElement> implements IAstVisitor<Boolea
 
     @Override
     public Boolean visitDeclaration(Declaration decl) {
-        if (toReplace == decl.type) {
-            decl.type = (Type) replacement;
+        if (this.toReplace == decl.type) {
+            decl.type = (Type) this.replacement;
             return true;
-        } else if (toReplace == decl.initExpr) {
-            decl.initExpr = (Expression) replacement;
+        } else if (this.toReplace == decl.initExpr) {
+            decl.initExpr = (Expression) this.replacement;
             return true;
         }
 
@@ -79,8 +79,8 @@ public class ElementReplacer<T extends AstElement> implements IAstVisitor<Boolea
 
     @Override
     public Boolean visitDeclarationStmt(DeclarationStmt stmt) {
-        if (toReplace == stmt.decl) {
-            stmt.decl = (Declaration) replacement;
+        if (this.toReplace == stmt.decl) {
+            stmt.decl = (Declaration) this.replacement;
             return true;
         }
 
@@ -89,13 +89,13 @@ public class ElementReplacer<T extends AstElement> implements IAstVisitor<Boolea
 
     @Override
     public Boolean visitDoWhileLoop(DoWhileLoop stmt) {
-        if (toReplace == stmt.condition) {
-            stmt.condition = (Expression) replacement;
+        if (this.toReplace == stmt.condition) {
+            stmt.condition = (Expression) this.replacement;
             return true;
         }
 
-        if (toReplace == stmt.body) {
-            stmt.body = (Statement) replacement;
+        if (this.toReplace == stmt.body) {
+            stmt.body = (Statement) this.replacement;
             return true;
         }
 
@@ -109,8 +109,8 @@ public class ElementReplacer<T extends AstElement> implements IAstVisitor<Boolea
 
     @Override
     public Boolean visitExpressionStmt(ExpressionStmt stmt) {
-        if (toReplace == stmt.expr) {
-            stmt.expr = (Expression) replacement;
+        if (this.toReplace == stmt.expr) {
+            stmt.expr = (Expression) this.replacement;
             return true;
         }
 
@@ -119,9 +119,9 @@ public class ElementReplacer<T extends AstElement> implements IAstVisitor<Boolea
 
     @Override
     public Boolean visitFile(File file) {
-        int i = Util.findIndex(file.functions, (Function) toReplace);
+        int i = Util.findIndex(file.functions, (Function) this.toReplace);
         if (i != -1) {
-            file.functions.set(i, replacement);
+            file.functions.set(i, this.replacement);
             return true;
         }
 
@@ -130,23 +130,23 @@ public class ElementReplacer<T extends AstElement> implements IAstVisitor<Boolea
 
     @Override
     public Boolean visitFor(For stmt) {
-        if (toReplace == stmt.init) {
-            stmt.init = (Declaration) replacement;
+        if (this.toReplace == stmt.init) {
+            stmt.init = (Declaration) this.replacement;
             return true;
         }
 
-        if (toReplace == stmt.condition) {
-            stmt.condition = (Expression) replacement;
+        if (this.toReplace == stmt.condition) {
+            stmt.condition = (Expression) this.replacement;
             return true;
         }
 
-        if (toReplace == stmt.increment) {
-            stmt.increment = (Expression) replacement;
+        if (this.toReplace == stmt.increment) {
+            stmt.increment = (Expression) this.replacement;
             return true;
         }
 
-        if (toReplace == stmt.body) {
-            stmt.body = (Statement) replacement;
+        if (this.toReplace == stmt.body) {
+            stmt.body = (Statement) this.replacement;
             return true;
         }
 
@@ -155,13 +155,13 @@ public class ElementReplacer<T extends AstElement> implements IAstVisitor<Boolea
 
     @Override
     public Boolean visitFunction(Function func) {
-        if (toReplace == func.header) {
-            func.header = (FunctionDecl) replacement;
+        if (this.toReplace == func.header) {
+            func.header = (FunctionDecl) this.replacement;
             return true;
         }
 
-        if (toReplace == func.body) {
-            func.body = (Block) replacement;
+        if (this.toReplace == func.body) {
+            func.body = (Block) this.replacement;
             return true;
         }
 
@@ -170,9 +170,9 @@ public class ElementReplacer<T extends AstElement> implements IAstVisitor<Boolea
 
     @Override
     public Boolean visitFunctionCall(FunctionCall expr) {
-        int i = Util.findIndex(expr.params, (Expression) toReplace);
+        int i = Util.findIndex(expr.params, (Expression) this.toReplace);
         if (i != -1) {
-            expr.params.set(i, (Expression) replacement);
+            expr.params.set(i, (Expression) this.replacement);
             return true;
         }
 
@@ -181,14 +181,14 @@ public class ElementReplacer<T extends AstElement> implements IAstVisitor<Boolea
 
     @Override
     public Boolean visitFunctionDecl(FunctionDecl decl) {
-        if (toReplace == decl.type) {
-            decl.type = (Type) replacement;
+        if (this.toReplace == decl.type) {
+            decl.type = (Type) this.replacement;
             return true;
         }
 
-        int i = Util.findIndex(decl.parameters, (Declaration) toReplace);
+        int i = Util.findIndex(decl.parameters, (Declaration) this.toReplace);
         if (i != -1) {
-            decl.parameters.set(i, (Declaration) replacement);
+            decl.parameters.set(i, (Declaration) this.replacement);
             return true;
         }
 
@@ -202,18 +202,18 @@ public class ElementReplacer<T extends AstElement> implements IAstVisitor<Boolea
 
     @Override
     public Boolean visitIf(If stmt) {
-        if (toReplace == stmt.condition) {
-            stmt.condition = (Expression) replacement;
+        if (this.toReplace == stmt.condition) {
+            stmt.condition = (Expression) this.replacement;
             return true;
         }
 
-        if (toReplace == stmt.thenBlock) {
-            stmt.thenBlock = (Statement) replacement;
+        if (this.toReplace == stmt.thenBlock) {
+            stmt.thenBlock = (Statement) this.replacement;
             return true;
         }
 
-        if (toReplace == stmt.elseBlock) {
-            stmt.elseBlock = (Statement) replacement;
+        if (this.toReplace == stmt.elseBlock) {
+            stmt.elseBlock = (Statement) this.replacement;
             return true;
         }
 
@@ -232,8 +232,8 @@ public class ElementReplacer<T extends AstElement> implements IAstVisitor<Boolea
 
     @Override
     public Boolean visitReturn(Return stmt) {
-        if (toReplace == stmt.value) {
-            stmt.value = (Expression) replacement;
+        if (this.toReplace == stmt.value) {
+            stmt.value = (Expression) this.replacement;
             return true;
         }
 
@@ -247,8 +247,8 @@ public class ElementReplacer<T extends AstElement> implements IAstVisitor<Boolea
 
     @Override
     public Boolean visitUnaryExpr(UnaryExpr expr) {
-        if (toReplace == expr.expr) {
-            expr.expr = (Expression) replacement;
+        if (this.toReplace == expr.expr) {
+            expr.expr = (Expression) this.replacement;
             return true;
         }
 
@@ -257,13 +257,13 @@ public class ElementReplacer<T extends AstElement> implements IAstVisitor<Boolea
 
     @Override
     public Boolean visitWhile(While stmt) {
-        if (toReplace == stmt.condition) {
-            stmt.condition = (Expression) replacement;
+        if (this.toReplace == stmt.condition) {
+            stmt.condition = (Expression) this.replacement;
             return true;
         }
 
-        if (toReplace == stmt.body) {
-            stmt.body = (Statement) replacement;
+        if (this.toReplace == stmt.body) {
+            stmt.body = (Statement) this.replacement;
             return true;
         }
 

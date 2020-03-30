@@ -34,7 +34,7 @@ public class FullExpressionVisitor implements IAstVisitor<Void> {
 
     @Override
     public Void visitBinaryExpr(BinaryExpr expr) {
-        other.visitBinaryExpr(expr);
+        this.other.visitBinaryExpr(expr);
 
         expr.left.accept(this);
         expr.right.accept(this);
@@ -124,7 +124,7 @@ public class FullExpressionVisitor implements IAstVisitor<Void> {
 
     @Override
     public Void visitFunctionCall(FunctionCall expr) {
-        other.visitFunctionCall(expr);
+        this.other.visitFunctionCall(expr);
 
         for (Expression param : expr.params) {
             param.accept(this);
@@ -145,7 +145,7 @@ public class FullExpressionVisitor implements IAstVisitor<Void> {
 
     @Override
     public Void visitIdentifier(Identifier expr) {
-        other.visitIdentifier(expr);
+        this.other.visitIdentifier(expr);
 
         return null;
     }
@@ -168,7 +168,7 @@ public class FullExpressionVisitor implements IAstVisitor<Void> {
 
     @Override
     public Void visitLiteral(Literal expr) {
-        other.visitLiteral(expr);
+        this.other.visitLiteral(expr);
 
         return null;
     }
@@ -189,7 +189,7 @@ public class FullExpressionVisitor implements IAstVisitor<Void> {
 
     @Override
     public Void visitUnaryExpr(UnaryExpr expr) {
-        other.visitUnaryExpr(expr);
+        this.other.visitUnaryExpr(expr);
 
         expr.expr.accept(this);
 

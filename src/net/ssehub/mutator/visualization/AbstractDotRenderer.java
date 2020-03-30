@@ -36,7 +36,7 @@ abstract class AbstractDotRenderer {
             }
 
             List<String> command = new LinkedList<>();
-            command.add(dotExe);
+            command.add(this.dotExe);
             command.add("-T" + type);
             command.add("-K" + engine);
             command.add("-o");
@@ -51,7 +51,7 @@ abstract class AbstractDotRenderer {
             try {
                 pb.start().waitFor();
             } catch (InterruptedException e) {
-                LOGGER.logException(e);
+                AbstractDotRenderer.LOGGER.logException(e);
             }
         }
     }

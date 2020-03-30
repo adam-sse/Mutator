@@ -35,14 +35,14 @@ public class Literal extends Expression {
         boolean equals = false;
         if (super.equals(obj)) {
             Literal other = (Literal) obj;
-            equals = value.equals(other.value);
+            equals = this.value.equals(other.value);
         }
         return equals;
     }
 
     @Override
     public int hashCode() {
-        return 199 * value.hashCode();
+        return 199 * this.value.hashCode();
     }
 
 }

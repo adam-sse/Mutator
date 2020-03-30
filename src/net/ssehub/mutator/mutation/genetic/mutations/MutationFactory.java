@@ -16,7 +16,8 @@ public class MutationFactory {
     public Mutation createRandomMutation(File ast, Random random) {
         Mutation result;
         do {
-            result = createMutation(allowedMutations.get(random.nextInt(allowedMutations.size())), ast, random);
+            result = createMutation(this.allowedMutations.get(random.nextInt(this.allowedMutations.size())), ast,
+                    random);
         } while (result == null);
         return result;
     }

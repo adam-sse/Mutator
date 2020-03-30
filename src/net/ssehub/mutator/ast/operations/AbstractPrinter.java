@@ -108,6 +108,7 @@ abstract class AbstractPrinter implements IAstVisitor<String> {
         return stmt.type.toString() + ";";
     }
 
+    @Override
     public String visitLiteral(Literal expr) {
         return expr.value;
     }

@@ -15,12 +15,12 @@ public class Block extends Statement {
 
     @Override
     public AstElement getChild(int index) throws IndexOutOfBoundsException {
-        return statements.get(index);
+        return this.statements.get(index);
     }
 
     @Override
     public int getNumChildren() {
-        return statements.size();
+        return this.statements.size();
     }
 
     @Override
@@ -33,14 +33,14 @@ public class Block extends Statement {
         boolean equals = false;
         if (super.equals(obj)) {
             Block other = (Block) obj;
-            equals = statements.equals(other.statements);
+            equals = this.statements.equals(other.statements);
         }
         return equals;
     }
 
     @Override
     public int hashCode() {
-        return statements.hashCode();
+        return this.statements.hashCode();
     }
 
 }

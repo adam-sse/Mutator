@@ -53,27 +53,27 @@ public class PatternBasedConfig extends BaseConfig {
     }
 
     public List<String> getPatterns() {
-        return patterns;
+        return this.patterns;
     }
 
     public int[] getStartParams() {
-        return startParams;
+        return this.startParams;
     }
 
     public double getInitialTemperature() {
-        return initialTemperature;
+        return this.initialTemperature;
     }
 
     public int getMaxAnnealingIterations() {
-        return maxAnnealingIterations;
+        return this.maxAnnealingIterations;
     }
 
     public Double getCoolingFactor() {
-        return coolingFactor;
+        return this.coolingFactor;
     }
 
     public int getRandomSearchIterations() {
-        return randomSearchIterations;
+        return this.randomSearchIterations;
     }
 
 }

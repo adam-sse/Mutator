@@ -51,8 +51,8 @@ public class For extends Loop {
 
     @Override
     public int hashCode() {
-        return super.hashCode() + (init != null ? 269 * init.hashCode() : 223)
-                + (increment != null ? 379 * increment.hashCode() : 487);
+        return super.hashCode() + (this.init != null ? 269 * this.init.hashCode() : 223)
+                + (this.increment != null ? 379 * this.increment.hashCode() : 487);
     }
 
 }
