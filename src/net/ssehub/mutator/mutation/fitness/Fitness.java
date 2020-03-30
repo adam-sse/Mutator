@@ -19,6 +19,10 @@ public class Fitness {
         return values.length;
     }
     
+    public double[] getValues() {
+        return values;
+    }
+    
     @Override
     public String toString() {
         StringJoiner sj = new StringJoiner(";");

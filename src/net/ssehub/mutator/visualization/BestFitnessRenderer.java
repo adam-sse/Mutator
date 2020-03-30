@@ -32,7 +32,7 @@ public class BestFitnessRenderer {
         
         for (int i = 0; i < bestFitnesses.size(); i++) {
             renderer.addNode(bestFitnesses.get(i), String.format(Locale.ROOT, "%03d", i + 1),
-                    i == bestFitnesses.size() - 1);
+                    i == 0, i == bestFitnesses.size() - 1, (double) i / bestFitnesses.size());
         }
         
         renderer.render(output);

@@ -1,5 +1,6 @@
 package net.ssehub.mutator.visualization;
 
+import java.awt.Color;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
@@ -184,13 +185,15 @@ public class FitnessRenderer extends AbstractDotRenderer {
         return dist(x1, y1, x2, y2) > minDist;
     }
     
-    protected String getSpecialNodeAttributes(boolean first, boolean last) {
+    protected String getSpecialNodeAttributes(boolean first, boolean last, double colorShade) {
         if (first) {
             return "style=filled, fillcolor=\"#fdc086\"";
         } else if (last) {
             return "style=filled, fillcolor=\"#7fc97f\"";
         } else {
-            return null;
+            Color color = Color.getHSBColor(0.737f, 0.179f, (float) colorShade * 0.5f + 0.5f);
+            return String.format(Locale.ROOT, "style=filled, fillcolor=\"#%02x%02x%02x%02x\"",
+                    color.getRed(), color.getGreen(), color.getBlue(), 127);
         }
     }
     
@@ -228,9 +231,7 @@ public class FitnessRenderer extends AbstractDotRenderer {
         return true;
     }
     
-    public void addNode(Fitness fitness, String label, boolean last) {
-        boolean first = nodeIndex == 0;
-        
+    public void addNode(Fitness fitness, String label, boolean first, boolean last, double colorShade) {
         if (!preventOverlap || first || last || checkDistance(previousFitness, fitness, 0.4)) {
             // node
             dot
@@ -253,7 +254,7 @@ public class FitnessRenderer extends AbstractDotRenderer {
                 dot.append("fontsize=8");
             }
             
-            String specialAttr = getSpecialNodeAttributes(first, last);
+            String specialAttr = getSpecialNodeAttributes(first, last, colorShade);
             if (specialAttr != null) {
                 dot.append(", ").append(specialAttr);
             }

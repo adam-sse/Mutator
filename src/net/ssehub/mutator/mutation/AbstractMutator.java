@@ -25,11 +25,24 @@ public abstract class AbstractMutator implements IMutator {
 
     private static final Logger LOGGER = Logger.get(AbstractMutator.class.getSimpleName());
 
+    private static class FitnessStoreEntry extends Fitness {
+        
+        private int iteration;
+
+        public FitnessStoreEntry(Fitness fitness, int iteration) {
+            super(fitness.getValues());
+            this.iteration = iteration;
+        }
+        
+    }
+    
     private Map<String, Fitness> fitnessStore;
 
     private BaseConfig config;
 
     private Evaluator evaluator;
+    
+    private int iteration;
 
     private int statNumEvaluated;
     private int statNumCompileError;
@@ -46,13 +59,21 @@ public abstract class AbstractMutator implements IMutator {
         this.statBestInIteration = new ArrayList<>();
     }
 
+    protected int getIteration() {
+        return iteration;
+    }
+    
+    protected void nextIteration() {
+        this.iteration++;
+    }
+    
     @Override
     public Fitness getFitness(String mutantId) {
         return this.fitnessStore.get(mutantId);
     }
 
     protected void setFitness(String mutantId, Fitness fitness) {
-        this.fitnessStore.put(mutantId, fitness);
+        this.fitnessStore.put(mutantId, new FitnessStoreEntry(fitness, this.iteration));
     }
 
     protected boolean hasFitness(String mutantId) {
@@ -116,15 +137,15 @@ public abstract class AbstractMutator implements IMutator {
         return fitness;
     }
 
-    protected void setBestInIteration(int iteration, IMutant bestMutant) {
-        setBestInIteration(iteration, getFitness(bestMutant.getId()));
+    protected void setBestInIteration(IMutant bestMutant) {
+        setBestInIteration(getFitness(bestMutant.getId()));
     }
 
-    protected void setBestInIteration(int iteration, Fitness bestFitness) {
+    protected void setBestInIteration(Fitness bestFitness) {
         if (iteration - 1 < this.statBestInIteration.size()) {
-            this.statBestInIteration.set(iteration - 1, bestFitness);
+            this.statBestInIteration.set(this.iteration - 1, bestFitness);
         } else {
-            this.statBestInIteration.add(iteration - 1, bestFitness);
+            this.statBestInIteration.add(this.iteration - 1, bestFitness);
         }
     }
 
@@ -213,18 +234,18 @@ public abstract class AbstractMutator implements IMutator {
                 
                 try {
                     if (allFitRenderer.init(fitnessStore.values())) {
-                        // initial node first
-                        allFitRenderer.addNode(fitnessStore.get(getUnmodifiedId()), getUnmodifiedId(), false);
-                        
-                        
                         // find best seen fitness
                         IFitnessComparator comparator = FitnessComparatorFactory.get();
                         Fitness best = Collections.max(fitnessStore.values(), comparator);
                         
                         for (Map.Entry<String, Fitness> entry : fitnessStore.entrySet()) {
+                            FitnessStoreEntry fitness = (FitnessStoreEntry) entry.getValue();
+                            
+                            boolean isInit = entry.getKey().equals(getUnmodifiedId());
                             boolean isBest = !comparator.isLower(entry.getValue(), best);
                             
-                            allFitRenderer.addNode(entry.getValue(), isBest ? entry.getKey() : "", isBest);
+                            allFitRenderer.addNode(entry.getValue(), (isBest || isInit) ? entry.getKey() : "",
+                                    isInit, isBest, (double) fitness.iteration / (this.iteration - 1));
                         }
                         
                         allFitRenderer.render(allFitOutput);

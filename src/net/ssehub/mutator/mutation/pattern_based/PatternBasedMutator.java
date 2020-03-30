@@ -27,8 +27,6 @@ public class PatternBasedMutator extends AbstractMutator {
     
     private List<IOpportunity> opportunities;
     
-    private int iteration;
-    
     private IFitnessComparator comparator;
     
     public PatternBasedMutator(PatternBasedConfig config) {
@@ -42,8 +40,6 @@ public class PatternBasedMutator extends AbstractMutator {
         LOGGER.println();
         LOGGER.println("Initialization");
         LOGGER.println("--------------");
-        
-        this.iteration = 0;
         
         this.opportunities = new ArrayList<>();
         // the order here matters, as mutations are applied in this order
@@ -106,6 +102,8 @@ public class PatternBasedMutator extends AbstractMutator {
         
         mutantList.insertMutant(initial, initialFitness);
         
+        nextIteration();
+        
         if (config.getMaxAnnealingIterations() > 0) {
             simulatedAnnealing(originalAst, mutantList);
         } else if (config.getRandomSearchIterations() > 0) {
@@ -120,10 +118,8 @@ public class PatternBasedMutator extends AbstractMutator {
     private void hillClimbing(File originalAst, TopXMutants mutantList) {
         boolean improved;
         do {
-            iteration++;
-            
             LOGGER.println();
-            LOGGER.printf("Iteration %03d\n", iteration);
+            LOGGER.printf("Iteration %03d\n", getIteration());
             LOGGER.println("-------------");
             
             improved = false;
@@ -134,7 +130,7 @@ public class PatternBasedMutator extends AbstractMutator {
                 neighbor.apply(originalAst);
                 if (config.getSaveIterations()) {
                     java.io.File dir = new java.io.File(config.getExecDir(),
-                            String.format(Locale.ROOT, "iteration_%03d", iteration));
+                            String.format(Locale.ROOT, "iteration_%03d", getIteration()));
                     dir.mkdir();
                     java.io.File out = new java.io.File(dir, "mutant_" + neighbor.getId() + ".c");
                     try {
@@ -156,7 +152,8 @@ public class PatternBasedMutator extends AbstractMutator {
                 }
             }
             
-            setBestInIteration(iteration, mutantList.getTopMutant());
+            setBestInIteration(mutantList.getTopMutant());
+            nextIteration();
             
         } while (improved);
     }
@@ -170,16 +167,16 @@ public class PatternBasedMutator extends AbstractMutator {
         
         mutantList.clear();
         
-        for (iteration = 1; iteration <= maxIter; iteration++) {
+        while (getIteration() <= config.getMaxAnnealingIterations()) {
             LOGGER.println();
-            LOGGER.printf("Iteration %03d\n", iteration);
+            LOGGER.printf("Iteration %03d\n", getIteration());
             LOGGER.println("-------------");
             
             double temperature;
             if (config.getCoolingFactor() == null) {
-                temperature = initTemp * (maxIter - iteration + 1) / maxIter;
+                temperature = initTemp * (maxIter - getIteration() + 1) / maxIter;
             } else {
-                temperature = initTemp * Math.pow(config.getCoolingFactor(), iteration - 1);
+                temperature = initTemp * Math.pow(config.getCoolingFactor(), getIteration() - 1);
             }
             LOGGER.println("Temperature: " + temperature);
             
@@ -195,7 +192,7 @@ public class PatternBasedMutator extends AbstractMutator {
                 
                 if (config.getSaveIterations()) {
                     java.io.File dir = new java.io.File(config.getExecDir(),
-                            String.format(Locale.ROOT, "iteration_%03d", iteration));
+                            String.format(Locale.ROOT, "iteration_%03d", getIteration()));
                     dir.mkdir();
                     java.io.File out = new java.io.File(dir, "mutant_" + neighbor.getId() + ".c");
                     try {
@@ -227,7 +224,8 @@ public class PatternBasedMutator extends AbstractMutator {
                 }
             }
             
-            setBestInIteration(iteration, currentFitness);
+            setBestInIteration(currentFitness);
+            nextIteration();
         }
         
         LOGGER.println();
@@ -237,7 +235,6 @@ public class PatternBasedMutator extends AbstractMutator {
         
         mutantList.insertMutant(currentMutant, currentFitness);
         
-        iteration--; // hillClimbing starts by increasing the iteration
         hillClimbing(originalAst, mutantList);
     }
     
@@ -247,13 +244,15 @@ public class PatternBasedMutator extends AbstractMutator {
         LOGGER.println("-------------");
         LOGGER.println("Number to generate: " + config.getRandomSearchIterations());
         
-        for (iteration = 1; iteration <= config.getRandomSearchIterations(); iteration++) {
+        while (getIteration() <= config.getRandomSearchIterations()) {
             Mutant random = generateRandom();
             random.apply(originalAst);
             Fitness fitness = evaluate(random, true, true);
             if (fitness != null) {
                 mutantList.insertMutant(random, fitness);
             }
+            
+            nextIteration();
         }
     }
     

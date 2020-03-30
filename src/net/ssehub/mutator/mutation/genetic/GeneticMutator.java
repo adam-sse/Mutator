@@ -28,8 +28,6 @@ public class GeneticMutator extends AbstractMutator {
     
     private MutantList population;
     
-    private int generation;
-    
     private int nextMutantId;
     
     public GeneticMutator(GeneticConfig config) {
@@ -43,8 +41,7 @@ public class GeneticMutator extends AbstractMutator {
         this.originalAst = originalAst;
         
         this.population = new MutantList();
-        this.generation = 0;
-        nextGeneration();
+        nextIteration();
 
         LOGGER.println();
         LOGGER.println("Initial Creation");
@@ -60,7 +57,7 @@ public class GeneticMutator extends AbstractMutator {
             }
         }
         
-        while (generation <= config.getGenerations()) {
+        while (getIteration() <= config.getGenerations()) {
             if (config.getSaveIterations()) {
                 saveGeneration();
             }
@@ -82,18 +79,18 @@ public class GeneticMutator extends AbstractMutator {
             
             population.sort(this);
             
-            if (this.generation % config.getCleanFrequency() == 0) {
+            if (getIteration() % config.getCleanFrequency() == 0) {
                 cleanPopulation();
             }
             
             if (population.getSize() > 0) {
-                setBestInIteration(generation, population.getMutant(0));
+                setBestInIteration(population.getMutant(0));
             } else {
-                setBestInIteration(generation, new Fitness(0.0));
+                setBestInIteration(new Fitness(0.0));
             }
             
-            nextGeneration();
-            if (generation <= config.getGenerations()) {
+            nextIteration();
+            if (getIteration() <= config.getGenerations()) {
                 
                 LOGGER.println();
                 LOGGER.println("Creation");
@@ -155,7 +152,7 @@ public class GeneticMutator extends AbstractMutator {
             }
         }
 
-        if ((this.generation - 1) % config.getCleanFrequency() != 0) {
+        if ((getIteration() - 1) % config.getCleanFrequency() != 0) {
             cleanPopulation();
         }
         
@@ -214,20 +211,21 @@ public class GeneticMutator extends AbstractMutator {
         throw new AssertionError();
     }
     
-    private void nextGeneration() {
-        this.generation++;
+    @Override
+    protected void nextIteration() {
+        super.nextIteration();
         this.nextMutantId = 1;
         
-        if (generation <= config.getGenerations()) {
+        if (getIteration() <= config.getGenerations()) {
             LOGGER.println();
-            LOGGER.printf("Generation %03d\n", generation);
+            LOGGER.printf("Generation %03d\n", getIteration());
             LOGGER.println("==============");
         }
     }
     
     private void saveGeneration() {
         java.io.File folder = new java.io.File(config.getExecDir(),
-                String.format(Locale.ROOT, "generation_%03d", generation));
+                String.format(Locale.ROOT, "generation_%03d", getIteration()));
         folder.mkdir();
         
         for (Mutant mutant : population) {
@@ -356,7 +354,7 @@ public class GeneticMutator extends AbstractMutator {
     }
     
     private String generateMutantId() {
-        return String.format(Locale.ROOT, "G%03d_M%03d", generation, nextMutantId++);
+        return String.format(Locale.ROOT, "G%03d_M%03d", getIteration(), nextMutantId++);
     }
 
     @Override

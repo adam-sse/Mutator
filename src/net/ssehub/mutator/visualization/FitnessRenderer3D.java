@@ -189,15 +189,14 @@ public class FitnessRenderer3D extends FitnessRenderer {
     }
     
     @Override
-    protected String getSpecialNodeAttributes(boolean first, boolean last) {
+    protected String getSpecialNodeAttributes(boolean first, boolean last, double colorShade) {
         if (first) {
             return "color=\"#fdc086\"";
         } else if (last) {
             return "color=\"#7fc97f\"";
         } else {
-            return "color=\"#beaed4\"";
+            return String.format(Locale.ROOT, "color=\"0.737 0.179 %.3f\"", colorShade * 0.5 + 0.5);
         }
     }
-    
     
 }
