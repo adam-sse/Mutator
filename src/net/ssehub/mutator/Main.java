@@ -260,9 +260,9 @@ public class Main {
             // create an execution directory
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss", Locale.ROOT);
             File execDir = new File(inputBase + '_' + mutatorType + '_' + formatter.format(LocalDateTime.now()));
-            Main.LOGGER.println("Execution directory is at " + execDir.getAbsolutePath());
+            LOGGER.println("Execution directory is at " + execDir.getAbsolutePath());
             if (execDir.exists()) {
-                Main.LOGGER.println(execDir + " already exists");
+                LOGGER.println(execDir + " already exists");
                 return false;
             }
             execDir.mkdir();
@@ -291,7 +291,7 @@ public class Main {
                 break;
 
             default:
-                Main.LOGGER.println("Invalid mutator setting: " + mutatorType);
+                LOGGER.println("Invalid mutator setting: " + mutatorType);
                 return false;
             }
 
@@ -305,7 +305,7 @@ public class Main {
             config.setFitnessSrc(newFitnessSrc);
 
             // 1) parse file to mutate
-            Main.LOGGER.println("Parsing...");
+            LOGGER.println("Parsing...");
             net.ssehub.mutator.ast.File file = parse(this.input);
 
             // write to execDir
@@ -315,13 +315,13 @@ public class Main {
             }
 
             // 2) mutate file
-            Main.LOGGER.println("Mutating...");
+            LOGGER.println("Mutating...");
             List<IMutant> mutants = mutator.run(file);
 
             // 3) print out
             // TODO: multi-objective fitness
-            Main.LOGGER.println();
-            Main.LOGGER.println("Writing " + mutants.size() + " mutants...");
+            LOGGER.println();
+            LOGGER.println("Writing " + mutants.size() + " mutants...");
             IFitnessComparator comparator = FitnessComparatorFactory.get();
 
             double bestFitness = mutants.size() > 0
@@ -358,12 +358,12 @@ public class Main {
                 mutant.write(output);
             }
 
-            Main.LOGGER.println(table.toString());
+            LOGGER.println(table.toString());
 
-            Main.LOGGER.println("Statistics:");
+            LOGGER.println("Statistics:");
             mutator.printStatistics();
         } catch (IOException | IllegalArgumentException e) {
-            Main.LOGGER.logException(e);
+            LOGGER.logException(e);
             return false;
         }
 
@@ -376,7 +376,7 @@ public class Main {
             FitnessComparatorFactory.init(config);
 
             // 1) parse file
-            Main.LOGGER.println("Parsing...");
+            LOGGER.println("Parsing...");
             net.ssehub.mutator.ast.File file = parse(this.input);
             PseudoMutant mutant = new PseudoMutant(file);
 
@@ -396,20 +396,20 @@ public class Main {
             config.setFitnessSrc(newFitnessSrc);
 
             // 3) evaluate
-            Main.LOGGER.println("Evaluating...");
+            LOGGER.println("Evaluating...");
             Evaluator evaluator = EvaluatorFactory.create(config);
             TestResult result = evaluator.test(mutant);
-            Main.LOGGER.println("Test result: " + result);
+            LOGGER.println("Test result: " + result);
             if (result == TestResult.PASS) {
                 Fitness fitness = evaluator.measureFitness(mutant);
-                Main.LOGGER.println("Fitness: " + fitness);
-                Main.LOGGER.println("  (= " + FitnessComparatorFactory.get().toSingleValue(fitness) + ")");
+                LOGGER.println("Fitness: " + fitness);
+                LOGGER.println("  (= " + FitnessComparatorFactory.get().toSingleValue(fitness) + ")");
             }
 
             // 4) clean up
             Util.deleteDirecotry(tmp);
         } catch (IOException e) {
-            Main.LOGGER.logException(e);
+            LOGGER.logException(e);
             return false;
         }
 
@@ -419,17 +419,17 @@ public class Main {
     private boolean clean() {
         try {
             // 1) parse file
-            Main.LOGGER.println("Parsing...");
+            LOGGER.println("Parsing...");
             net.ssehub.mutator.ast.File file = parse(this.input);
 
             // 2) print out
-            Main.LOGGER.println("Writing...");
+            LOGGER.println("Writing...");
 
             try (FileWriter out = new FileWriter(this.output)) {
                 out.write(file.accept(new AstPrettyPrinter(false)));
             }
         } catch (IOException | IllegalArgumentException e) {
-            Main.LOGGER.logException(e);
+            LOGGER.logException(e);
             return false;
         }
 
@@ -439,11 +439,11 @@ public class Main {
     private boolean render() {
         try {
             // 1) parse file
-            Main.LOGGER.println("Parsing...");
+            LOGGER.println("Parsing...");
             net.ssehub.mutator.ast.File file = parse(this.input);
 
             // 2) print out
-            Main.LOGGER.println("Rendering...");
+            LOGGER.println("Rendering...");
             switch (this.renderType) {
             case "control-flow": {
                 ControlFlowRenderer renderer = new ControlFlowRenderer(this.dotExe);
@@ -458,7 +458,7 @@ public class Main {
                 break;
             }
         } catch (IOException e) {
-            Main.LOGGER.logException(e);
+            LOGGER.logException(e);
             return false;
         }
 

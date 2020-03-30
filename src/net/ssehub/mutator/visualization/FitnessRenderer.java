@@ -188,7 +188,7 @@ public class FitnessRenderer extends AbstractDotRenderer {
 
     public boolean init(Collection<Fitness> allFitnesses) {
         if (!checkDimension(allFitnesses)) {
-            FitnessRenderer.LOGGER.println("Can only log two-dimensional fitnesses");
+            LOGGER.println("Can only log two-dimensional fitnesses");
             return false;
         }
 

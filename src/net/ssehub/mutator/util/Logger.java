@@ -55,7 +55,7 @@ public class Logger {
                 Logger.fileOut.write('\n');
                 Logger.fileOut.flush();
             } catch (IOException e) {
-                Logger.LOGGER.logException(e);
+                LOGGER.logException(e);
             }
         } else {
             Logger.fileOutBuffer.add(message);

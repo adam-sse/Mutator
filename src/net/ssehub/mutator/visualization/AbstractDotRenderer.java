@@ -51,7 +51,7 @@ abstract class AbstractDotRenderer {
             try {
                 pb.start().waitFor();
             } catch (InterruptedException e) {
-                AbstractDotRenderer.LOGGER.logException(e);
+                LOGGER.logException(e);
             }
         }
     }

@@ -38,9 +38,9 @@ public class PatternBasedMutator extends AbstractMutator {
 
     @Override
     public List<IMutant> run(File originalAst) {
-        PatternBasedMutator.LOGGER.println();
-        PatternBasedMutator.LOGGER.println("Initialization");
-        PatternBasedMutator.LOGGER.println("--------------");
+        LOGGER.println();
+        LOGGER.println("Initialization");
+        LOGGER.println("--------------");
 
         this.opportunities = new ArrayList<>();
         // the order here matters, as mutations are applied in this order
@@ -53,15 +53,15 @@ public class PatternBasedMutator extends AbstractMutator {
                         .getMethod("findOpportunities", File.class).invoke(null, originalAst);
                 this.opportunities.addAll(oppos);
             } catch (ReflectiveOperationException e) {
-                PatternBasedMutator.LOGGER.logException(e);
+                LOGGER.logException(e);
             }
         }
 
-        PatternBasedMutator.LOGGER.println("Opportunities:");
+        LOGGER.println("Opportunities:");
         for (IOpportunity oppo : this.opportunities) {
-            PatternBasedMutator.LOGGER.println(" * " + oppo);
+            LOGGER.println(" * " + oppo);
         }
-        PatternBasedMutator.LOGGER.println();
+        LOGGER.println();
 
         TopXMutants mutantList = new TopXMutants(5);
 
@@ -70,9 +70,8 @@ public class PatternBasedMutator extends AbstractMutator {
         // get initial starting parameters from config, if set
         if (this.config.getStartParams() != null) {
             if (this.opportunities.size() != this.config.getStartParams().length) {
-                PatternBasedMutator.LOGGER.println(
-                        "Warning: got " + this.config.getStartParams().length + " start parameters from config, "
-                                + "but got " + this.opportunities.size() + " opportunities");
+                LOGGER.println("Warning: got " + this.config.getStartParams().length + " start parameters from config, "
+                        + "but got " + this.opportunities.size() + " opportunities");
             }
 
             for (int i = 0; i < Math.min(this.opportunities.size(), this.config.getStartParams().length); i++) {
@@ -95,10 +94,10 @@ public class PatternBasedMutator extends AbstractMutator {
         this.unmodifiedId = initial.getId();
         initial.apply(originalAst);
 
-        PatternBasedMutator.LOGGER.println("Original fitness:");
+        LOGGER.println("Original fitness:");
         Fitness initialFitness = evaluate(initial, false, true);
         if (initialFitness == null) {
-            PatternBasedMutator.LOGGER.println("ERROR: Initial mutant doesn't pass");
+            LOGGER.println("ERROR: Initial mutant doesn't pass");
             return new LinkedList<>();
         }
 
@@ -120,13 +119,13 @@ public class PatternBasedMutator extends AbstractMutator {
     private void hillClimbing(File originalAst, TopXMutants mutantList) {
         boolean improved;
         do {
-            PatternBasedMutator.LOGGER.println();
-            PatternBasedMutator.LOGGER.printf("Iteration %03d\n", getIteration());
-            PatternBasedMutator.LOGGER.println("-------------");
+            LOGGER.println();
+            LOGGER.printf("Iteration %03d\n", getIteration());
+            LOGGER.println("-------------");
 
             improved = false;
             List<Mutant> neighbors = generateNeighbors(mutantList.getTopMutant());
-            PatternBasedMutator.LOGGER.println("Generated " + neighbors.size() + " neighbors");
+            LOGGER.println("Generated " + neighbors.size() + " neighbors");
 
             for (Mutant neighbor : neighbors) {
                 neighbor.apply(originalAst);
@@ -138,14 +137,14 @@ public class PatternBasedMutator extends AbstractMutator {
                     try {
                         neighbor.write(out);
                     } catch (IOException e) {
-                        PatternBasedMutator.LOGGER.logException(e);
+                        LOGGER.logException(e);
                     }
                 }
 
                 Fitness fitness = evaluate(neighbor, true, true);
                 if (fitness != null) {
                     if (this.comparator.isLower(mutantList.getTopFitness(), fitness)) {
-                        PatternBasedMutator.LOGGER.println(
+                        LOGGER.println(
                                 " -> " + neighbor.getId() + " is better than " + mutantList.getTopMutant().getId());
                         improved = true;
                     }
@@ -169,9 +168,9 @@ public class PatternBasedMutator extends AbstractMutator {
         mutantList.clear();
 
         while (getIteration() <= this.config.getMaxAnnealingIterations()) {
-            PatternBasedMutator.LOGGER.println();
-            PatternBasedMutator.LOGGER.printf("Iteration %03d\n", getIteration());
-            PatternBasedMutator.LOGGER.println("-------------");
+            LOGGER.println();
+            LOGGER.printf("Iteration %03d\n", getIteration());
+            LOGGER.println("-------------");
 
             double temperature;
             if (this.config.getCoolingFactor() == null) {
@@ -179,10 +178,10 @@ public class PatternBasedMutator extends AbstractMutator {
             } else {
                 temperature = initTemp * Math.pow(this.config.getCoolingFactor(), getIteration() - 1);
             }
-            PatternBasedMutator.LOGGER.println("Temperature: " + temperature);
+            LOGGER.println("Temperature: " + temperature);
 
             List<Mutant> neighbors = generateNeighbors(currentMutant);
-            PatternBasedMutator.LOGGER.println("Generated " + neighbors.size() + " neighbors");
+            LOGGER.println("Generated " + neighbors.size() + " neighbors");
 
             Mutant neighbor;
             Fitness nFitness;
@@ -198,7 +197,7 @@ public class PatternBasedMutator extends AbstractMutator {
                     try {
                         neighbor.write(out);
                     } catch (IOException e) {
-                        PatternBasedMutator.LOGGER.logException(e);
+                        LOGGER.logException(e);
                     }
                 }
 
@@ -216,11 +215,11 @@ public class PatternBasedMutator extends AbstractMutator {
                 // TODO: use max delta for multi-objective?
 
                 if (Math.random() < Math.pow(Math.E, -delta / temperature)) {
-                    PatternBasedMutator.LOGGER.println(" -> " + neighbor.getId() + " selected because of temperature");
+                    LOGGER.println(" -> " + neighbor.getId() + " selected because of temperature");
                     currentMutant = neighbor;
                     currentFitness = nFitness;
                 } else {
-                    PatternBasedMutator.LOGGER.println(" -> " + neighbor.getId() + " not selected");
+                    LOGGER.println(" -> " + neighbor.getId() + " not selected");
                 }
             }
 
@@ -228,10 +227,10 @@ public class PatternBasedMutator extends AbstractMutator {
             nextIteration();
         }
 
-        PatternBasedMutator.LOGGER.println();
-        PatternBasedMutator.LOGGER.println("Temperature exceeded, falling back to hill climbing");
-        PatternBasedMutator.LOGGER.println("Current mutant:");
-        PatternBasedMutator.LOGGER.println(currentMutant.getId() + ": " + currentFitness);
+        LOGGER.println();
+        LOGGER.println("Temperature exceeded, falling back to hill climbing");
+        LOGGER.println("Current mutant:");
+        LOGGER.println(currentMutant.getId() + ": " + currentFitness);
 
         mutantList.insertMutant(currentMutant, currentFitness);
 
@@ -239,10 +238,10 @@ public class PatternBasedMutator extends AbstractMutator {
     }
 
     private void randomSearch(File originalAst, TopXMutants mutantList) {
-        PatternBasedMutator.LOGGER.println();
-        PatternBasedMutator.LOGGER.println("Random Search");
-        PatternBasedMutator.LOGGER.println("-------------");
-        PatternBasedMutator.LOGGER.println("Number to generate: " + this.config.getRandomSearchIterations());
+        LOGGER.println();
+        LOGGER.println("Random Search");
+        LOGGER.println("-------------");
+        LOGGER.println("Number to generate: " + this.config.getRandomSearchIterations());
 
         while (getIteration() <= this.config.getRandomSearchIterations()) {
             Mutant random = generateRandom();

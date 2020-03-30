@@ -194,8 +194,8 @@ public class TypeGuesser {
                 if (previous == null) {
                     this.types.put(decl.identifier, decl.type.type);
                 } else if (previous != decl.type.type) {
-                    TypeGuesser.LOGGER.println("Warning: conflicting types for variable " + decl.identifier + ": "
-                            + previous + " and " + decl.type.type);
+                    LOGGER.println("Warning: conflicting types for variable " + decl.identifier + ": " + previous
+                            + " and " + decl.type.type);
 
                     // use double over int
                     this.types.put(decl.identifier,

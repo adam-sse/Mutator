@@ -92,7 +92,7 @@ public abstract class AbstractMutator implements IMutator {
         if (useCache && hasFitness(mutant.getId())) {
             fitness = getFitness(mutant.getId());
             if (printAndStats) {
-                AbstractMutator.LOGGER.println(mutant.getId() + ": " + fitness + " (cached)");
+                LOGGER.println(mutant.getId() + ": " + fitness + " (cached)");
             }
             return fitness;
         }
@@ -104,7 +104,7 @@ public abstract class AbstractMutator implements IMutator {
         TestResult testResult = this.evaluator.test(mutant);
         if (testResult != TestResult.PASS) {
             if (printAndStats) {
-                AbstractMutator.LOGGER.println(mutant.getId() + " " + testResult);
+                LOGGER.println(mutant.getId() + " " + testResult);
 
                 switch (testResult) {
                 case COMPILATION_FAILED:
@@ -130,13 +130,13 @@ public abstract class AbstractMutator implements IMutator {
             fitness = this.evaluator.measureFitness(mutant);
             if (fitness == Evaluator.RUNTIME_ERROR) {
                 if (printAndStats) {
-                    AbstractMutator.LOGGER.println(mutant.getId() + " had a runtime error during fitness evaluation");
+                    LOGGER.println(mutant.getId() + " had a runtime error during fitness evaluation");
                     this.statNumRuntimeError++;
                 }
                 fitness = null;
             } else {
                 if (printAndStats) {
-                    AbstractMutator.LOGGER.println(mutant.getId() + ": " + fitness);
+                    LOGGER.println(mutant.getId() + ": " + fitness);
                 }
                 setFitness(mutant.getId(), fitness);
             }
@@ -159,30 +159,30 @@ public abstract class AbstractMutator implements IMutator {
 
     @Override
     public void printStatistics() {
-        AbstractMutator.LOGGER.println("Evaluated: " + this.statNumEvaluated);
-        AbstractMutator.LOGGER.printf("    failed compilation: %d (%.2f %%)", this.statNumCompileError,
+        LOGGER.println("Evaluated: " + this.statNumEvaluated);
+        LOGGER.printf("    failed compilation: %d (%.2f %%)", this.statNumCompileError,
                 (double) this.statNumCompileError / this.statNumEvaluated * 100.0);
-        AbstractMutator.LOGGER.println();
-        AbstractMutator.LOGGER.printf("    timed-out: %d (%.2f %%)", this.statNumTimeout,
+        LOGGER.println();
+        LOGGER.printf("    timed-out: %d (%.2f %%)", this.statNumTimeout,
                 (double) this.statNumTimeout / this.statNumEvaluated * 100.0);
-        AbstractMutator.LOGGER.println();
-        AbstractMutator.LOGGER.printf("    failed tests: %d (%.2f %%)", this.statNumFailed,
+        LOGGER.println();
+        LOGGER.printf("    failed tests: %d (%.2f %%)", this.statNumFailed,
                 (double) this.statNumFailed / this.statNumEvaluated * 100.0);
-        AbstractMutator.LOGGER.println();
-        AbstractMutator.LOGGER.printf("    runtime error: %d (%.2f %%)", this.statNumRuntimeError,
+        LOGGER.println();
+        LOGGER.printf("    runtime error: %d (%.2f %%)", this.statNumRuntimeError,
                 (double) this.statNumRuntimeError / this.statNumEvaluated * 100.0);
-        AbstractMutator.LOGGER.println();
-        AbstractMutator.LOGGER.printf("    error: %d (%.2f %%)", this.statNumError,
+        LOGGER.println();
+        LOGGER.printf("    error: %d (%.2f %%)", this.statNumError,
                 (double) this.statNumError / this.statNumEvaluated * 100.0);
-        AbstractMutator.LOGGER.println();
+        LOGGER.println();
 
         if (this.statBestInIteration.size() >= 2) {
-            AbstractMutator.LOGGER.println();
-            AbstractMutator.LOGGER.println("Best Fitness per Iteration:");
+            LOGGER.println();
+            LOGGER.println("Best Fitness per Iteration:");
 
             for (int objective = 0; objective < this.statBestInIteration.get(0).numValues(); objective++) {
-                AbstractMutator.LOGGER.println();
-                AbstractMutator.LOGGER.println("Objective " + (objective + 1));
+                LOGGER.println();
+                LOGGER.println("Objective " + (objective + 1));
 
                 AsciiChart chart = new AsciiChart(20);
 
@@ -191,7 +191,7 @@ public abstract class AbstractMutator implements IMutator {
                     chart.addPoint(iteration + 1, fitness);
                 }
 
-                AbstractMutator.LOGGER.println(chart.toString());
+                LOGGER.println(chart.toString());
             }
 
             if (this.config.getDotExe() != null) {
@@ -208,11 +208,11 @@ public abstract class AbstractMutator implements IMutator {
                 }
 
                 if (bestFitRenderer != null) {
-                    AbstractMutator.LOGGER.println("Rendering fitness evolution to " + bestFitOutput.getName());
+                    LOGGER.println("Rendering fitness evolution to " + bestFitOutput.getName());
                     try {
                         bestFitRenderer.render(this.statBestInIteration, bestFitOutput);
                     } catch (IOException e) {
-                        AbstractMutator.LOGGER.logException(e);
+                        LOGGER.logException(e);
                     }
                 }
             }
@@ -236,7 +236,7 @@ public abstract class AbstractMutator implements IMutator {
             }
 
             if (allFitRenderer != null) {
-                AbstractMutator.LOGGER.println("Rendering all fitness values to " + allFitOutput.getName());
+                LOGGER.println("Rendering all fitness values to " + allFitOutput.getName());
 
                 try {
                     if (allFitRenderer.init(this.fitnessStore.values())) {
@@ -257,7 +257,7 @@ public abstract class AbstractMutator implements IMutator {
                         allFitRenderer.render(allFitOutput);
                     }
                 } catch (IOException e) {
-                    AbstractMutator.LOGGER.logException(e);
+                    LOGGER.logException(e);
                 }
             }
         }
