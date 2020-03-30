@@ -9,13 +9,13 @@ import net.ssehub.mutator.ast.Type;
 public interface IAstVisitor<T> extends IExpressionVisitor<T>, IStatementVisitor<T> {
 
     public T visitDeclaration(Declaration decl);
-    
+
     public T visitFile(File file);
-    
+
     public T visitFunction(Function func);
-    
+
     public T visitFunctionDecl(FunctionDecl decl);
-    
+
     public T visitType(Type type);
-    
+
 }

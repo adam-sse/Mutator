@@ -56,13 +56,13 @@ import net.ssehub.mutator.parsing.SimpleCParser.StmtWhileLoopContext;
 public class Converter {
 
     private Deque<AstElement> parents;
-    
+
     public File convert(FileContext tree) {
         parents = new LinkedList<>();
         parents.push(null);
         return convertFile(tree);
     }
-    
+
     private File convertFile(FileContext tree) {
         File f = new File(parents.peek());
         f.initLocation(tree.start, tree.stop);
@@ -77,32 +77,32 @@ public class Converter {
                 throw new IllegalArgumentException();
             }
         }
-        
+
         parents.pop();
         return f;
     }
-    
+
     private FunctionDecl convertFunctionDecl(FunctionDeclContext tree) {
         FunctionDecl f = new FunctionDecl(parents.peek());
         f.initLocation(tree.start, tree.stop);
         parents.push(f);
-        
+
         f.name = tree.name.getText();
         f.type = convertType(tree.type);
-        
+
         for (DeclarationContext declTree : tree.declList().declaration()) {
             f.parameters.add(convertDeclaration(declTree));
         }
-        
+
         parents.pop();
         return f;
     }
-    
+
     private Function convertFunction(FunctionContext tree) {
         Function f = new Function(parents.peek());
         f.initLocation(tree.start, tree.stop);
         parents.push(f);
-        
+
         f.header = convertFunctionDecl(tree.functionDecl());
         f.body = convertCompoundStatement(tree.body);
 
@@ -112,7 +112,7 @@ public class Converter {
 
     private Statement convertStatement(StmtContext tree) {
         Statement result = null;
-        
+
         if (tree.stmtBranch() != null) {
             result = convertBranchStatement(tree.stmtBranch());
         } else if (tree.stmtLoop() != null) {
@@ -136,28 +136,28 @@ public class Converter {
                 throw new IllegalArgumentException(tree.getClass().getName());
             }
         }
-        
+
         return result;
     }
-    
+
     private If convertBranchStatement(StmtBranchContext tree) {
         If stmt = new If(parents.peek());
         stmt.initLocation(tree.start, tree.stop);
         parents.push(stmt);
-        
+
         stmt.condition = convertExpression(tree.condition);
         stmt.thenBlock = convertStatement(tree.thenBody);
         if (tree.elseBody != null) {
             stmt.elseBlock = convertStatement(tree.elseBody);
         }
-        
+
         parents.pop();
         return stmt;
     }
-    
+
     private Loop convertLoopStatement(StmtLoopContext tree) {
         Loop result;
-        
+
         if (tree.stmtWhileLoop() != null) {
             result = convertWhileLoop(tree.stmtWhileLoop());
         } else if (tree.stmtDoWhileLoop() != null) {
@@ -171,34 +171,34 @@ public class Converter {
                 throw new IllegalArgumentException(tree.getClass().getName());
             }
         }
-        
+
         return result;
     }
-    
+
     private While convertWhileLoop(StmtWhileLoopContext tree) {
         While loop = new While(parents.peek());
         loop.initLocation(tree.start, tree.stop);
         parents.push(loop);
-        
+
         loop.condition = convertExpression(tree.condition);
         loop.body = convertStatement(tree.body);
-        
+
         parents.pop();
         return loop;
     }
-    
+
     private DoWhileLoop convertDoWhileLoop(StmtDoWhileLoopContext tree) {
         DoWhileLoop loop = new DoWhileLoop(parents.peek());
         loop.initLocation(tree.start, tree.stop);
         parents.push(loop);
-        
+
         loop.condition = convertExpression(tree.condition);
         loop.body = convertStatement(tree.body);
-        
+
         parents.pop();
         return loop;
     }
-    
+
     private For convertForLoop(StmtForLoopContext tree) {
         For loop = new For(parents.peek());
         loop.initLocation(tree.start, tree.stop);
@@ -213,20 +213,20 @@ public class Converter {
         if (tree.increment != null) {
             loop.increment = convertExpression(tree.increment);
         }
-        
+
         loop.body = convertStatement(tree.body);
-        
+
         parents.pop();
         return loop;
     }
-    
+
     private DeclarationStmt convertDeclarationStmt(StmtDeclarationContext tree) {
         DeclarationStmt stmt = new DeclarationStmt(parents.peek());
         stmt.initLocation(tree.start, tree.stop);
         parents.push(stmt);
-        
+
         stmt.decl = convertDeclaration(tree.declaration());
-        
+
         parents.pop();
         return stmt;
     }
@@ -235,49 +235,49 @@ public class Converter {
         ExpressionStmt stmt = new ExpressionStmt(parents.peek());
         stmt.initLocation(tree.start, tree.stop);
         parents.push(stmt);
-        
+
         stmt.expr = convertExpression(tree.expr());
-        
+
         parents.pop();
         return stmt;
     }
-    
+
     private Return convertReturnStatement(StmtReturnContext tree) {
         Return stmt = new Return(parents.peek());
         stmt.initLocation(tree.start, tree.stop);
         parents.push(stmt);
-        
+
         if (tree.expr() != null) {
             stmt.value = convertExpression(tree.expr());
         }
-        
+
         parents.pop();
         return stmt;
     }
-    
+
     private Block convertCompoundStatement(StmtCompoundContext tree) {
         Block block = new Block(parents.peek());
         block.initLocation(tree.start, tree.stop);
         parents.push(block);
-        
+
         for (StmtContext child : tree.stmt()) {
             block.statements.add(convertStatement(child));
         }
-        
+
         parents.pop();
         return block;
     }
-    
+
     private EmptyStmt convertEmptyStatement(StmtEmptyContext tree) {
         EmptyStmt stmt = new EmptyStmt(parents.peek());
         stmt.initLocation(tree.start, tree.stop);
         return stmt;
     }
-    
+
     private JumpStmt convertJumpStmt(StmtJumpContext tree) {
         JumpStmt stmt = new JumpStmt(parents.peek());
         stmt.initLocation(tree.start, tree.stop);
-        
+
         if (tree.type.getText().equals("break")) {
             stmt.type = net.ssehub.mutator.ast.JumpStmt.Type.BREAK;
         } else if (tree.type.getText().equals("continue")) {
@@ -285,133 +285,125 @@ public class Converter {
         } else {
             throw new IllegalArgumentException();
         }
-        
+
         return stmt;
     }
-    
+
     private Expression convertExpression(ExprContext tree) {
         Expression result;
-        
+
         if (tree.op != null && tree.op.getText().equals("[")) {
             // array access
             BinaryExpr expr = new BinaryExpr(parents.peek());
             expr.initLocation(tree.start, tree.stop);
             parents.push(expr);
-            
+
             Identifier var = new Identifier(parents.peek());
             var.initLocation(tree.var, tree.var);
             var.identifier = tree.var.getText();
-            
+
             expr.left = var;
             expr.operator = BinaryOperator.ARRAY_ACCESS;
             expr.right = convertExpression(tree.r);
-            
+
             parents.pop();
             result = expr;
-            
         } else if (tree.op != null && tree.op.getText().equals("(")) {
             // function call
             FunctionCall call = new FunctionCall(parents.peek());
             call.initLocation(tree.start, tree.stop);
             parents.push(call);
-            
+
             call.function = tree.var.getText();
             if (tree.params != null) {
                 for (ExprContext expr : tree.params.expr()) {
                     call.params.add(convertExpression(expr));
                 }
             }
-            
+
             parents.pop();
             result = call;
-            
         } else if (tree.lit != null) {
             // literal value
             Literal expr = new Literal(parents.peek());
             expr.initLocation(tree.start, tree.stop);
             expr.value = tree.lit.getText();
-            
+
             result = expr;
-            
         } else if (tree.var != null) {
             // single identifier
             Identifier expr = new Identifier(parents.peek());
             expr.initLocation(tree.start, tree.stop);
             expr.identifier = tree.var.getText();
-            
-            result = expr;
 
+            result = expr;
         } else if (tree.post_op != null) {
             // post ++ or --
             UnaryExpr expr = new UnaryExpr(parents.peek());
             expr.initLocation(tree.start, tree.stop);
             parents.push(expr);
-            
+
             expr.operator = (tree.post_op.getText().equals("++") ? UnaryOperator.POST_INC : UnaryOperator.POST_DEC);
             expr.expr = convertExpression(tree.l);
-            
+
             parents.pop();
             result = expr;
-            
         } else if (tree.op != null && tree.l != null && tree.r != null) {
             // binary operator
             BinaryExpr expr = new BinaryExpr(parents.peek());
             expr.initLocation(tree.start, tree.stop);
             parents.push(expr);
-            
+
             expr.left = convertExpression(tree.l);
             expr.operator = BinaryOperator.get(tree.op.getText());
             expr.right = convertExpression(tree.r);
-            
+
             parents.pop();
             result = expr;
-            
         } else if (tree.op != null && tree.l == null && tree.r != null) {
             // unary operator (prefix)
             UnaryExpr expr = new UnaryExpr(parents.peek());
             expr.initLocation(tree.start, tree.stop);
             parents.push(expr);
-            
+
             expr.operator = UnaryOperator.get(tree.op.getText());
             expr.expr = convertExpression(tree.r);
-            
+
             parents.pop();
             result = expr;
-            
         } else if (tree.nested != null) {
-            // nested ( ) 
+            // nested ( )
             result = convertExpression(tree.nested);
-            
         } else {
             throw new IllegalArgumentException();
         }
-        
+
         return result;
     }
-    
+
     private Declaration convertDeclaration(DeclarationContext tree) {
         Declaration decl = new Declaration(parents.peek());
         decl.initLocation(tree.start, tree.stop);
         parents.push(decl);
-        
+
         decl.identifier = tree.name.getText();
         decl.type = convertType(tree.declType());
         if (tree.init != null) {
             decl.initExpr = convertExpression(tree.init);
         }
-        
+
         parents.pop();
         return decl;
     }
-    
+
     private Type convertType(DeclTypeContext tree) {
         Type type = new Type(parents.peek());
         type.initLocation(tree.start, tree.stop);
         parents.push(type);
-        
+
         type.type = BasicType.get(tree.type.getText());
         type.pointer = tree.ptr != null;
-        
+
         if (tree.modifier != null) {
             if (tree.modifier.getText().equals("unsigned")) {
                 type.modifier = Modifier.UNSIGNED;
@@ -425,5 +417,5 @@ public class Converter {
         parents.pop();
         return type;
     }
-    
+
 }

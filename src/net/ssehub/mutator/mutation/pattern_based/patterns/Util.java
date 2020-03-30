@@ -8,7 +8,7 @@ class Util {
 
     private Util() {
     }
-    
+
     public static Statement findParentStatement(Expression expr) {
         AstElement parent = expr.parent;
         while (!(parent instanceof Statement)) {
@@ -16,7 +16,7 @@ class Util {
         }
         return (Statement) parent;
     }
-    
+
     public static int depth(AstElement element) {
         int depth = 0;
         while (element != null) {
@@ -25,7 +25,7 @@ class Util {
         }
         return depth;
     }
-    
+
     public static boolean sameElements(AstElement... elements) {
         for (int i = 1; i < elements.length; i++) {
             if (elements[i].id != elements[0].id) {
@@ -34,9 +34,8 @@ class Util {
         }
         return true;
     }
-    
-    public static AstElement findCommonParent(AstElement... elements) {
 
+    public static AstElement findCommonParent(AstElement... elements) {
         int minDepth = Integer.MAX_VALUE;
         for (AstElement element : elements) {
             int depth = depth(element);
@@ -44,21 +43,20 @@ class Util {
                 minDepth = depth;
             }
         }
-        
+
         for (int i = 0; i < elements.length; i++) {
             while (depth(elements[i]) > minDepth) {
                 elements[i] = elements[i].parent;
             }
         }
-        
+
         while (!sameElements(elements)) {
             for (int i = 0; i < elements.length; i++) {
                 elements[i] = elements[i].parent;
             }
         }
-        
+
         return elements[0];
     }
-    
-    
+
 }

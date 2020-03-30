@@ -13,13 +13,13 @@ import net.ssehub.mutator.mutation.IMutant;
 import net.ssehub.mutator.mutation.pattern_based.patterns.IOpportunity;
 
 public class Mutant implements IMutant {
-    
+
     private List<IOpportunity> opportunities;
-    
+
     private List<Integer> params;
-    
+
     private File ast;
-    
+
     public Mutant(List<IOpportunity> opportunities) {
         this.opportunities = opportunities;
         this.params = new ArrayList<>(this.opportunities.size());
@@ -27,28 +27,28 @@ public class Mutant implements IMutant {
             this.params.add(this.opportunities.get(i).getDefaultParam());
         }
     }
-    
+
     public Mutant(Mutant other) {
         this.opportunities = other.opportunities;
         this.params = new ArrayList<>(other.params);
     }
-    
+
     public void setParam(int index, int value) {
         this.params.set(index, value);
     }
-    
+
     public int getParams(int index) {
         return params.get(index);
     }
-    
+
     public void apply(File originalAst) {
         this.ast = new AstCloner(null, true).visitFile(originalAst);
-        
+
         for (int i = 0; i < this.opportunities.size(); i++) {
             this.opportunities.get(i).apply(params.get(i), ast);
         }
     }
-    
+
     @Override
     public String getId() {
         StringJoiner sj = new StringJoiner(".");
@@ -57,7 +57,7 @@ public class Mutant implements IMutant {
         }
         return sj.toString();
     }
-    
+
     @Override
     public String toString() {
         return "Mutant " + getId();

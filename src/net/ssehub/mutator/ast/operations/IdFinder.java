@@ -27,11 +27,11 @@ import net.ssehub.mutator.ast.While;
 public class IdFinder implements IAstVisitor<AstElement> {
 
     private long id;
-    
+
     public IdFinder(long id) {
         this.id = id;
     }
-    
+
     private static AstElement getNonNull(AstElement... elements) {
         for (AstElement element : elements) {
             if (element != null) {
@@ -40,7 +40,7 @@ public class IdFinder implements IAstVisitor<AstElement> {
         }
         return null;
     }
-    
+
     @Override
     public AstElement visitBinaryExpr(BinaryExpr expr) {
         if (expr.id == this.id) {
@@ -54,14 +54,14 @@ public class IdFinder implements IAstVisitor<AstElement> {
         if (stmt.id == this.id) {
             return stmt;
         }
-        
+
         for (Statement nested : stmt.statements) {
             AstElement result = nested.accept(this);
             if (result != null) {
                 return result;
             }
         }
-        
+
         return null;
     }
 
@@ -110,14 +110,14 @@ public class IdFinder implements IAstVisitor<AstElement> {
         if (file.id == this.id) {
             return file;
         }
-        
+
         for (AstElement func : file.functions) {
             AstElement found = func.accept(this);
             if (found != null) {
                 return found;
             }
         }
-        
+
         return null;
     }
 
@@ -126,12 +126,9 @@ public class IdFinder implements IAstVisitor<AstElement> {
         if (stmt.id == this.id) {
             return stmt;
         }
-        return getNonNull(
-            stmt.init != null ? stmt.init.accept(this) : null,
-            stmt.condition != null ? stmt.condition.accept(this) : null,
-            stmt.increment != null ? stmt.increment.accept(this) : null,
-            stmt.body.accept(this)
-        );
+        return getNonNull(stmt.init != null ? stmt.init.accept(this) : null,
+                stmt.condition != null ? stmt.condition.accept(this) : null,
+                stmt.increment != null ? stmt.increment.accept(this) : null, stmt.body.accept(this));
     }
 
     @Override
@@ -139,7 +136,7 @@ public class IdFinder implements IAstVisitor<AstElement> {
         if (func.id == this.id) {
             return func;
         }
-        
+
         return getNonNull(func.header.accept(this), func.body.accept(this));
     }
 
@@ -148,30 +145,30 @@ public class IdFinder implements IAstVisitor<AstElement> {
         if (expr.id == this.id) {
             return expr;
         }
-        
+
         for (Expression param : expr.params) {
             AstElement found = param.accept(this);
             if (found != null) {
                 return found;
             }
         }
-        
+
         return null;
     }
-    
+
     @Override
     public AstElement visitFunctionDecl(FunctionDecl decl) {
         if (decl.id == this.id) {
             return decl;
         }
-        
+
         for (Declaration param : decl.parameters) {
             AstElement found = param.accept(this);
             if (found != null) {
                 return found;
             }
         }
-        
+
         return decl.type.accept(this);
     }
 

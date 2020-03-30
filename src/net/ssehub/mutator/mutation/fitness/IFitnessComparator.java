@@ -5,10 +5,9 @@ import java.util.Comparator;
 public interface IFitnessComparator extends Comparator<Fitness> {
 
     public boolean isLower(Fitness f1, Fitness f2);
-    
+
     public double toSingleValue(Fitness fitness);
-    
-    
+
     @Override
     default int compare(Fitness o1, Fitness o2) {
         if (isLower(o1, o2)) {
@@ -19,5 +18,5 @@ public interface IFitnessComparator extends Comparator<Fitness> {
             return 0;
         }
     }
-    
+
 }

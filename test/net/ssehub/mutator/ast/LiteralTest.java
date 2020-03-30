@@ -8,17 +8,17 @@ public class LiteralTest extends AbstractAstElementTest {
         {
             l1.value = "15";
         }
-        
+
         Literal l2 = new Literal(null);
         {
-            l2.value= "15";
+            l2.value = "15";
         }
-        
+
         Literal l3 = new Literal(null);
         {
             l3.value = "3154";
         }
-        
+
         return new AstElement[] { l1, l2, l3 };
     }
 
@@ -36,9 +36,14 @@ public class LiteralTest extends AbstractAstElementTest {
     @Override
     protected String getLineString(int element) {
         switch (element) {
-        case 0: return "15";
-        case 1: return "15";
-        case 2: return "3154";
+        case 0:
+            return "15";
+
+        case 1:
+            return "15";
+
+        case 2:
+            return "3154";
         }
         return null;
     }

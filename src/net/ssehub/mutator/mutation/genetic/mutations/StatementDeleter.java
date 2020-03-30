@@ -26,12 +26,12 @@ import net.ssehub.mutator.ast.operations.IAstVisitor;
 import net.ssehub.mutator.util.Util;
 
 class StatementDeleter implements IAstVisitor<Boolean> {
-    
+
     private Statement target;
-    
+
     public boolean delete(Statement target) {
         this.target = target;
-        
+
         return target.parent.accept(this);
     }
 
@@ -43,10 +43,10 @@ class StatementDeleter implements IAstVisitor<Boolean> {
             stmt.body = replacement;
             return true;
         }
-        
+
         return false;
     }
-    
+
     @Override
     public Boolean visitBinaryExpr(BinaryExpr expr) {
         return false;
@@ -59,7 +59,7 @@ class StatementDeleter implements IAstVisitor<Boolean> {
             stmt.statements.remove(i);
             return true;
         }
-        
+
         return false;
     }
 
@@ -92,7 +92,7 @@ class StatementDeleter implements IAstVisitor<Boolean> {
     public Boolean visitFile(File file) {
         return false;
     }
-    
+
     @Override
     public Boolean visitFor(For stmt) {
         return visitLoop(stmt);
@@ -104,11 +104,11 @@ class StatementDeleter implements IAstVisitor<Boolean> {
             Block replacement = new Block(func);
             replacement.start = func.body.start;
             replacement.end = func.body.end;
-            
+
             func.body = replacement;
             return true;
         }
-        
+
         return false;
     }
 
@@ -116,7 +116,7 @@ class StatementDeleter implements IAstVisitor<Boolean> {
     public Boolean visitFunctionCall(FunctionCall expr) {
         return false;
     }
-    
+
     @Override
     public Boolean visitFunctionDecl(FunctionDecl decl) {
         return null;
@@ -136,7 +136,7 @@ class StatementDeleter implements IAstVisitor<Boolean> {
             stmt.thenBlock = replacement;
             return true;
         }
-        
+
         if (target == stmt.elseBlock) {
             EmptyStmt replacement = new EmptyStmt(stmt);
             replacement.start = stmt.elseBlock.start;
@@ -144,7 +144,7 @@ class StatementDeleter implements IAstVisitor<Boolean> {
             stmt.elseBlock = replacement;
             return true;
         }
-        
+
         return false;
     }
 
@@ -152,7 +152,7 @@ class StatementDeleter implements IAstVisitor<Boolean> {
     public Boolean visitJumpStmt(JumpStmt stmt) {
         return false;
     }
-    
+
     @Override
     public Boolean visitLiteral(Literal expr) {
         return false;

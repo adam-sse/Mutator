@@ -27,11 +27,11 @@ import net.ssehub.mutator.ast.operations.IAstVisitor;
 import net.ssehub.mutator.util.Util;
 
 public class ElementReplacer<T extends AstElement> implements IAstVisitor<Boolean> {
-    
+
     private T toReplace;
-    
+
     private T replacement;
-    
+
     public boolean replace(T toReplace, T replacement) {
         this.toReplace = toReplace;
         this.replacement = replacement;
@@ -44,12 +44,12 @@ public class ElementReplacer<T extends AstElement> implements IAstVisitor<Boolea
             expr.left = (Expression) replacement;
             return true;
         }
-        
+
         if (toReplace == expr.right) {
             expr.right = (Expression) replacement;
             return true;
         }
-        
+
         return false;
     }
 
@@ -60,7 +60,7 @@ public class ElementReplacer<T extends AstElement> implements IAstVisitor<Boolea
             stmt.statements.set(i, (Statement) replacement);
             return true;
         }
-        
+
         return false;
     }
 
@@ -73,7 +73,7 @@ public class ElementReplacer<T extends AstElement> implements IAstVisitor<Boolea
             decl.initExpr = (Expression) replacement;
             return true;
         }
-        
+
         return false;
     }
 
@@ -83,7 +83,7 @@ public class ElementReplacer<T extends AstElement> implements IAstVisitor<Boolea
             stmt.decl = (Declaration) replacement;
             return true;
         }
-        
+
         return false;
     }
 
@@ -93,12 +93,12 @@ public class ElementReplacer<T extends AstElement> implements IAstVisitor<Boolea
             stmt.condition = (Expression) replacement;
             return true;
         }
-        
+
         if (toReplace == stmt.body) {
             stmt.body = (Statement) replacement;
             return true;
         }
-        
+
         return false;
     }
 
@@ -113,7 +113,7 @@ public class ElementReplacer<T extends AstElement> implements IAstVisitor<Boolea
             stmt.expr = (Expression) replacement;
             return true;
         }
-        
+
         return false;
     }
 
@@ -124,32 +124,32 @@ public class ElementReplacer<T extends AstElement> implements IAstVisitor<Boolea
             file.functions.set(i, replacement);
             return true;
         }
-        
+
         return false;
     }
-    
+
     @Override
     public Boolean visitFor(For stmt) {
         if (toReplace == stmt.init) {
             stmt.init = (Declaration) replacement;
             return true;
         }
-        
+
         if (toReplace == stmt.condition) {
             stmt.condition = (Expression) replacement;
             return true;
         }
-        
+
         if (toReplace == stmt.increment) {
             stmt.increment = (Expression) replacement;
             return true;
         }
-        
+
         if (toReplace == stmt.body) {
             stmt.body = (Statement) replacement;
             return true;
         }
-        
+
         return false;
     }
 
@@ -159,12 +159,12 @@ public class ElementReplacer<T extends AstElement> implements IAstVisitor<Boolea
             func.header = (FunctionDecl) replacement;
             return true;
         }
-        
+
         if (toReplace == func.body) {
             func.body = (Block) replacement;
             return true;
         }
-        
+
         return false;
     }
 
@@ -175,23 +175,23 @@ public class ElementReplacer<T extends AstElement> implements IAstVisitor<Boolea
             expr.params.set(i, (Expression) replacement);
             return true;
         }
-        
+
         return false;
     }
-    
+
     @Override
     public Boolean visitFunctionDecl(FunctionDecl decl) {
         if (toReplace == decl.type) {
             decl.type = (Type) replacement;
             return true;
         }
-        
+
         int i = Util.findIndex(decl.parameters, (Declaration) toReplace);
         if (i != -1) {
             decl.parameters.set(i, (Declaration) replacement);
             return true;
         }
-        
+
         return null;
     }
 
@@ -206,20 +206,20 @@ public class ElementReplacer<T extends AstElement> implements IAstVisitor<Boolea
             stmt.condition = (Expression) replacement;
             return true;
         }
-        
+
         if (toReplace == stmt.thenBlock) {
             stmt.thenBlock = (Statement) replacement;
             return true;
         }
-        
+
         if (toReplace == stmt.elseBlock) {
             stmt.elseBlock = (Statement) replacement;
             return true;
         }
-        
+
         return false;
     }
-    
+
     @Override
     public Boolean visitJumpStmt(JumpStmt stmt) {
         return false;
@@ -236,7 +236,7 @@ public class ElementReplacer<T extends AstElement> implements IAstVisitor<Boolea
             stmt.value = (Expression) replacement;
             return true;
         }
-        
+
         return false;
     }
 
@@ -251,7 +251,7 @@ public class ElementReplacer<T extends AstElement> implements IAstVisitor<Boolea
             expr.expr = (Expression) replacement;
             return true;
         }
-        
+
         return false;
     }
 
@@ -261,13 +261,13 @@ public class ElementReplacer<T extends AstElement> implements IAstVisitor<Boolea
             stmt.condition = (Expression) replacement;
             return true;
         }
-        
+
         if (toReplace == stmt.body) {
             stmt.body = (Statement) replacement;
             return true;
         }
-        
+
         return false;
     }
-    
+
 }

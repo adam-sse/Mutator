@@ -15,5 +15,5 @@ class Util {
             return getParentStatementText(element.parent);
         }
     }
-    
+
 }

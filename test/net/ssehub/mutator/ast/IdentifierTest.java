@@ -8,17 +8,17 @@ public class IdentifierTest extends AbstractAstElementTest {
         {
             i1.identifier = "VAR_1";
         }
-        
+
         Identifier i2 = new Identifier(null);
         {
             i2.identifier = "VAR_1";
         }
-        
+
         Identifier i3 = new Identifier(null);
         {
             i3.identifier = "VAR_2";
         }
-        
+
         return new AstElement[] { i1, i2, i3 };
     }
 
@@ -36,9 +36,14 @@ public class IdentifierTest extends AbstractAstElementTest {
     @Override
     protected String getLineString(int element) {
         switch (element) {
-        case 0: return "VAR_1";
-        case 1: return "VAR_1";
-        case 2: return "VAR_2";
+        case 0:
+            return "VAR_1";
+
+        case 1:
+            return "VAR_1";
+
+        case 2:
+            return "VAR_2";
         }
         return null;
     }
@@ -47,7 +52,5 @@ public class IdentifierTest extends AbstractAstElementTest {
     protected String getPrettyString(int element) {
         return getLineString(element);
     }
-    
-    
 
 }

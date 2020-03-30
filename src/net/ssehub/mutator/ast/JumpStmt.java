@@ -5,30 +5,30 @@ import net.ssehub.mutator.ast.operations.IStatementVisitor;
 public class JumpStmt extends Statement {
 
     public enum Type {
-        
+
         CONTINUE("continue"),
-        
+
         BREAK("break");
-        
+
         private String str;
-        
+
         private Type(String str) {
             this.str = str;
         }
-        
+
         @Override
         public String toString() {
             return str;
         }
-        
+
     }
-    
+
     public Type type;
-    
+
     public JumpStmt(AstElement parent) {
         super(parent);
     }
-    
+
     @Override
     public AstElement getChild(int index) throws IndexOutOfBoundsException {
         throw new IndexOutOfBoundsException(index);
@@ -53,7 +53,7 @@ public class JumpStmt extends Statement {
         }
         return equals;
     }
-    
+
     @Override
     public int hashCode() {
         return 149 * type.hashCode();

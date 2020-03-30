@@ -8,26 +8,26 @@ public class ExpressionStmtTest extends AbstractAstElementTest {
         {
             Identifier expr = new Identifier(s1);
             expr.identifier = "A";
-            
+
             s1.expr = expr;
         }
-        
+
         ExpressionStmt s2 = new ExpressionStmt(null);
         {
             Identifier expr = new Identifier(s2);
             expr.identifier = "A";
-            
+
             s2.expr = expr;
         }
-        
+
         ExpressionStmt s3 = new ExpressionStmt(null);
         {
             Literal expr = new Literal(s3);
             expr.value = "4";
-            
+
             s3.expr = expr;
         }
-        
+
         return new AstElement[] { s1, s2, s3 };
     }
 
@@ -45,9 +45,14 @@ public class ExpressionStmtTest extends AbstractAstElementTest {
     @Override
     protected String getLineString(int element) {
         switch (element) {
-        case 0: return "A;";
-        case 1: return "A;";
-        case 2: return "4;";
+        case 0:
+            return "A;";
+
+        case 1:
+            return "A;";
+
+        case 2:
+            return "4;";
         }
         return null;
     }

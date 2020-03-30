@@ -9,13 +9,13 @@ import net.ssehub.mutator.ast.UnaryExpr;
 public interface IExpressionVisitor<T> {
 
     public T visitBinaryExpr(BinaryExpr expr);
-    
+
     public T visitFunctionCall(FunctionCall expr);
-    
+
     public T visitIdentifier(Identifier expr);
-    
+
     public T visitLiteral(Literal expr);
-    
+
     public T visitUnaryExpr(UnaryExpr expr);
-    
+
 }

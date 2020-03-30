@@ -5,11 +5,11 @@ import net.ssehub.mutator.ast.operations.IExpressionVisitor;
 public class Literal extends Expression {
 
     public String value;
-    
+
     public Literal(AstElement parent) {
         super(parent);
     }
-    
+
     @Override
     public int getPrecedence() {
         return Integer.MAX_VALUE;
@@ -19,12 +19,12 @@ public class Literal extends Expression {
     public AstElement getChild(int index) throws IndexOutOfBoundsException {
         throw new IndexOutOfBoundsException(index);
     }
-    
+
     @Override
     public int getNumChildren() {
         return 0;
     }
-    
+
     @Override
     public <T> T accept(IExpressionVisitor<T> visitor) {
         return visitor.visitLiteral(this);
@@ -39,10 +39,10 @@ public class Literal extends Expression {
         }
         return equals;
     }
-    
+
     @Override
     public int hashCode() {
         return 199 * value.hashCode();
     }
-    
+
 }

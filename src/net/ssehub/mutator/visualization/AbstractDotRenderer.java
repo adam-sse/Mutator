@@ -11,31 +11,30 @@ import net.ssehub.mutator.util.Logger;
 abstract class AbstractDotRenderer {
 
     private static final Logger LOGGER = Logger.get("AbstractDotRenderer");
-    
+
     private String dotExe;
-    
+
     protected AbstractDotRenderer(String dotExe) {
         this.dotExe = dotExe;
     }
-    
+
     protected void render(String dotGraph, String engine, File output) throws IOException {
         if (output.getName().endsWith(".dot")) {
             try (FileWriter out = new FileWriter(output)) {
                 out.write(dotGraph);
             }
-            
         } else {
             java.io.File tmp = java.io.File.createTempFile("mutator_", ".dot");
             tmp.deleteOnExit();
             try (FileWriter out = new FileWriter(tmp)) {
                 out.write(dotGraph);
             }
-            
+
             String type = output.getName().substring(output.getName().lastIndexOf('.') + 1);
             if (type.equals("wrl")) {
                 type = "vrml";
             }
-            
+
             List<String> command = new LinkedList<>();
             command.add(dotExe);
             command.add("-T" + type);
@@ -43,12 +42,12 @@ abstract class AbstractDotRenderer {
             command.add("-o");
             command.add(output.getAbsolutePath());
             command.add(tmp.getAbsolutePath());
-            
+
             ProcessBuilder pb = new ProcessBuilder(command);
             pb.directory(output.getAbsoluteFile().getParentFile());
             pb.inheritIO();
             pb.redirectErrorStream(true);
-            
+
             try {
                 pb.start().waitFor();
             } catch (InterruptedException e) {
@@ -56,5 +55,5 @@ abstract class AbstractDotRenderer {
             }
         }
     }
-    
+
 }

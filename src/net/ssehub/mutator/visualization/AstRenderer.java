@@ -36,59 +36,50 @@ public class AstRenderer extends AbstractDotRenderer {
     public AstRenderer(String dotExe) {
         super(dotExe);
     }
-    
+
     public void render(File file, java.io.File output) throws IOException {
         StringBuilder dot = new StringBuilder();
-        
-        dot
-            .append("digraph AST {\n")
-            .append("    graph [fontname=\"Liberation Mono\"; fontsize=9];\n")
-            .append("    node [fontname=\"Liberation Mono\"; fontsize=9; shape=\"rectangle\"; nojustify=\"true\"; margin=\"0.1\"];\n")
-            .append("    edge [fontname=\"Liberation Mono\"; fontsize=9; arrowhead=\"vee\"; arrowsize=0.8];\n")
-            .append("    splines=polyline;")
-            .append("\n");
-        
+
+        dot.append("digraph AST {\n").append("    graph [fontname=\"Liberation Mono\"; fontsize=9];\n").append(
+                "    node [fontname=\"Liberation Mono\"; fontsize=9; shape=\"rectangle\"; nojustify=\"true\"; margin=\"0.1\"];\n")
+                .append("    edge [fontname=\"Liberation Mono\"; fontsize=9; arrowhead=\"vee\"; arrowsize=0.8];\n")
+                .append("    splines=polyline;").append("\n");
+
         RankCollector rankCollector = new RankCollector();
         file.accept(new FullVisitor(rankCollector));
-        
+
         LabelCreator labelCreator = new LabelCreator();
-        
-        rankCollector.ranks.entrySet().stream()
-                .sorted((r1, r2) -> Integer.compare(r1.getKey(), r2.getKey()))
+
+        rankCollector.ranks.entrySet().stream().sorted((r1, r2) -> Integer.compare(r1.getKey(), r2.getKey()))
                 .forEach((rank) -> {
-                    
-                    dot
-                        .append("    subgraph \"rank_").append(rank.getKey()).append("\" {\n")
-                        .append("        rank=same;\n");
-                    
+
+                    dot.append("    subgraph \"rank_").append(rank.getKey()).append("\" {\n")
+                            .append("        rank=same;\n");
+
                     for (AstElement node : rank.getValue()) {
-                        dot
-                            .append("        \"")
-                            .append(node.id)
-                            .append("\" [label=\"")
-                            .append(node.accept(labelCreator))
-                            .append("\"];\n");
+                        dot.append("        \"").append(node.id).append("\" [label=\"")
+                                .append(node.accept(labelCreator)).append("\"];\n");
                     }
-                    
+
                     dot.append("    }\n");
-                    
+
                     for (AstElement node : rank.getValue()) {
                         if (node.parent != null) {
-                            dot.append("    \"").append(node.parent.id).append("\" -> \"")
-                                .append(node.id).append("\";\n");
+                            dot.append("    \"").append(node.parent.id).append("\" -> \"").append(node.id)
+                                    .append("\";\n");
                         }
                     }
                 });
-        
+
         dot.append("}\n");
-        
+
         render(dot.toString(), "dot", output);
     }
-    
+
     private static class RankCollector extends SingleOperationVisitor<Void> {
 
         private Map<Integer, List<AstElement>> ranks = new HashMap<>();
-        
+
         private int getRank(AstElement element) {
             int rank = 1;
             while (element != null) {
@@ -97,7 +88,7 @@ public class AstRenderer extends AbstractDotRenderer {
             }
             return rank;
         }
-        
+
         @Override
         protected Void visit(AstElement element) {
             int rank = getRank(element);
@@ -109,9 +100,9 @@ public class AstRenderer extends AbstractDotRenderer {
             list.add(element);
             return null;
         }
-        
+
     }
-    
+
     private static class LabelCreator implements IAstVisitor<String> {
 
         @Override
@@ -213,7 +204,7 @@ public class AstRenderer extends AbstractDotRenderer {
         public String visitWhile(While stmt) {
             return "while";
         }
-        
+
     }
 
 }

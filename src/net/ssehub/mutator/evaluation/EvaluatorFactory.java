@@ -6,7 +6,7 @@ import net.ssehub.mutator.util.Logger;
 public class EvaluatorFactory {
 
     private static final Logger LOGGER = Logger.get(EvaluatorFactory.class.getSimpleName());
-    
+
     public static Evaluator create(BaseConfig config) {
         String os = System.getProperty("os.name", "generic").toLowerCase();
         if (os.startsWith("win")) {
@@ -16,5 +16,5 @@ public class EvaluatorFactory {
             return new LinuxEvaluator(config);
         }
     }
-    
+
 }

@@ -26,30 +26,36 @@ public abstract class AbstractMutator implements IMutator {
     private static final Logger LOGGER = Logger.get(AbstractMutator.class.getSimpleName());
 
     private static class FitnessStoreEntry extends Fitness {
-        
+
         private int iteration;
 
         public FitnessStoreEntry(Fitness fitness, int iteration) {
             super(fitness.getValues());
             this.iteration = iteration;
         }
-        
+
     }
-    
+
     private Map<String, Fitness> fitnessStore;
 
     private BaseConfig config;
 
     private Evaluator evaluator;
-    
+
     private int iteration;
 
     private int statNumEvaluated;
+
     private int statNumCompileError;
+
     private int statNumTimeout;
+
     private int statNumFailed;
+
     private int statNumRuntimeError;
+
     private int statNumError;
+
     private List<Fitness> statBestInIteration;
 
     public AbstractMutator(BaseConfig config) {
@@ -62,11 +68,11 @@ public abstract class AbstractMutator implements IMutator {
     protected int getIteration() {
         return iteration;
     }
-    
+
     protected void nextIteration() {
         this.iteration++;
     }
-    
+
     @Override
     public Fitness getFitness(String mutantId) {
         return this.fitnessStore.get(mutantId);
@@ -104,19 +110,22 @@ public abstract class AbstractMutator implements IMutator {
                 case COMPILATION_FAILED:
                     statNumCompileError++;
                     break;
+
                 case ERROR:
                     statNumError++;
                     break;
+
                 case TEST_FAILED:
                     statNumFailed++;
                     break;
+
                 case TIMEOUT:
                     statNumTimeout++;
                     break;
+
                 default:
                 }
             }
-
         } else {
             fitness = this.evaluator.measureFitness(mutant);
             if (fitness == Evaluator.RUNTIME_ERROR) {
@@ -125,7 +134,6 @@ public abstract class AbstractMutator implements IMutator {
                     statNumRuntimeError++;
                 }
                 fitness = null;
-
             } else {
                 if (printAndStats) {
                     LOGGER.println(mutant.getId() + ": " + fitness);
@@ -164,34 +172,32 @@ public abstract class AbstractMutator implements IMutator {
         LOGGER.printf("    runtime error: %d (%.2f %%)", statNumRuntimeError,
                 (double) statNumRuntimeError / statNumEvaluated * 100.0);
         LOGGER.println();
-        LOGGER.printf("    error: %d (%.2f %%)", statNumError,
-                (double) statNumError / statNumEvaluated * 100.0);
+        LOGGER.printf("    error: %d (%.2f %%)", statNumError, (double) statNumError / statNumEvaluated * 100.0);
         LOGGER.println();
 
-        
         if (statBestInIteration.size() >= 2) {
             LOGGER.println();
             LOGGER.println("Best Fitness per Iteration:");
-            
+
             for (int objective = 0; objective < statBestInIteration.get(0).numValues(); objective++) {
                 LOGGER.println();
                 LOGGER.println("Objective " + (objective + 1));
-                
+
                 AsciiChart chart = new AsciiChart(20);
-                
+
                 for (int iteration = 0; iteration < statBestInIteration.size(); iteration++) {
                     double fitness = statBestInIteration.get(iteration).getValue(objective);
                     chart.addPoint(iteration + 1, fitness);
                 }
-                
+
                 LOGGER.println(chart.toString());
             }
-            
+
             if (config.getDotExe() != null) {
                 int dimension = statBestInIteration.get(0).numValues();
                 File bestFitOutput = null;
                 BestFitnessRenderer bestFitRenderer = null;
-                
+
                 if (dimension == 2) {
                     bestFitOutput = new File(config.getExecDir(), "fitness-evolution.svg");
                     bestFitRenderer = new BestFitnessRenderer(config.getDotExe(), false);
@@ -209,18 +215,17 @@ public abstract class AbstractMutator implements IMutator {
                     }
                 }
             }
-            
         }
-        
+
         if (config.getDotExe() != null) {
             int dimension = -1;
             if (!fitnessStore.isEmpty()) {
                 dimension = fitnessStore.values().iterator().next().numValues();
             }
-            
+
             File allFitOutput = null;
             FitnessRenderer allFitRenderer = null;
-            
+
             if (dimension == 2) {
                 allFitOutput = new File(config.getExecDir(), "fitness-all.svg");
                 allFitRenderer = new FitnessRenderer(config.getDotExe(), false, false);
@@ -228,26 +233,26 @@ public abstract class AbstractMutator implements IMutator {
                 allFitOutput = new File(config.getExecDir(), "fitness-all.wrl");
                 allFitRenderer = new FitnessRenderer3D(config.getDotExe(), false, false);
             }
-            
+
             if (allFitRenderer != null) {
                 LOGGER.println("Rendering all fitness values to " + allFitOutput.getName());
-                
+
                 try {
                     if (allFitRenderer.init(fitnessStore.values())) {
                         // find best seen fitness
                         IFitnessComparator comparator = FitnessComparatorFactory.get();
                         Fitness best = Collections.max(fitnessStore.values(), comparator);
-                        
+
                         for (Map.Entry<String, Fitness> entry : fitnessStore.entrySet()) {
                             FitnessStoreEntry fitness = (FitnessStoreEntry) entry.getValue();
-                            
+
                             boolean isInit = entry.getKey().equals(getUnmodifiedId());
                             boolean isBest = !comparator.isLower(entry.getValue(), best);
-                            
-                            allFitRenderer.addNode(entry.getValue(), (isBest || isInit) ? entry.getKey() : "",
-                                    isInit, isBest, (double) fitness.iteration / (this.iteration - 1));
+
+                            allFitRenderer.addNode(entry.getValue(), (isBest || isInit) ? entry.getKey() : "", isInit,
+                                    isBest, (double) fitness.iteration / (this.iteration - 1));
                         }
-                        
+
                         allFitRenderer.render(allFitOutput);
                     }
                 } catch (IOException e) {

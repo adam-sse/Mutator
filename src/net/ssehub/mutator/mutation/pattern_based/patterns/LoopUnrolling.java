@@ -39,48 +39,48 @@ import net.ssehub.mutator.mutation.genetic.mutations.StatementInserter;
 public class LoopUnrolling implements IOpportunity {
 
     private long loopId;
-    
+
     private String var;
-    
+
     private int increment;
-    
+
     public LoopUnrolling(long loopId, String var, int increment) {
         this.loopId = loopId;
         this.var = var;
         this.increment = increment;
     }
-    
+
     @Override
     public int getMinParam() {
         return 1;
     }
-    
+
     @Override
     public int getDefaultParam() {
         return 1;
     }
-    
+
     @Override
     public int getMaxParam() {
         return 16;
     }
-    
+
     @Override
     public void apply(int param, File ast) {
         // no modification if param = 1
         if (param > 1) {
             For loop = (For) ast.accept(new IdFinder(this.loopId));
             if (loop != null) {
-                // clone now, before, the original loop is modified 
+                // clone now, before, the original loop is modified
                 For remainderLoop = new AstCloner(loop.parent, false).visitFor(loop);
-                
+
                 // create a new body block with duplicated loop.body elements
                 Block newBody = new Block(loop);
-                
+
                 Statement oldBody = loop.body;
                 newBody.statements.add(oldBody);
                 oldBody.parent = newBody;
-                
+
                 for (int i = 1; i < param; i++) {
                     // for each duplication, increase var by one (e.g. i + 1, i + 2, etc.)
                     insertIncrement(loop, newBody);
@@ -88,22 +88,24 @@ public class LoopUnrolling implements IOpportunity {
                     newBody.statements.add(clone);
                 }
                 insertIncrement(loop, newBody);
-                
+
                 loop.body = newBody;
-                
+
                 // remove the increment, as we inserted the increment statements
                 loop.increment = null;
-                
+
                 int newIncrement = increment * param;
-                
+
                 // decrease the bound
-                // the remainder loop will take care of all remaining elements that don't fit the new increment
+                // the remainder loop will take care of all remaining elements that don't fit
+                // the new increment
                 decreaseBound(loop, newIncrement - 1);
-                
+
                 String newCountVar = null;
                 if (loop.init != null) {
                     // introduce new temporary variable for remainder loop
-                    // this keeps track of the main loop var, so the remainder loop can finish the job
+                    // this keeps track of the main loop var, so the remainder loop can finish the
+                    // job
                     newCountVar = "mutator_tmp_" + (int) (Math.random() * Integer.MAX_VALUE);
                     insertCountDeclaration(newCountVar, loop);
                     insertCountAssigment(newCountVar, newBody);
@@ -112,81 +114,81 @@ public class LoopUnrolling implements IOpportunity {
                 // set the correct values for the remainder loop
                 // no init, as it uses the newCountVar temporary variable
                 remainderLoop.init = null;
-                
+
                 if (newCountVar != null) {
                     // replace main loop var with newCountVar
                     remainderLoop.accept(new FullVisitor(new WithIdentifierReplacer(newCountVar)));
                 }
-                
+
                 // insert the remainder loop after the main loop
                 new StatementInserter().insert(loop, false, remainderLoop);
             }
         }
     }
-    
+
     private void insertIncrement(For loop, Block block) {
         ExpressionStmt incStmt = new ExpressionStmt(block);
-        
+
         Expression inc = (Expression) loop.increment.accept(new AstCloner(block, false));
         incStmt.expr = inc;
-        
+
         block.statements.add(incStmt);
     }
-    
+
     private void insertCountDeclaration(String countVarId, For loop) {
         DeclarationStmt stmt = new DeclarationStmt(loop.parent);
-        
+
         Declaration countDecl = new Declaration(stmt);
         Type countType = new Type(countDecl);
         countType.type = BasicType.INT;
         countDecl.type = countType;
         countDecl.identifier = countVarId;
-        
+
         Expression initValue = (Expression) loop.init.initExpr.accept(new AstCloner(countDecl, false));
         countDecl.initExpr = initValue;
 
         stmt.decl = countDecl;
-        
+
         new StatementInserter().insert(loop, true, stmt);
     }
-    
+
     private void insertCountAssigment(String countVarId, Block body) {
         ExpressionStmt stmt = new ExpressionStmt(body);
-        
+
         BinaryExpr expr = new BinaryExpr(stmt);
         expr.operator = BinaryOperator.ASSIGNMENT;
-        
+
         Identifier left = new Identifier(expr);
         left.identifier = countVarId;
-        
+
         Identifier right = new Identifier(expr);
         right.identifier = var;
-        
+
         expr.left = left;
         expr.right = right;
-        
+
         stmt.expr = expr;
-        
+
         new StatementInserter().insert(body.statements.get(body.statements.size() - 1), false, stmt);
     }
-    
+
     private void decreaseBound(For loop, int bound) {
         BinaryExpr cond = (BinaryExpr) loop.condition;
-        
+
         BinaryExpr subtract = new BinaryExpr(loop);
-        
+
         Literal lit = new Literal(subtract);
         lit.value = Integer.toString(bound);
-        
+
         subtract.operator = BinaryOperator.SUBTRACTION;
-        
+
         subtract.left = cond.right;
         subtract.right = lit;
         cond.right.parent = subtract;
-        
+
         cond.right = subtract;
     }
-    
+
 //    private void setNewIncrement(For loop, int increment) {
 //        BinaryExpr newIncrementOp = new BinaryExpr(loop);
 //        
@@ -206,17 +208,17 @@ public class LoopUnrolling implements IOpportunity {
 //        
 //        loop.increment = newIncrementOp;
 //    }
-    
+
     private static abstract class AbstractIdentifierReplacer implements IAstVisitor<Void> {
 
         private String toReplace;
-        
+
         public AbstractIdentifierReplacer(String toReplace) {
             this.toReplace = toReplace;
         }
-        
+
         protected abstract Expression convert(Identifier identifier);
-        
+
         private Expression checkAndConvert(Expression expr) {
             Expression result = expr;
             if (expr instanceof Identifier && ((Identifier) expr).identifier.equals(toReplace)) {
@@ -227,7 +229,7 @@ public class LoopUnrolling implements IOpportunity {
             }
             return result;
         }
-        
+
         @Override
         public Void visitBinaryExpr(BinaryExpr expr) {
             expr.left = checkAndConvert(expr.left);
@@ -296,7 +298,7 @@ public class LoopUnrolling implements IOpportunity {
             }
             return null;
         }
-        
+
         @Override
         public Void visitFunctionDecl(FunctionDecl decl) {
             return null;
@@ -347,9 +349,9 @@ public class LoopUnrolling implements IOpportunity {
             stmt.condition = checkAndConvert(stmt.condition);
             return null;
         }
-        
+
     }
-    
+
 //    private class WithLiteralReplacer extends AbstractIdentifierReplacer {
 //
 //        private int varAddition;
@@ -387,11 +389,11 @@ public class LoopUnrolling implements IOpportunity {
 //            return null;
 //        }
 //    }
-    
+
     private class WithIdentifierReplacer extends AbstractIdentifierReplacer {
 
         private String newIdentifier;
-        
+
         public WithIdentifierReplacer(String newIdentifier) {
             super(LoopUnrolling.this.var);
             this.newIdentifier = newIdentifier;
@@ -403,9 +405,9 @@ public class LoopUnrolling implements IOpportunity {
             newIdentifier.identifier = this.newIdentifier;
             return newIdentifier;
         }
-        
+
     }
-    
+
     @Override
     public String toString() {
         return "LoopUnrolling(loop=#" + loopId + "; var=" + var + "; increment=" + increment + ")";
@@ -414,17 +416,17 @@ public class LoopUnrolling implements IOpportunity {
     public static List<LoopUnrolling> findOpportunities(File ast) {
         LoopUnrollingFinder finder = new LoopUnrollingFinder();
         ast.accept(new FullStatementVisitor(finder));
-        
+
         // sort higher IDs first -> inner loops come before outer loops
         finder.opportunities.sort((o1, o2) -> Long.compare(o2.loopId, o1.loopId));
-        
+
         return finder.opportunities;
     }
-    
+
     private static class LoopUnrollingFinder implements IStatementVisitor<Void> {
 
         private List<LoopUnrolling> opportunities = new LinkedList<>();
-        
+
         @Override
         public Void visitBlock(Block stmt) {
             return null;
@@ -453,31 +455,32 @@ public class LoopUnrolling implements IOpportunity {
         private boolean isIntType(Type type) {
             return !type.pointer && type.type == BasicType.INT && type.modifier == null;
         }
-        
+
         private boolean isVariable(Expression expr, String expectedName) {
             return expr instanceof Identifier && ((Identifier) expr).identifier.equals(expectedName);
         }
-        
+
         private String getVariable(Expression expr) {
             if (expr instanceof Identifier) {
                 return ((Identifier) expr).identifier;
             }
             return null;
         }
-        
+
         private Integer getConstant(Expression expr) {
             Integer result = null;
-            
+
             if (expr != null && expr instanceof Literal) {
                 try {
                     result = Integer.parseInt(((Literal) expr).value);
-                } catch (NumberFormatException e) {}
+                } catch (NumberFormatException e) {
+                }
             }
             // TODO: unary minus, or more generally: any constant (evaluated)
-            
+
             return result;
         }
-        
+
         @Override
         public Void visitFor(For stmt) {
             // check init
@@ -488,13 +491,13 @@ public class LoopUnrolling implements IOpportunity {
                 }
                 var = stmt.init.identifier;
             }
-            
+
             // check condition
             boolean conditionFits = false;
             if (stmt.condition != null) {
                 if (stmt.condition instanceof BinaryExpr) {
                     BinaryExpr op = (BinaryExpr) stmt.condition;
-                    
+
                     if (var != null) {
                         if (!isVariable(op.left, var)) {
                             return null;
@@ -502,7 +505,7 @@ public class LoopUnrolling implements IOpportunity {
                     } else {
                         var = getVariable(op.left);
                     }
-                    
+
                     if (var != null) {
                         if (op.operator == BinaryOperator.CMP_LOWER || op.operator == BinaryOperator.CMP_LOWER_EQUAL) {
                             conditionFits = true;
@@ -510,7 +513,7 @@ public class LoopUnrolling implements IOpportunity {
                     }
                 }
             }
-            
+
             // check increment
             Integer increment = null;
             if (conditionFits && stmt.increment != null) {
@@ -521,7 +524,7 @@ public class LoopUnrolling implements IOpportunity {
                     } else if (op.operator == UnaryOperator.PRE_DEC || op.operator == UnaryOperator.POST_DEC) {
                         increment = -1;
                     }
-                    
+
                     if (var != null) {
                         if (!isVariable(op.expr, var)) {
                             return null;
@@ -529,7 +532,6 @@ public class LoopUnrolling implements IOpportunity {
                     } else {
                         var = getVariable(op.expr);
                     }
-                    
                 } else if (stmt.increment instanceof BinaryExpr) {
                     BinaryExpr op = (BinaryExpr) stmt.increment;
                     if (op.operator == BinaryOperator.ASSIGNMENT_PLUS) {
@@ -547,11 +549,11 @@ public class LoopUnrolling implements IOpportunity {
                     }
                 }
             }
-            
+
             if (var != null && conditionFits && increment != null) {
                 opportunities.add(new LoopUnrolling(stmt.id, var, increment));
             }
-            
+
             return null;
         }
 
@@ -574,7 +576,7 @@ public class LoopUnrolling implements IOpportunity {
         public Void visitWhile(While stmt) {
             return null;
         }
-        
+
     }
-    
+
 }

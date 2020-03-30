@@ -6,23 +6,23 @@ import java.util.List;
 import net.ssehub.mutator.ast.operations.IAstVisitor;
 
 public class File extends AstElement {
-    
+
     public List<AstElement> functions = new LinkedList<>();
-    
+
     public File(AstElement parent) {
         super(parent);
     }
-    
+
     @Override
     public AstElement getChild(int index) throws IndexOutOfBoundsException {
         return functions.get(index);
     }
-    
+
     @Override
     public int getNumChildren() {
         return functions.size();
     }
-    
+
     @Override
     public <T> T accept(IAstVisitor<T> visitor) {
         return visitor.visitFile(this);
@@ -37,10 +37,10 @@ public class File extends AstElement {
         }
         return equals;
     }
-    
+
     @Override
     public int hashCode() {
         return functions.hashCode();
     }
-    
+
 }

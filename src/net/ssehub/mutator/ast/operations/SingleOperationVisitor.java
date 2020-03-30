@@ -25,7 +25,7 @@ import net.ssehub.mutator.ast.While;
 public abstract class SingleOperationVisitor<T> implements IAstVisitor<T> {
 
     protected abstract T visit(AstElement element);
-    
+
     @Override
     public T visitBinaryExpr(BinaryExpr expr) {
         return visit(expr);

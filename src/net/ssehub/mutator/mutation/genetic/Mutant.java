@@ -13,46 +13,46 @@ import net.ssehub.mutator.mutation.IMutant;
 import net.ssehub.mutator.mutation.genetic.mutations.Mutation;
 
 public class Mutant implements IMutant {
-    
+
     private String id;
-    
+
     private List<Mutation> mutations;
-    
+
     private File ast;
-    
+
     public Mutant(String id, File original) {
         this.id = id;
         this.ast = new AstCloner(null, true).visitFile(original);
         this.mutations = new LinkedList<>();
     }
-    
+
     public File getAst() {
         return ast;
     }
-    
+
     public boolean addMutation(Mutation mutation) {
         if (mutations.contains(mutation)) {
             return false;
         }
-        
+
         boolean applies = mutation.apply(this.ast);
-        
+
         if (applies) {
             this.mutations.add(mutation);
         }
-        
+
         return applies;
     }
-    
+
     public List<Mutation> getMutations() {
         return mutations;
     }
-    
+
     @Override
     public String getId() {
         return id;
     }
-    
+
     @Override
     public void write(java.io.File destination) throws IOException {
         try (FileWriter out = new FileWriter(destination)) {
@@ -69,14 +69,14 @@ public class Mutant implements IMutant {
             out.write(ast.accept(new AstPrettyPrinter(true)));
         }
     }
-    
+
     public Mutant clone(String cloneId) {
         Mutant clone = new Mutant(cloneId, this.ast);
         clone.mutations = new LinkedList<>(this.mutations);
-        
+
         return clone;
     }
-    
+
     @Override
     public String toString() {
         StringJoiner sj = new StringJoiner(", ");
@@ -85,20 +85,19 @@ public class Mutant implements IMutant {
         }
         return "Mutant " + getId() + " [" + sj.toString() + "]";
     }
-    
+
     @Override
     public boolean equals(Object obj) {
         boolean equal = false;
-        
+
         if (obj instanceof Mutant) {
             Mutant other = (Mutant) obj;
             equal = mutations.equals(other.mutations);
         }
-        
-        
+
         return equal;
     }
-    
+
     @Override
     public int hashCode() {
         return 223 * mutations.hashCode();

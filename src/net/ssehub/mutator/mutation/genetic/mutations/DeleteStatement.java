@@ -12,27 +12,27 @@ import net.ssehub.mutator.mutation.genetic.MutationIdentifier;
 public class DeleteStatement extends Mutation {
 
     private MutationIdentifier target;
-    
+
     DeleteStatement(MutationIdentifier target) {
         this.target = target;
     }
-    
+
     @Override
     public boolean apply(AstElement ast) {
         Statement targetElem = (Statement) target.find(ast);
-        
+
         boolean success = false;
-        
+
         if (targetElem != null) {
             StatementDeleter deleter = new StatementDeleter();
             success = deleter.delete(targetElem);
-            
+
             if (success) {
                 this.diff = new ArrayList<>(1);
                 this.diff.add("-" + targetElem.getText());
             }
         }
-        
+
         return success;
     }
 
@@ -40,19 +40,19 @@ public class DeleteStatement extends Mutation {
     public String toString() {
         return "DeleteStatement(target=" + target + ")";
     }
-    
+
     @Override
     public boolean equals(Object obj) {
         boolean equal = false;
-        
+
         if (obj instanceof DeleteStatement) {
             DeleteStatement other = (DeleteStatement) obj;
             equal = target.equals(other.target);
         }
-        
+
         return equal;
     }
-    
+
     @Override
     public int hashCode() {
         return target.hashCode();
@@ -66,11 +66,12 @@ public class DeleteStatement extends Mutation {
                 collector.getFoundElements().remove(((Function) func).body);
             }
         }
-        
-        Statement mutationTarget = collector.getFoundElements().get(random.nextInt(collector.getFoundElements().size()));
-        
+
+        Statement mutationTarget = collector.getFoundElements()
+                .get(random.nextInt(collector.getFoundElements().size()));
+
         DeleteStatement mutation = new DeleteStatement(new MutationIdentifier(mutationTarget));
-        
+
         return mutation;
     }
 

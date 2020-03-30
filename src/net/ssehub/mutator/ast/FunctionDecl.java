@@ -8,15 +8,15 @@ import net.ssehub.mutator.ast.operations.IAstVisitor;
 public class FunctionDecl extends AstElement {
 
     public Type type;
-    
+
     public String name;
-    
+
     public List<Declaration> parameters = new LinkedList<>();
-    
+
     public FunctionDecl(AstElement parent) {
         super(parent);
     }
-    
+
     @Override
     public AstElement getChild(int index) throws IndexOutOfBoundsException {
         if (index == 0) {
@@ -27,12 +27,12 @@ public class FunctionDecl extends AstElement {
             throw new IndexOutOfBoundsException(index);
         }
     }
-    
+
     @Override
     public int getNumChildren() {
         return 1 + parameters.size();
     }
-    
+
     @Override
     public <T> T accept(IAstVisitor<T> visitor) {
         return visitor.visitFunctionDecl(this);
@@ -47,10 +47,10 @@ public class FunctionDecl extends AstElement {
         }
         return equals;
     }
-    
+
     @Override
     public int hashCode() {
         return name.hashCode() + 487 * type.hashCode() + 271 * parameters.hashCode();
     }
-    
+
 }

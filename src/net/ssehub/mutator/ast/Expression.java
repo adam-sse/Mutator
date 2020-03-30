@@ -10,16 +10,16 @@ public abstract class Expression extends AstElement {
     }
 
     public abstract <T> T accept(IExpressionVisitor<T> visitor);
-    
+
     @Override
     public <T> T accept(IAstVisitor<T> visitor) {
         return accept((IExpressionVisitor<T>) visitor);
     }
-    
+
     /**
-     * Used for printing parenthesis only. Higher precedence means evaluated first. That means,
-     * an argument with lower or equal precedence needs parenthesis.
+     * Used for printing parenthesis only. Higher precedence means evaluated first.
+     * That means, an argument with lower or equal precedence needs parenthesis.
      */
     public abstract int getPrecedence();
-    
+
 }

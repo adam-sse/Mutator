@@ -7,13 +7,18 @@ public class DoWhileLoop extends Loop {
     public DoWhileLoop(AstElement parent) {
         super(parent);
     }
-    
+
     @Override
     public AstElement getChild(int index) throws IndexOutOfBoundsException {
         switch (index) {
-        case 0: return body;
-        case 1: return condition;
-        default: throw new IndexOutOfBoundsException(index);
+        case 0:
+            return body;
+
+        case 1:
+            return condition;
+
+        default:
+            throw new IndexOutOfBoundsException(index);
         }
     }
 

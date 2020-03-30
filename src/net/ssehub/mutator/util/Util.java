@@ -13,36 +13,36 @@ public class Util {
 
     private Util() {
     }
-    
+
     public static <T> int findIndex(List<T> list, T exactObj) {
         int i = 0;
         for (T element : list) {
             if (element == exactObj) {
-                return i; 
+                return i;
             }
             i++;
         }
         return -1;
     }
-    
+
     public static void deleteDirecotry(File dir) throws IOException {
         Files.walkFileTree(dir.toPath(), new SimpleFileVisitor<Path>() {
-            
+
             @Override
             public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
                 Files.delete(file);
                 return FileVisitResult.CONTINUE;
             }
-            
+
             @Override
             public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
                 Files.delete(dir);
                 return FileVisitResult.CONTINUE;
             }
-            
+
         });
     }
-    
+
     public static String fillWithSpaces(String str, int width) {
         String result;
         int numSpaces = width - str.length();
@@ -53,5 +53,5 @@ public class Util {
         }
         return result;
     }
-    
+
 }

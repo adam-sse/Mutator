@@ -25,9 +25,9 @@ import net.ssehub.mutator.ast.UnaryExpr;
 import net.ssehub.mutator.ast.While;
 
 public class FullExpressionVisitor implements IAstVisitor<Void> {
-    
+
     private IExpressionVisitor<?> other;
-    
+
     public FullExpressionVisitor(IExpressionVisitor<?> other) {
         this.other = other;
     }
@@ -35,10 +35,10 @@ public class FullExpressionVisitor implements IAstVisitor<Void> {
     @Override
     public Void visitBinaryExpr(BinaryExpr expr) {
         other.visitBinaryExpr(expr);
-        
+
         expr.left.accept(this);
         expr.right.accept(this);
-        
+
         return null;
     }
 
@@ -47,7 +47,7 @@ public class FullExpressionVisitor implements IAstVisitor<Void> {
         for (Statement child : stmt.statements) {
             child.accept(this);
         }
-        
+
         return null;
     }
 
@@ -57,14 +57,14 @@ public class FullExpressionVisitor implements IAstVisitor<Void> {
         if (decl.initExpr != null) {
             decl.initExpr.accept(this);
         }
-        
+
         return null;
     }
 
     @Override
     public Void visitDeclarationStmt(DeclarationStmt stmt) {
         stmt.decl.accept(this);
-        
+
         return null;
     }
 
@@ -72,7 +72,7 @@ public class FullExpressionVisitor implements IAstVisitor<Void> {
     public Void visitDoWhileLoop(DoWhileLoop stmt) {
         stmt.condition.accept(this);
         stmt.body.accept(this);
-        
+
         return null;
     }
 
@@ -84,7 +84,7 @@ public class FullExpressionVisitor implements IAstVisitor<Void> {
     @Override
     public Void visitExpressionStmt(ExpressionStmt stmt) {
         stmt.expr.accept(this);
-        
+
         return null;
     }
 
@@ -93,10 +93,10 @@ public class FullExpressionVisitor implements IAstVisitor<Void> {
         for (AstElement f : file.functions) {
             f.accept(this);
         }
-        
+
         return null;
     }
-    
+
     @Override
     public Void visitFor(For stmt) {
         if (stmt.init != null) {
@@ -108,9 +108,9 @@ public class FullExpressionVisitor implements IAstVisitor<Void> {
         if (stmt.increment != null) {
             stmt.increment.accept(this);
         }
-        
+
         stmt.body.accept(this);
-        
+
         return null;
     }
 
@@ -118,35 +118,35 @@ public class FullExpressionVisitor implements IAstVisitor<Void> {
     public Void visitFunction(Function func) {
         func.header.accept(this);
         func.body.accept(this);
-        
+
         return null;
     }
 
     @Override
     public Void visitFunctionCall(FunctionCall expr) {
         other.visitFunctionCall(expr);
-        
+
         for (Expression param : expr.params) {
             param.accept(this);
         }
-        
+
         return null;
     }
-    
+
     @Override
     public Void visitFunctionDecl(FunctionDecl decl) {
         decl.type.accept(this);
         for (Declaration param : decl.parameters) {
             param.accept(this);
         }
-        
+
         return null;
     }
 
     @Override
     public Void visitIdentifier(Identifier expr) {
         other.visitIdentifier(expr);
-        
+
         return null;
     }
 
@@ -157,10 +157,10 @@ public class FullExpressionVisitor implements IAstVisitor<Void> {
         if (stmt.elseBlock != null) {
             stmt.elseBlock.accept(this);
         }
-        
+
         return null;
     }
-    
+
     @Override
     public Void visitJumpStmt(JumpStmt stmt) {
         return null;
@@ -169,7 +169,7 @@ public class FullExpressionVisitor implements IAstVisitor<Void> {
     @Override
     public Void visitLiteral(Literal expr) {
         other.visitLiteral(expr);
-        
+
         return null;
     }
 
@@ -178,7 +178,7 @@ public class FullExpressionVisitor implements IAstVisitor<Void> {
         if (stmt.value != null) {
             stmt.value.accept(this);
         }
-        
+
         return null;
     }
 
@@ -190,9 +190,9 @@ public class FullExpressionVisitor implements IAstVisitor<Void> {
     @Override
     public Void visitUnaryExpr(UnaryExpr expr) {
         other.visitUnaryExpr(expr);
-        
+
         expr.expr.accept(this);
-        
+
         return null;
     }
 
@@ -200,7 +200,7 @@ public class FullExpressionVisitor implements IAstVisitor<Void> {
     public Void visitWhile(While stmt) {
         stmt.condition.accept(this);
         stmt.body.accept(this);
-        
+
         return null;
     }
 

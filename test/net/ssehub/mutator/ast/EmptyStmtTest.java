@@ -6,7 +6,7 @@ public class EmptyStmtTest extends AbstractAstElementTest {
     protected AstElement[] createElements() {
         EmptyStmt s1 = new EmptyStmt(null);
         EmptyStmt s2 = new EmptyStmt(null);
-        
+
         return new AstElement[] { s1, s2 };
     }
 
@@ -24,8 +24,11 @@ public class EmptyStmtTest extends AbstractAstElementTest {
     @Override
     protected String getLineString(int element) {
         switch (element) {
-        case 0: return ";";
-        case 1: return ";";
+        case 0:
+            return ";";
+
+        case 1:
+            return ";";
         }
         return null;
     }
@@ -34,7 +37,5 @@ public class EmptyStmtTest extends AbstractAstElementTest {
     protected String getPrettyString(int element) {
         return getLineString(element) + "\n";
     }
-    
-    
 
 }

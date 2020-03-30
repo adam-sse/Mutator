@@ -8,28 +8,28 @@ import net.ssehub.mutator.ast.operations.IExpressionVisitor;
 public class FunctionCall extends Expression {
 
     public String function;
-    
+
     public List<Expression> params = new LinkedList<>();
-    
+
     public FunctionCall(AstElement parent) {
         super(parent);
     }
-    
+
     @Override
     public int getPrecedence() {
         return 12;
     }
-    
+
     @Override
     public AstElement getChild(int index) throws IndexOutOfBoundsException {
         return params.get(index);
     }
-    
+
     @Override
     public int getNumChildren() {
         return params.size();
     }
-    
+
     @Override
     public <T> T accept(IExpressionVisitor<T> visitor) {
         return visitor.visitFunctionCall(this);
@@ -44,10 +44,10 @@ public class FunctionCall extends Expression {
         }
         return equals;
     }
-    
+
     @Override
     public int hashCode() {
         return 281 * function.hashCode() + 521 * params.hashCode();
     }
-    
+
 }

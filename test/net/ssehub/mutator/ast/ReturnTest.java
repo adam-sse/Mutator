@@ -8,29 +8,29 @@ public class ReturnTest extends AbstractAstElementTest {
         {
             Identifier expr = new Identifier(s1);
             expr.identifier = "A";
-            
+
             s1.value = expr;
         }
-        
+
         Return s2 = new Return(null);
         {
             Identifier expr = new Identifier(s2);
             expr.identifier = "A";
-            
+
             s2.value = expr;
         }
-        
+
         Return s3 = new Return(null);
         {
             Literal expr = new Literal(s3);
             expr.value = "4";
-            
+
             s3.value = expr;
         }
-        
+
         Return s4 = new Return(null);
         Return s5 = new Return(null);
-        
+
         return new AstElement[] { s1, s2, s3, s4, s5 };
     }
 
@@ -51,11 +51,20 @@ public class ReturnTest extends AbstractAstElementTest {
     @Override
     protected String getLineString(int element) {
         switch (element) {
-        case 0: return "return A;";
-        case 1: return "return A;";
-        case 2: return "return 4;";
-        case 3: return "return;";
-        case 4: return "return;";
+        case 0:
+            return "return A;";
+
+        case 1:
+            return "return A;";
+
+        case 2:
+            return "return 4;";
+
+        case 3:
+            return "return;";
+
+        case 4:
+            return "return;";
         }
         return null;
     }

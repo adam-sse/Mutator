@@ -5,13 +5,13 @@ import net.ssehub.mutator.ast.operations.IAstVisitor;
 public class Function extends AstElement {
 
     public FunctionDecl header;
-    
+
     public Block body;
-    
+
     public Function(AstElement parent) {
         super(parent);
     }
-    
+
     @Override
     public AstElement getChild(int index) throws IndexOutOfBoundsException {
         if (index == 0) {
@@ -22,12 +22,12 @@ public class Function extends AstElement {
             throw new IndexOutOfBoundsException(index);
         }
     }
-    
+
     @Override
     public int getNumChildren() {
         return 2;
     }
-    
+
     @Override
     public <T> T accept(IAstVisitor<T> visitor) {
         return visitor.visitFunction(this);
@@ -42,10 +42,10 @@ public class Function extends AstElement {
         }
         return equals;
     }
-    
+
     @Override
     public int hashCode() {
         return 389 * header.hashCode() + 541 * body.hashCode();
     }
-    
+
 }

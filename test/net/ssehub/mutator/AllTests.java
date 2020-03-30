@@ -8,10 +8,7 @@ import net.ssehub.mutator.ast.AllAstTests;
 import net.ssehub.mutator.mutation.genetic.mutations.AllMutationTests;
 
 @RunWith(Suite.class)
-@SuiteClasses({
-    AllMutationTests.class,
-    AllAstTests.class,
-})
+@SuiteClasses({ AllMutationTests.class, AllAstTests.class, })
 public class AllTests {
 
 }

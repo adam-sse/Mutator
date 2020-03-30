@@ -24,28 +24,26 @@ abstract class AbstractPrinter implements IAstVisitor<String> {
     @Override
     public String visitBinaryExpr(BinaryExpr expr) {
         StringBuilder sb = new StringBuilder();
-        
+
         if (expr.left.getPrecedence() <= expr.getPrecedence()) {
             sb.append("(").append(expr.left.accept(this)).append(")");
         } else {
             sb.append(expr.left.accept(this));
         }
-        
+
         if (expr.operator == BinaryOperator.ARRAY_ACCESS) {
             sb.append("[").append(expr.right.accept(this)).append("]");
-            
         } else {
-            
 
             sb.append(" ").append(expr.operator).append(" ");
-            
+
             if (expr.right.getPrecedence() <= expr.getPrecedence()) {
                 sb.append("(").append(expr.right.accept(this)).append(")");
             } else {
                 sb.append(expr.right.accept(this));
             }
         }
-        
+
         return sb.toString();
     }
 
@@ -82,12 +80,12 @@ abstract class AbstractPrinter implements IAstVisitor<String> {
         }
         return sj.toString();
     }
-    
+
     @Override
     public String visitFunctionDecl(FunctionDecl decl) {
         StringBuilder sb = new StringBuilder();
         sb.append(decl.type.accept(this)).append(" ").append(decl.name).append("(");
-        
+
         StringJoiner sj = new StringJoiner(", ");
         for (Declaration param : decl.parameters) {
             sj.add(param.accept(this));
@@ -96,7 +94,7 @@ abstract class AbstractPrinter implements IAstVisitor<String> {
         if (!(decl.parent instanceof Function)) {
             sb.append(";");
         }
-        
+
         return sb.toString();
     }
 
@@ -104,7 +102,7 @@ abstract class AbstractPrinter implements IAstVisitor<String> {
     public String visitIdentifier(Identifier expr) {
         return expr.identifier;
     }
-    
+
     @Override
     public String visitJumpStmt(JumpStmt stmt) {
         return stmt.type.toString() + ";";
@@ -122,28 +120,28 @@ abstract class AbstractPrinter implements IAstVisitor<String> {
     @Override
     public String visitType(Type type) {
         StringBuilder sb = new StringBuilder();
-        
+
         if (type.modifier != null) {
             sb.append(type.modifier.name().toLowerCase()).append(" ");
         }
-        
+
         sb.append(type.type.str);
-        
+
         if (type.pointer) {
             sb.append("*");
         }
-        
+
         return sb.toString();
     }
 
     @Override
     public String visitUnaryExpr(UnaryExpr expr) {
         StringBuilder sb = new StringBuilder();
-        
+
         if (expr.operator.prefix) {
             sb.append(expr.operator);
         }
-            
+
         if (expr.expr.getPrecedence() <= expr.getPrecedence()) {
             sb.append("(").append(expr.expr.accept(this)).append(")");
         } else {
@@ -153,7 +151,7 @@ abstract class AbstractPrinter implements IAstVisitor<String> {
         if (!expr.operator.prefix) {
             sb.append(expr.operator);
         }
-        
+
         return sb.toString();
     }
 

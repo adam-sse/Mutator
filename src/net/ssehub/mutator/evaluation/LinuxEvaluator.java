@@ -16,40 +16,38 @@ import net.ssehub.mutator.mutation.fitness.FitnessComparatorFactory;
 import net.ssehub.mutator.mutation.fitness.IFitnessComparator;
 
 public class LinuxEvaluator extends Evaluator {
-    
+
     private BaseConfig config;
-    
+
     public LinuxEvaluator(BaseConfig config) {
         this.config = config;
     }
-    
+
     @Override
     public TestResult test(IMutant mutant) {
         TestResult result;
-        
+
         try {
             mutant.write(new File(config.getEvalDir(), config.getDropin()));
             boolean compilationSuccess = compile(config.getTestSrc(), getExe(config.getTestSrc()));
             if (compilationSuccess) {
                 List<String> stdout = run(getExe(config.getTestSrc()));
-                
+
                 if (stdout.size() == 1 && stdout.get(0).equals("timeout")) {
                     result = TestResult.TIMEOUT;
-                } else  if (stdout.size() >= 1 && stdout.get(stdout.size() - 1).equals("1")) {
+                } else if (stdout.size() >= 1 && stdout.get(stdout.size() - 1).equals("1")) {
                     result = TestResult.PASS;
                 } else {
                     result = TestResult.TEST_FAILED;
                 }
-                
             } else {
                 result = TestResult.COMPILATION_FAILED;
             }
-            
         } catch (IOException e) {
             e.printStackTrace();
             result = TestResult.ERROR;
         }
-        
+
         return result;
     }
 
@@ -57,12 +55,12 @@ public class LinuxEvaluator extends Evaluator {
     public Fitness measureFitness(IMutant mutant) {
         IFitnessComparator comparator = FitnessComparatorFactory.get();
         Fitness fitness = RUNTIME_ERROR;
-        
+
         try {
             mutant.write(new File(config.getEvalDir(), config.getDropin()));
             boolean compilationSuccess = compile(config.getFitnessSrc(), getExe(config.getFitnessSrc()));
             if (compilationSuccess) {
-                
+
                 Fitness[] measures = new Fitness[config.getFitnessMeasures()];
                 for (int i = 0; i < measures.length; i++) {
                     // sleep a bit so that we can cool down before performance measures take place
@@ -70,30 +68,29 @@ public class LinuxEvaluator extends Evaluator {
                         Thread.sleep(config.getSleepBeforeFitness());
                     } catch (InterruptedException e) {
                     }
-                    
+
                     List<String> stdout = run(getExe(config.getFitnessSrc()));
                     double[] values = new double[stdout.size()];
                     int j = 0;
                     for (String line : stdout) {
                         values[j++] = Double.parseDouble(line);
                     }
-                    
+
                     measures[i] = new Fitness(values);
                 }
                 Arrays.sort(measures, comparator);
-                
+
                 fitness = measures[measures.length / 2];
             }
-            
         } catch (NumberFormatException e) {
             // ignore
         } catch (IOException e) {
             e.printStackTrace();
         }
-        
+
         return fitness;
     }
-    
+
     private boolean compile(File src, File target) throws IOException {
         List<String> command = new LinkedList<>();
         command.addAll(config.getCompilerArgs());
@@ -103,27 +100,27 @@ public class LinuxEvaluator extends Evaluator {
         ProcessBuilder pb = new ProcessBuilder(command);
         pb.redirectErrorStream(true);
         pb.redirectOutput(new File("/dev/null"));
-        
+
         Process p = pb.start();
-        
+
         int ret = -1;
         try {
             ret = p.waitFor();
         } catch (InterruptedException e) {
             throw new IOException(e);
         }
-        
+
         return ret == 0;
     }
-    
+
     private List<String> run(File exe) throws IOException {
         ProcessBuilder pb = new ProcessBuilder(exe.getPath());
         pb.redirectErrorStream(true);
 
         Process p = pb.start();
-        
+
         List<String> lines = new LinkedList<>();
-        
+
         Thread reader = new Thread(() -> {
             try {
                 BufferedReader in = new BufferedReader(new InputStreamReader(p.getInputStream()));
@@ -136,8 +133,7 @@ public class LinuxEvaluator extends Evaluator {
             }
         });
         reader.start();
-        
-        
+
         int ret = -1;
         boolean timeout = false;
         try {
@@ -151,13 +147,13 @@ public class LinuxEvaluator extends Evaluator {
         } catch (InterruptedException e) {
             throw new IOException(e);
         }
-        
+
         try {
             reader.join();
         } catch (InterruptedException e) {
             throw new IOException(e);
         }
-        
+
         if (timeout) {
             return Arrays.asList("timeout");
         } else if (ret == 0) {
@@ -166,7 +162,7 @@ public class LinuxEvaluator extends Evaluator {
             return Arrays.asList("error");
         }
     }
-    
+
     private static File getExe(File src) {
         return new File(src.getParentFile(), src.getName() + "_exe");
     }

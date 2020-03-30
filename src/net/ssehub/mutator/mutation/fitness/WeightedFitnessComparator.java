@@ -13,17 +13,17 @@ class WeightedFitnessComparator implements IFitnessComparator {
         if (fitness.numValues() != weights.length) {
             throw new IllegalArgumentException("Fitness objectives don't match weights");
         }
-        
+
         double sum = 0.0;
         for (int i = 0; i < weights.length; i++) {
             sum += weights[i] * fitness.getValue(i);
         }
         return sum;
     }
-    
+
     @Override
     public boolean isLower(Fitness f1, Fitness f2) {
         return toSingleValue(f1) < toSingleValue(f2);
     }
-    
+
 }

@@ -9,37 +9,37 @@ import net.ssehub.mutator.mutation.IMutant;
 import net.ssehub.mutator.mutation.fitness.Fitness;
 
 public class DummyEvaluator extends Evaluator {
-    
+
     private Random random = new Random(123);
-    
+
     private Map<String, TestResult> testResults;
-    
+
     private Map<String, Fitness> fitnessResults;
-    
+
     private int numObjectives;
 
     private double bias;
-    
+
     public DummyEvaluator(BaseConfig config) {
         this.testResults = new HashMap<>();
         this.fitnessResults = new HashMap<>();
-        
+
         if (config.getFitnessWeights() != null) {
             this.numObjectives = config.getFitnessWeights().length;
         } else {
             this.numObjectives = 2;
         }
-        
+
         bias = 0.0;
     }
-    
+
     @Override
     public TestResult test(IMutant mutant) {
         TestResult result = testResults.get(mutant.getId());
-        
+
         if (result == null) {
             double rand = random.nextDouble();
-            
+
             if (rand < 0.01) {
                 result = TestResult.ERROR;
             } else if (rand < 0.05) {
@@ -51,27 +51,27 @@ public class DummyEvaluator extends Evaluator {
             } else {
                 result = TestResult.PASS;
             }
-            
+
             testResults.put(mutant.getId(), result);
         }
-        
+
         return result;
     }
 
     @Override
     public Fitness measureFitness(IMutant mutant) {
         Fitness result = fitnessResults.get(mutant.getId());
-        
+
         if (result == null) {
             double[] values = new double[this.numObjectives];
             for (int i = 0; i < values.length; i++) {
                 values[i] = random.nextDouble() * (1.0 + this.bias);
             }
             this.bias += 0.05;
-            
+
             result = new Fitness(values);
         }
-        
+
         return result;
     }
 

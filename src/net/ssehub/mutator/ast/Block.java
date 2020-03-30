@@ -8,21 +8,21 @@ import net.ssehub.mutator.ast.operations.IStatementVisitor;
 public class Block extends Statement {
 
     public List<Statement> statements = new LinkedList<>();
-    
+
     public Block(AstElement parent) {
         super(parent);
     }
-    
+
     @Override
     public AstElement getChild(int index) throws IndexOutOfBoundsException {
         return statements.get(index);
     }
-    
+
     @Override
     public int getNumChildren() {
         return statements.size();
     }
-    
+
     @Override
     public <T> T accept(IStatementVisitor<T> visitor) {
         return visitor.visitBlock(this);
@@ -37,7 +37,7 @@ public class Block extends Statement {
         }
         return equals;
     }
-    
+
     @Override
     public int hashCode() {
         return statements.hashCode();

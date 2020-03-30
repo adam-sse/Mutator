@@ -10,22 +10,22 @@ import net.ssehub.mutator.ast.operations.SingleOperationVisitor;
 class Collector<T> extends SingleOperationVisitor<Void> {
 
     private Class<T> type;
-    
+
     private List<T> foundElements = new LinkedList<>();
-    
+
     public Collector(Class<T> type) {
         this.type = type;
     }
-    
+
     public List<T> getFoundElements() {
         return foundElements;
     }
-    
+
     public void collect(AstElement element) {
         FullVisitor visitor = new FullVisitor(this);
         element.accept(visitor);
     }
-    
+
     @Override
     @SuppressWarnings("unchecked")
     protected Void visit(AstElement element) {
@@ -34,5 +34,5 @@ class Collector<T> extends SingleOperationVisitor<Void> {
         }
         return null;
     }
-    
+
 }

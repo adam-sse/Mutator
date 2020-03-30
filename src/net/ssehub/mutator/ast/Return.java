@@ -5,11 +5,11 @@ import net.ssehub.mutator.ast.operations.IStatementVisitor;
 public class Return extends Statement {
 
     public Expression value;
-    
+
     public Return(AstElement parent) {
         super(parent);
     }
-    
+
     @Override
     public AstElement getChild(int index) throws IndexOutOfBoundsException {
         if (index == 0 && value != null) {
@@ -18,12 +18,12 @@ public class Return extends Statement {
             throw new IndexOutOfBoundsException(index);
         }
     }
-    
+
     @Override
     public int getNumChildren() {
         return value != null ? 1 : 0;
     }
-    
+
     @Override
     public <T> T accept(IStatementVisitor<T> visitor) {
         return visitor.visitReturn(this);
@@ -42,10 +42,10 @@ public class Return extends Statement {
         }
         return equals;
     }
-    
+
     @Override
     public int hashCode() {
         return 509 + (value != null ? 457 * value.hashCode() : 523);
     }
-    
+
 }

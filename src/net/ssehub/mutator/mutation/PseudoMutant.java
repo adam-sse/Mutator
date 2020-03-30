@@ -9,11 +9,11 @@ import net.ssehub.mutator.ast.operations.AstPrettyPrinter;
 public class PseudoMutant implements IMutant {
 
     private File ast;
-    
+
     public PseudoMutant(File ast) {
         this.ast = ast;
     }
-    
+
     @Override
     public String getId() {
         return "input";

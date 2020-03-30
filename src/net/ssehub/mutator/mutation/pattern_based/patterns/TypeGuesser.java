@@ -21,14 +21,14 @@ import net.ssehub.mutator.ast.operations.SingleOperationVisitor;
 import net.ssehub.mutator.util.Logger;
 
 public class TypeGuesser {
-    
+
     private static final Logger LOGGER = Logger.get("TypeGuesser");
 
     public BasicType guessType(Expression expression) {
         Function func = getParentFunction(expression);
-        
+
         File file = getParentFile(func);
-        
+
         Map<String, BasicType> typeFunctions = new HashMap<>(file.functions.size());
         for (AstElement f : file.functions) {
             FunctionDecl decl;
@@ -39,13 +39,13 @@ public class TypeGuesser {
             }
             typeFunctions.put(decl.name, decl.type.type);
         }
-        
+
         DeclTypeBuilder typeBuilder = new DeclTypeBuilder();
         func.accept(new FullVisitor(typeBuilder));
-        
+
         return expression.accept(new TypeEvaluator(typeBuilder.types, typeFunctions));
     }
-    
+
     private Function getParentFunction(AstElement element) {
         if (element instanceof Function) {
             return (Function) element;
@@ -53,7 +53,7 @@ public class TypeGuesser {
             return getParentFunction(element.parent);
         }
     }
-    
+
     private File getParentFile(AstElement element) {
         if (element instanceof File) {
             return (File) element;
@@ -61,13 +61,13 @@ public class TypeGuesser {
             return getParentFile(element.parent);
         }
     }
-    
+
     private static class TypeEvaluator implements IExpressionVisitor<BasicType> {
-        
+
         private Map<String, BasicType> varTypes;
-        
+
         private Map<String, BasicType> funcTypes;
-        
+
         public TypeEvaluator(Map<String, BasicType> varTypes, Map<String, BasicType> funcTypes) {
             this.varTypes = varTypes;
             this.funcTypes = funcTypes;
@@ -76,7 +76,7 @@ public class TypeGuesser {
         @Override
         public BasicType visitBinaryExpr(BinaryExpr expr) {
             BasicType result;
-            
+
             switch (expr.operator) {
             case ADDITION:
             case SUBTRACTION:
@@ -85,13 +85,13 @@ public class TypeGuesser {
             case MODULO:
             case BIT_AND:
             case BIT_OR:
-            case BIT_XOR:
-            {
+            case BIT_XOR: {
                 BasicType left = expr.left.accept(this);
                 BasicType right = expr.right.accept(this);
                 result = left.ordinal() > right.ordinal() ? left : right;
-            } break;
-            
+            }
+                break;
+
             case CMP_EQUAL:
             case CMP_NOT_EQUAL:
             case CMP_GREATER:
@@ -119,14 +119,14 @@ public class TypeGuesser {
             case ASSIGNMENT_XOR:
                 result = expr.left.accept(this);
                 break;
-                
+
             default: { // can't happen
                 BasicType left = expr.left.accept(this);
                 BasicType right = expr.right.accept(this);
                 result = left.ordinal() > right.ordinal() ? left : right;
             }
             }
-            
+
             return result;
         }
 
@@ -154,11 +154,11 @@ public class TypeGuesser {
         public BasicType visitLiteral(Literal expr) {
             return expr.value.contains(".") ? BasicType.DOUBLE : BasicType.INT;
         }
-        
+
         @Override
         public BasicType visitUnaryExpr(UnaryExpr expr) {
             BasicType result;
-            
+
             switch (expr.operator) {
             case MINUS:
             case BIT_NEGATION:
@@ -168,24 +168,24 @@ public class TypeGuesser {
             case PRE_INC:
                 result = expr.expr.accept(this);
                 break;
-                
+
             case NEGATION:
                 result = BasicType.INT;
                 break;
-                
+
             default: // can't happen
                 result = expr.expr.accept(this);
             }
-            
+
             return result;
         }
 
     }
-    
+
     private static class DeclTypeBuilder extends SingleOperationVisitor<Void> {
 
         private Map<String, BasicType> types = new HashMap<>();
-        
+
         @Override
         protected Void visit(AstElement element) {
             if (element instanceof Declaration) {
@@ -194,16 +194,17 @@ public class TypeGuesser {
                 if (previous == null) {
                     types.put(decl.identifier, decl.type.type);
                 } else if (previous != decl.type.type) {
-                    LOGGER.println("Warning: conflicting types for variable " + decl.identifier + ": " 
-                            + previous + " and " + decl.type.type);
-                    
+                    LOGGER.println("Warning: conflicting types for variable " + decl.identifier + ": " + previous
+                            + " and " + decl.type.type);
+
                     // use double over int
-                    types.put(decl.identifier, previous.ordinal() > decl.type.type.ordinal() ? previous : decl.type.type);
+                    types.put(decl.identifier,
+                            previous.ordinal() > decl.type.type.ordinal() ? previous : decl.type.type);
                 }
             }
             return null;
         }
-        
+
     }
-    
+
 }
