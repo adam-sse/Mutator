@@ -14,6 +14,8 @@ public class MutantList implements Iterable<Mutant> {
 
     private List<Mutant> mutants;
 
+    private List<Integer> ranks;
+
     public MutantList() {
         this.mutants = new LinkedList<>();
     }
@@ -22,8 +24,20 @@ public class MutantList implements Iterable<Mutant> {
         return this.mutants.get(index);
     }
 
+    public int getRank(int index) {
+        if (hasRanks())
+            return this.ranks.get(index);
+        else
+            return -1;
+    }
+
+    public boolean hasRanks() {
+        return this.ranks != null;
+    }
+
     public boolean addMutant(Mutant mutant) {
         if (!this.mutants.contains(mutant)) {
+            this.ranks = null;
             this.mutants.add(mutant);
             return true;
         }
@@ -32,6 +46,10 @@ public class MutantList implements Iterable<Mutant> {
 
     public void removeMutant(int index) {
         this.mutants.remove(index);
+
+        if (hasRanks()) {
+            this.ranks.remove(index);
+        }
     }
 
     public int getSize() {
@@ -41,22 +59,7 @@ public class MutantList implements Iterable<Mutant> {
     public void sort(IFitnessStore fitness) {
         IFitnessComparator comparator = FitnessComparatorFactory.get();
 
-        // bubble sort
-        boolean changed;
-        do {
-            changed = false;
-
-            for (int i = 0; i < this.mutants.size() - 1; i++) {
-                Mutant mi = this.mutants.get(i);
-                Mutant mi1 = this.mutants.get(i + 1);
-                if (comparator.isLower(fitness.getFitness(mi.getId()), fitness.getFitness(mi1.getId()))) {
-                    this.mutants.set(i, mi1);
-                    this.mutants.set(i + 1, mi);
-
-                    changed = true;
-                }
-            }
-        } while (changed);
+        this.ranks = comparator.sort(this.mutants, fitness);
     }
 
     public List<IMutant> convertToList() {

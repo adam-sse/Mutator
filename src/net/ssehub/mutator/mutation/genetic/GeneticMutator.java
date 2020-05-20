@@ -15,6 +15,8 @@ import net.ssehub.mutator.mutation.fitness.IFitnessComparator;
 import net.ssehub.mutator.mutation.genetic.mutations.Mutation;
 import net.ssehub.mutator.mutation.genetic.mutations.MutationFactory;
 import net.ssehub.mutator.util.Logger;
+import net.ssehub.mutator.visualization.FitnessRenderer;
+import net.ssehub.mutator.visualization.FitnessRenderer3D;
 
 public class GeneticMutator extends AbstractMutator {
 
@@ -79,6 +81,10 @@ public class GeneticMutator extends AbstractMutator {
 
             this.population.sort(this);
 
+            if (this.config.getSaveIterations() && this.population.getSize() > 0 && this.config.getDotExe() != null) {
+                saveGenerationFitness();
+            }
+
             if (getIteration() % this.config.getCleanFrequency() == 0) {
                 cleanPopulation();
             }
@@ -99,10 +105,17 @@ public class GeneticMutator extends AbstractMutator {
                 // create next generation
                 MutantList nextPopulation = new MutantList();
 
-                // elitism: keep best X unmodified mutants from previous generation
-                for (int i = 0; i < this.config.getElitism() && i < this.population.getSize(); i++) {
-                    if (nextPopulation.addMutant(this.population.getMutant(i))) {
-                        LOGGER.println(this.population.getMutant(i).getId() + " survived because of elitism");
+                // elitism: keep best X unmodified mutants (ranks) from previous generation
+                for (int rank = 1; rank <= this.config.getElitism(); rank++) {
+                    for (int i = 0; i < this.population.getSize(); i++) {
+                        int r = this.population.getRank(i);
+                        if (r == rank) {
+                            if (nextPopulation.addMutant(this.population.getMutant(i))) {
+                                LOGGER.println(this.population.getMutant(i).getId() + " survived because of elitism");
+                            }
+                        } else if (r > rank) {
+                            break;
+                        }
                     }
                 }
 
@@ -184,6 +197,9 @@ public class GeneticMutator extends AbstractMutator {
          * P([2]) = 3/15 = 20.00 % [3]: 12 - 13 => P([3]) = 2/15 = 13.33 % [4]: 14 - 14
          * => P([4]) = 1/15 = 6.66 %
          */
+
+        // TODO: modify this so that elements with equal rank have the same probability
+
         int limit = (population.getSize() * (population.getSize() + 1)) / 2;
         int random = this.random.nextInt(limit);
 
@@ -225,6 +241,56 @@ public class GeneticMutator extends AbstractMutator {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+        }
+    }
+
+    private void saveGenerationFitness() {
+        int dimension = getFitness(this.population.getMutant(0).getId()).numValues();
+
+        java.io.File folder = new java.io.File(this.config.getExecDir(),
+                String.format(Locale.ROOT, "generation_%03d", getIteration()));
+        folder.mkdir();
+
+        FitnessRenderer renderer = null;
+        java.io.File output = null;
+        if (dimension == 2) {
+            renderer = new FitnessRenderer(this.config.getDotExe(), false, false);
+            output = new java.io.File(folder, "fitness.svg");
+        } else if (dimension == 3) {
+            renderer = new FitnessRenderer3D(this.config.getDotExe(), false, false);
+            output = new java.io.File(folder, "fitness.wrl");
+        }
+
+        List<Fitness> allFitnesses = new ArrayList<>(this.population.getSize());
+        for (Mutant mutant : this.population) {
+            allFitnesses.add(getFitness(mutant.getId()));
+        }
+
+        renderer.init(allFitnesses);
+
+        int maxRank = this.population.getRank(this.population.getSize() - 1);
+
+        int i = 0;
+        int indexInRank = 1;
+        int previousRank = 0;
+        for (Mutant mutant : this.population) {
+            int rank = this.population.getRank(i);
+            if (rank != previousRank) {
+                indexInRank = 1;
+                previousRank = rank;
+            }
+
+            renderer.addNode(allFitnesses.get(i), mutant.getId() + "\\n" + rank + " #" + indexInRank, false, rank == 1,
+                    1.0 - (double) rank / maxRank);
+
+            indexInRank++;
+            i++;
+        }
+
+        try {
+            renderer.render(output);
+        } catch (IOException e) {
+            LOGGER.logException(e);
         }
     }
 

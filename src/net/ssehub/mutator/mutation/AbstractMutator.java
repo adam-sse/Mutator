@@ -3,7 +3,6 @@ package net.ssehub.mutator.mutation;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -242,13 +241,19 @@ public abstract class AbstractMutator implements IMutator {
                     if (allFitRenderer.init(this.fitnessStore.values())) {
                         // find best seen fitness
                         IFitnessComparator comparator = FitnessComparatorFactory.get();
-                        Fitness best = Collections.max(this.fitnessStore.values(), comparator);
 
                         for (Map.Entry<String, Fitness> entry : this.fitnessStore.entrySet()) {
                             FitnessStoreEntry fitness = (FitnessStoreEntry) entry.getValue();
 
                             boolean isInit = entry.getKey().equals(getUnmodifiedId());
-                            boolean isBest = !comparator.isLower(entry.getValue(), best);
+
+                            boolean isBest = true;
+                            for (Map.Entry<String, Fitness> other : this.fitnessStore.entrySet()) {
+                                if (comparator.isLower(entry.getValue(), other.getValue())) {
+                                    isBest = false;
+                                    break;
+                                }
+                            }
 
                             allFitRenderer.addNode(entry.getValue(), (isBest || isInit) ? entry.getKey() : "", isInit,
                                     isBest, (double) fitness.iteration / (this.iteration - 1));
